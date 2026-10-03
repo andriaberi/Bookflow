@@ -207,6 +207,39 @@ def test_volume_part_and_chapter_levels() -> None:
     ]
     assert headings(paragraphs) == [
         Heading(1, "ტომი I"),
-        Heading(2, "მესამე ნაწილი"),
+        Heading(2, "ნაწილი მესამე"),
         Heading(3, "თავი პირველი"),
+    ]
+
+
+def test_label_order_follows_the_rest_of_the_book() -> None:
+    paragraphs = [
+        big("ნაწილი პირველი", 60, size=18),
+        big("თავი პირველი", 100),
+        text("ტექსტი.", 130),
+        big("მესამე ნაწილი", 160, size=18),
+        big("მეორე თავი", 200),
+        text("ტექსტი.", 230),
+    ]
+    assert [h.label for h in headings(paragraphs) if h] == [
+        "ნაწილი პირველი",
+        "თავი პირველი",
+        "ნაწილი მესამე",
+        "თავი მეორე",
+    ]
+
+
+def test_label_order_can_follow_a_book_that_puts_the_number_first() -> None:
+    paragraphs = [
+        big("პირველი თავი", 60),
+        text("ტექსტი.", 90),
+        big("მეორე თავი", 120),
+        text("ტექსტი.", 150),
+        big("თავი მესამე", 180),
+        text("ტექსტი.", 210),
+    ]
+    assert [h.label for h in headings(paragraphs) if h] == [
+        "პირველი თავი",
+        "მეორე თავი",
+        "მესამე თავი",
     ]

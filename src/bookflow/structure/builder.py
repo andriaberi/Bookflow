@@ -7,6 +7,7 @@ from bookflow.pdf import Page
 
 from .headings import (
     MAX_TITLE_LINES,
+    find_label,
     fix_label,
     gap_after,
     is_centred,
@@ -55,6 +56,7 @@ def build_sections(paragraphs: list[Paragraph], pages: list[Page]) -> list[Secti
     if not sections[0].paragraphs:
         sections.pop(0)
     renumber_levels(sections)
+    match_label_order(sections)
     return sections
 
 
@@ -109,3 +111,20 @@ def renumber_levels(sections: list[Section]) -> None:
     for section in sections:
         if section.heading:
             section.heading.level = used.index(section.heading.level) + 1
+
+
+def match_label_order(sections: list[Section]) -> None:
+    """Put the label word where most of the book puts it.
+
+    A book that mostly says "ნაწილი მეორე" may still print "მესამე ნაწილი"; the
+    contents should read the same way throughout. Ties go to the label first.
+    """
+    headings = [s.heading for s in sections if s.heading and len(s.heading.label.split()) == 2]
+    places = [found[0] for h in headings if (found := find_label(h.label))]
+    second = places.count(1) > places.count(0)
+    for heading in headings:
+        found = find_label(heading.label)
+        first, other = heading.label.split()
+        # Only a word moves in front of the label: "Chapter 4" never becomes "4 Chapter".
+        if found and found[0] != second and (not second or other.isalpha()):
+            heading.label = f"{other} {first}"
