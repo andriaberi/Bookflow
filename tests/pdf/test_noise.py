@@ -66,6 +66,19 @@ def test_removes_page_number_glued_to_text() -> None:
     assert [line.text for line in remove_noise(pages)[-1].lines] == ["Text.", "the last line."]
 
 
+def test_clears_pages_without_a_real_word() -> None:
+    [result] = remove_noise([page(1, (100, "I III"), (200, "M"))])
+    assert result.lines == []
+
+
+def test_strips_debris_but_keeps_footnote_marks() -> None:
+    p = body(1, 30, (500, "' ვ. ი ლენინი, თხზულებანი."))
+    p.lines.insert(0, Line("' ლივრი", 50, 80, 350, 90))
+    [result] = remove_noise([p])
+    assert result.lines[0].text == "ლივრი"
+    assert texts(result.footnotes) == ["' ვ. ი ლენინი, თხზულებანი."]
+
+
 def test_clears_junk_heavy_pages() -> None:
     [result] = remove_noise(
         [page(1, (100, "#22222X”>I>2."), (150, "72<2C"), (200, "M"), (300, "საქართველო"))]

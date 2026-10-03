@@ -4,7 +4,7 @@ from collections import Counter
 from itertools import pairwise
 
 from .models import Line, Page
-from .text import script_of
+from .text import script_of, strip_edge_debris
 
 # How far into the top or bottom of the page headers, footers and page numbers sit.
 MARGIN = 0.12
@@ -36,6 +36,9 @@ def remove_noise(pages: list[Page]) -> list[Page]:
     """Drop OCR junk, page numbers and running headers and footers."""
     for page in pages:
         page.lines = drop_junk(page.lines)
+        # A page without a single real word is a cover or a plate read as text.
+        if not any(has_long_word(line.text) for line in page.lines):
+            page.lines = []
 
     repeated = repeated_edge_lines(pages)
     removed = {page.number: strip_edges(page, repeated) for page in pages}
@@ -46,7 +49,11 @@ def remove_noise(pages: list[Page]) -> list[Page]:
             strip_glued_page_number(page, page.number + offset)
 
     for page in pages:
+        # Footnote marks look like specks, so clean the edges only once footnotes are out.
         split_footnotes(page)
+        for line in page.lines:
+            line.text = strip_edge_debris(line.text)
+        page.lines = [line for line in page.lines if line.text]
 
     return pages
 
