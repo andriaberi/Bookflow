@@ -133,6 +133,25 @@ h3 + p {
   text-indent: 0;
 }
 
+/* Cover: the picture alone, filling the screen. */
+
+body.cover {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+section.cover {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+section.cover svg {
+  width: 100%;
+  height: 100%;
+}
+
 /* Title page */
 
 .titlepage {

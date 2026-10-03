@@ -4,6 +4,7 @@ import uuid
 from pathlib import Path
 
 from bookflow.cli.commands import Args
+from bookflow.cover import Cover, CoverError, find_cover, load_cover
 from bookflow.epub import Metadata, write_epub
 from bookflow.paragraphs import build_paragraphs
 from bookflow.pdf import ReadError, read_pdf
@@ -12,8 +13,10 @@ from bookflow.structure import Section, build_sections
 
 def run(args: Args) -> int:
     try:
+        # Check the cover file first, so a typo fails before the slow part.
+        fallback_cover = load_cover(args.cover) if args.cover else None
         book = read_pdf(args.pdf, args.pages)
-    except (ReadError, ValueError) as e:
+    except (CoverError, ReadError, ValueError) as e:
         print(f"bookflow: {e}", file=sys.stderr)
         return 1
 
@@ -28,16 +31,27 @@ def run(args: Args) -> int:
     paragraphs = build_paragraphs(book.pages)
     sections = drop_repeated_title(build_sections(paragraphs, book.pages), metadata)
 
+    # The book's own cover comes first; --cover is for books without one.
+    cover, source = choose_cover(find_cover(args.pdf), fallback_cover)
+
     output = Path(args.output) if args.output else pdf.with_suffix(".epub")
     try:
-        write_epub(output, sections, metadata)
+        write_epub(output, sections, metadata, cover)
     except OSError as e:
         print(f"bookflow: can't write {output}: {e.strerror}", file=sys.stderr)
         return 1
 
     headings = sum(1 for section in sections if section.heading)
-    print(f"Wrote {output}: {headings} headings, {len(paragraphs)} paragraphs")
+    print(f"Wrote {output}: {headings} headings, {len(paragraphs)} paragraphs, {source}")
     return 0
+
+
+def choose_cover(own: Cover | None, fallback: Cover | None) -> tuple[Cover | None, str]:
+    if own:
+        return own, "cover from the PDF"
+    if fallback:
+        return fallback, "cover from --cover"
+    return None, "no cover"
 
 
 def drop_repeated_title(sections: list[Section], metadata: Metadata) -> list[Section]:
