@@ -1,6 +1,7 @@
 import sys
 
 from bookflow.cli.commands import Args
+from bookflow.paragraphs import build_paragraphs
 from bookflow.pdf import ReadError, read_pdf
 
 
@@ -18,11 +19,10 @@ def run(args: Args) -> int:
     print(f"title: {title}")
     print(f"author: {author}")
     print(f"language: {language}")
-    for page in book.pages:
-        print(f"\n--- page {page.number} ---")
-        for line in page.lines:
-            print(line.text)
+    for paragraph in build_paragraphs(book.pages):
+        print()
+        print(paragraph.text)
 
-    # TODO: build paragraphs -> write EPUB
+    # TODO: headings -> chapters -> write EPUB
 
     return 0
