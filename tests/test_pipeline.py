@@ -5,7 +5,10 @@ from pathlib import Path
 import pytest
 
 from bookflow.cli.commands import Args
-from bookflow.pipeline import run
+from bookflow.epub import Metadata
+from bookflow.paragraphs import Paragraph
+from bookflow.pipeline import drop_repeated_title, run
+from bookflow.structure import Heading, Section
 
 
 def test_writes_an_epub(
@@ -26,3 +29,17 @@ def test_writes_next_to_the_pdf_by_default(make_pdf: Callable[..., str]) -> None
 def test_reports_read_errors(capsys: pytest.CaptureFixture[str]) -> None:
     assert run(Args(pdf="missing.pdf")) == 1
     assert "no such file" in capsys.readouterr().err
+
+
+def test_front_matter_repeating_the_title_is_dropped() -> None:
+    metadata = Metadata(title="Les Misérables", author="Victor Hugo", language="en", identifier="x")
+    front = Section(None, [Paragraph("Victor Hugo", 1), Paragraph("LES MISÉRABLES", 1)])
+    chapter = Section(Heading(1, "Chapter 1"), [Paragraph("Text.", 2)])
+    assert drop_repeated_title([front, chapter], metadata) == [chapter]
+
+
+def test_front_matter_with_more_is_kept() -> None:
+    metadata = Metadata(title="Les Misérables", author=None, language="en", identifier="x")
+    front = Section(None, [Paragraph("Les Misérables", 1), Paragraph("A preface.", 1)])
+    [kept] = drop_repeated_title([front], metadata)
+    assert [p.text for p in kept.paragraphs] == ["A preface."]
