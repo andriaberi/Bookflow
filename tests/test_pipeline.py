@@ -15,7 +15,6 @@ def test_prints_book_and_lines(
         "author: None",
         "language: ka",
         "",
-        "--- page 1 ---",
         "Hello world.",
     ]
 
