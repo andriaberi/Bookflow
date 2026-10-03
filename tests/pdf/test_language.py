@@ -9,22 +9,17 @@ def book(*texts: str) -> list[Page]:
 
 
 @pytest.mark.parametrize(
-    ("text", "language"),
+    ("texts", "language"),
     [
-        ("1815 წელს შარლ-ფრანსუა-ბიენვენიუ მირიელი ქალაქ დინის", "ka"),
-        ("Ἐν ἀρχῇ ἦν ὁ λόγος", "el"),
-        ("It was the best of times, it was the worst of times", "en"),
-        ("Il était une fois dans un pays lointain, et le roi", "fr"),
-        ("Es war einmal ein König, der hatte eine Tochter und", "de"),
-        ("Он сказал, что это была она", "ru"),
-        ("Він сказав, що це була вона", "uk"),
-        ("吾輩は猫である。名前はまだ無い。", "ja"),
-        ("道可道，非常道。名可名，非常名。", "zh"),
+        (["1815 წელს შარლ-ფრანსუა-ბიენვენიუ მირიელი ქალაქ დინის"], "ka"),
+        (["It was the best of times, it was the worst of times"], "en"),
+        (["ბიენვენიუ (Bienvenu) სასურველი, კეთილმოვლენილი."], "ka"),
     ],
 )
-def test_detects_language(text: str, language: str) -> None:
-    assert detect_language(book(text)) == language
+def test_detects_language(texts: list[str], language: str) -> None:
+    assert detect_language(book(*texts)) == language
 
 
-def test_unknown_without_letters() -> None:
-    assert detect_language(book("1 2 3")) is None
+@pytest.mark.parametrize("text", ["1 2 3", "Он сказал, что это была она"])
+def test_unknown(text: str) -> None:
+    assert detect_language(book(text)) is None

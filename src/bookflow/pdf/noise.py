@@ -1,6 +1,5 @@
 import re
 import statistics
-import unicodedata
 from collections import Counter
 from itertools import pairwise
 
@@ -91,17 +90,11 @@ def has_long_word(text: str) -> bool:
 
 
 def is_word(token: str) -> bool:
-    """Letters of one script, with only marks, apostrophes, hyphens or dots inside.
-
-    Marks are the vowel signs and diacritics of Indic, Arabic and Hebrew writing.
-    """
+    """Letters of one script, with only apostrophes, hyphens or dots inside."""
     scripts = {script_of(c) for c in token if c.isalpha()}
     if len(scripts) != 1:
         return False
-    return all(
-        c.isalpha() or unicodedata.category(c).startswith("M") or c in "'’-.\u200c\u200d"
-        for c in token
-    )
+    return all(c.isalpha() or c in "'’-." for c in token)
 
 
 def is_furniture(line: Line, page: Page, repeated: set[str]) -> bool:
