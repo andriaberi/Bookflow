@@ -89,6 +89,13 @@ def test_heading_without_title_shows_its_label_as_the_title(tmp_path: Path) -> N
     assert "<h2>თავი მეორე</h2>" in chapter
 
 
+def test_fonts_are_embedded(tmp_path: Path) -> None:
+    epub = written(tmp_path)
+    assert "EPUB/fonts/NotoSerifGeorgian-Regular.ttf" in epub.namelist()
+    assert 'media-type="font/ttf"' in epub.read("EPUB/content.opf").decode()
+    assert "url(fonts/NotoSerifGeorgian-Regular.ttf)" in epub.read("EPUB/style.css").decode()
+
+
 def test_contents_is_a_page_of_the_book(tmp_path: Path) -> None:
     opf = written(tmp_path).read("EPUB/content.opf").decode()
     assert '<itemref idref="title"/>\n<itemref idref="nav"/>' in opf

@@ -6,9 +6,42 @@
 STYLESHEET = """\
 @charset "utf-8";
 
+/* Embedded so every reader shows the same type. Noto Serif carries Latin,
+   digits and punctuation; Noto Serif Georgian carries the Georgian letters. */
+@font-face {
+  font-family: "Bookflow Serif";
+  font-style: normal;
+  font-weight: normal;
+  src: url(fonts/NotoSerif-Regular.ttf);
+}
+@font-face {
+  font-family: "Bookflow Serif";
+  font-style: normal;
+  font-weight: bold;
+  src: url(fonts/NotoSerif-Bold.ttf);
+}
+@font-face {
+  font-family: "Bookflow Serif";
+  font-style: italic;
+  font-weight: normal;
+  src: url(fonts/NotoSerif-Italic.ttf);
+}
+@font-face {
+  font-family: "Bookflow Georgian";
+  font-style: normal;
+  font-weight: normal;
+  src: url(fonts/NotoSerifGeorgian-Regular.ttf);
+}
+@font-face {
+  font-family: "Bookflow Georgian";
+  font-style: normal;
+  font-weight: bold;
+  src: url(fonts/NotoSerifGeorgian-Bold.ttf);
+}
+
 body {
   margin: 0 5%;
-  font-family: serif;
+  font-family: "Bookflow Serif", "Bookflow Georgian", serif;
   line-height: 1.5;
   text-align: justify;
   -webkit-hyphens: auto;

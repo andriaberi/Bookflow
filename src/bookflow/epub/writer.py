@@ -1,6 +1,7 @@
 import zipfile
 from datetime import UTC, datetime
 from html import escape
+from importlib.resources import files as package_files
 from pathlib import Path
 
 from bookflow.structure import Section
@@ -21,6 +22,14 @@ CONTAINER = """\
 
 XHTML = "application/xhtml+xml"
 
+FONTS = [
+    "NotoSerif-Regular.ttf",
+    "NotoSerif-Bold.ttf",
+    "NotoSerif-Italic.ttf",
+    "NotoSerifGeorgian-Regular.ttf",
+    "NotoSerifGeorgian-Bold.ttf",
+]
+
 
 def write_epub(path: Path, sections: list[Section], metadata: Metadata) -> None:
     """Write the book as an EPUB 3 file, one page per section."""
@@ -34,6 +43,9 @@ def write_epub(path: Path, sections: list[Section], metadata: Metadata) -> None:
         epub.writestr("EPUB/content.opf", package_document(files, metadata))
         epub.writestr("EPUB/style.css", STYLESHEET)
         epub.writestr("EPUB/nav.xhtml", nav_document(toc, metadata.language))
+        fonts = package_files("bookflow.epub") / "fonts"
+        for font in FONTS:
+            epub.writestr(f"EPUB/fonts/{font}", (fonts / font).read_bytes())
         epub.writestr("EPUB/toc.ncx", ncx_document(toc, metadata.title, metadata.identifier))
         epub.writestr("EPUB/title.xhtml", title_page(metadata))
         for section, file in zip(sections, files, strict=True):
@@ -46,6 +58,10 @@ def package_document(files: list[str], metadata: Metadata) -> str:
     items = "\n".join(
         f'<item id="s{number}" href="{file}" media-type="{XHTML}"/>'
         for number, file in enumerate(files, start=1)
+    )
+    fonts = "\n".join(
+        f'<item id="font{number}" href="fonts/{font}" media-type="font/ttf"/>'
+        for number, font in enumerate(FONTS, start=1)
     )
     spine = "\n".join(f'<itemref idref="s{number}"/>' for number in range(1, len(files) + 1))
 
@@ -64,6 +80,7 @@ xml:lang="{escape(metadata.language)}">
 <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
 <item id="css" href="style.css" media-type="text/css"/>
 <item id="title" href="title.xhtml" media-type="{XHTML}"/>
+{fonts}
 {items}
 </manifest>
 <spine toc="ncx">
