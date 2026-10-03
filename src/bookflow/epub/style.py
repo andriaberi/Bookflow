@@ -121,6 +121,11 @@ h3 + p {
   font-size: 2em;
 }
 
+/* The outermost division, a volume where the book has them, is the largest. */
+.division h1 {
+  font-size: 2.4em;
+}
+
 .division h1 .label,
 .division h2 .label,
 .division h3 .label {

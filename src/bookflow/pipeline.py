@@ -29,7 +29,8 @@ def run(args: Args) -> int:
     )
 
     paragraphs = build_paragraphs(book.pages)
-    sections = drop_repeated_title(build_sections(paragraphs, book.pages), metadata)
+    sections = drop_title_page_reprints(build_sections(paragraphs, book.pages))
+    sections = drop_repeated_title(sections, metadata)
 
     # The book's own cover comes first; --cover is for books without one.
     cover, source = choose_cover(find_cover(args.pdf), fallback_cover)
@@ -52,6 +53,21 @@ def choose_cover(own: Cover | None, fallback: Cover | None) -> tuple[Cover | Non
     if fallback:
         return fallback, "cover from --cover"
     return None, "no cover"
+
+
+# Front matter this short is a title page, not a preface.
+TITLE_PAGE = 3
+
+
+def drop_title_page_reprints(sections: list[Section]) -> list[Section]:
+    """Drop the title page printed again before a new volume, at the end of a section."""
+    if not sections or sections[0].heading or len(sections[0].paragraphs) > TITLE_PAGE:
+        return sections
+    title_page = {p.text.casefold() for p in sections[0].paragraphs}
+    for section in sections[1:]:
+        while section.paragraphs and section.paragraphs[-1].text.casefold() in title_page:
+            section.paragraphs.pop()
+    return sections
 
 
 def drop_repeated_title(sections: list[Section], metadata: Metadata) -> list[Section]:

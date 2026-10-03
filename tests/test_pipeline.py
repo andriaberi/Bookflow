@@ -8,7 +8,7 @@ from bookflow.cli.commands import Args
 from bookflow.cover import Cover
 from bookflow.epub import Metadata
 from bookflow.paragraphs import Paragraph
-from bookflow.pipeline import choose_cover, drop_repeated_title, run
+from bookflow.pipeline import choose_cover, drop_repeated_title, drop_title_page_reprints, run
 from bookflow.structure import Heading, Section
 
 
@@ -44,6 +44,15 @@ def test_front_matter_with_more_is_kept() -> None:
     front = Section(None, [Paragraph("Les Misérables", 1), Paragraph("A preface.", 1)])
     [kept] = drop_repeated_title([front], metadata)
     assert [p.text for p in kept.paragraphs] == ["A preface."]
+
+
+def test_title_page_printed_again_before_a_volume_is_dropped() -> None:
+    front = Section(None, [Paragraph("ომი და მშვიდობა", 1)])
+    chapter = Section(Heading(3, "თავი ოცდამეერთე"), [Paragraph("ტექსტი.", 2)])
+    chapter.paragraphs.append(Paragraph("ომი და მშვიდობა", 3))
+    volume = Section(Heading(1, "ტომი II"))
+    drop_title_page_reprints([front, chapter, volume])
+    assert [p.text for p in chapter.paragraphs] == ["ტექსტი."]
 
 
 OWN = Cover(b"own", 1, 1)
