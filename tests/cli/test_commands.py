@@ -26,6 +26,8 @@ def test_all_options(monkeypatch: pytest.MonkeyPatch) -> None:
         "Author",
         "--language",
         "ka",
+        "--output",
+        "out.epub",
     )
     assert args == Args(
         pdf="book.pdf",
@@ -33,6 +35,7 @@ def test_all_options(monkeypatch: pytest.MonkeyPatch) -> None:
         title="Title",
         author="Author",
         language="ka",
+        output="out.epub",
     )
 
 

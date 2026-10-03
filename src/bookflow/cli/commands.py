@@ -9,6 +9,7 @@ class Args:
     title: str | None = None
     author: str | None = None
     language: str | None = None
+    output: str | None = None
 
 
 def extract_args() -> Args:
@@ -19,9 +20,15 @@ def extract_args() -> Args:
     parser.add_argument("--title", help="Title of the book")
     parser.add_argument("--author", help="Author of the book")
     parser.add_argument("--language", help="Language of the book")
+    parser.add_argument("-o", "--output", help="Where to write the EPUB (default: next to the PDF)")
 
     args = parser.parse_args()
 
     return Args(
-        pdf=args.pdf, pages=args.pages, title=args.title, author=args.author, language=args.language
+        pdf=args.pdf,
+        pages=args.pages,
+        title=args.title,
+        author=args.author,
+        language=args.language,
+        output=args.output,
     )
