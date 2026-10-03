@@ -177,31 +177,53 @@ section.cover svg {
 /* Contents */
 
 nav h1 {
-  margin: 1.5em 0 1.2em;
+  margin: 1.5em 0 1.5em;
 }
 
 nav ol {
-  margin: 0 0 0 1.2em;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-nav > ol {
-  margin-left: 0;
-}
-
+/* Wrapped titles line up under the first line's text, not under the label. */
 nav li {
-  margin: 0.35em 0;
+  margin: 0.4em 0;
+  padding-left: 1.2em;
   text-align: left;
-  text-indent: 0;
+  text-indent: -1.2em;
+  -epub-hyphens: none;
+  hyphens: none;
 }
 
-nav > ol > li {
-  margin-top: 0.9em;
+/* "თავი მეოცე:" never breaks between its words. */
+nav .label {
+  white-space: nowrap;
 }
 
-nav > ol > li > a {
+/* Chapters sit under their part or volume. */
+nav li li {
+  margin-left: 0.6em;
+}
+
+nav .group {
+  margin-top: 1.2em;
+}
+
+nav .group > a {
   font-weight: bold;
+}
+
+nav > ol > .group {
+  margin-top: 1.8em;
+}
+
+nav > ol > .group:first-child {
+  margin-top: 0;
+}
+
+nav > ol > .group > a {
+  font-size: 1.15em;
 }
 
 nav a {

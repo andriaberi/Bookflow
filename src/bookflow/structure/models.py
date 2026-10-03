@@ -11,7 +11,9 @@ class Heading:
 
     @property
     def text(self) -> str:
-        return f"{self.label}. {self.title}" if self.title else self.label
+        """ "თავი პირველი: ბატონი მირიელი", or the label alone."""
+        label = self.label.rstrip(".")
+        return f"{label}: {self.title}" if self.title else label
 
 
 @dataclass

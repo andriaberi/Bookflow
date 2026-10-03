@@ -75,14 +75,20 @@ def test_table_of_contents_is_nested(tmp_path: Path) -> None:
 
     books = nav.findall(f".//{xhtml}nav/{xhtml}ol/{xhtml}li")
     assert [text(book.find(f"{xhtml}a")) for book in books] == [  # type: ignore[arg-type]
-        "წიგნი პირველი. კაცი მართალი",
+        "წიგნი პირველი: კაცი მართალი",
         "წიგნი მეორე",
     ]
     chapters = books[0].findall(f"{xhtml}ol/{xhtml}li/{xhtml}a")
     assert [text(chapter) for chapter in chapters] == [
-        "თავი პირველი. ბატონი მირიელი",
+        "თავი პირველი: ბატონი მირიელი",
         "თავი მეორე",
     ]
+
+
+def test_contents_marks_parts_holding_chapters(tmp_path: Path) -> None:
+    nav = written(tmp_path).read("EPUB/nav.xhtml").decode()
+    assert '<li class="group"><a href="text/section-0002.xhtml"><span class="label">' in nav
+    assert '<span class="label">თავი პირველი:</span> ბატონი მირიელი</a>' in nav
 
 
 def test_heading_without_title_shows_its_label_as_the_title(tmp_path: Path) -> None:
