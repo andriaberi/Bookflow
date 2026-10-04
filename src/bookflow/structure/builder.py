@@ -1,4 +1,4 @@
-from bookflow.labels import find_label, fix_label, label_level
+from bookflow.labels import NUMBER_LEVEL, find_label, fix_label, label_level, numeral_value
 from bookflow.paragraphs import Paragraph
 from bookflow.paragraphs.builder import join
 from bookflow.paragraphs.layout import Layout, is_tall, text_column
@@ -14,21 +14,31 @@ from .headings import (
 )
 from .models import Heading, Section
 
+# Lone numbers count as chapter numbers only when the book has at least this many.
+MIN_NUMBERED = 3
+
+# A number may skip this many: OCR loses one now and then.
+MAX_SKIP = 2
+
 
 def build_sections(paragraphs: list[Paragraph], pages: list[Page]) -> list[Section]:
     """Split the paragraphs at chapter (and part, book) headings."""
     column = text_column(pages)
+    numbered = numbered_chapters(paragraphs)
     sections = [Section(heading=None)]
 
     index = 0
     while index < len(paragraphs):
         paragraph = paragraphs[index]
         index += 1
-        if not is_label(paragraph, column):
+        if is_label(paragraph, column):
+            heading = Heading(label_level(paragraph.text) or 0, fix_label(paragraph.text))
+        elif id(paragraph) in numbered:
+            heading = Heading(NUMBER_LEVEL, paragraph.text.rstrip("."))
+        else:
             sections[-1].paragraphs.append(paragraph)
             continue
 
-        heading = Heading(level=label_level(paragraph.text) or 0, label=fix_label(paragraph.text))
         # A label in a bigger font than the text has its title in one too; a line in
         # the text's size after it is the chapter's first line, and it has no title.
         tall = is_tall(paragraph.lines[0], column)
@@ -54,6 +64,24 @@ def build_sections(paragraphs: list[Paragraph], pages: list[Page]) -> list[Secti
     renumber_levels(sections)
     match_label_order(sections)
     return sections
+
+
+def numbered_chapters(paragraphs: list[Paragraph]) -> set[int]:
+    """The lone numbers that number the book's chapters ("I", "II", ... or "1.", "2.").
+
+    They count up through the book and may start again at 1 in each part; a number
+    out of step, like a stray "7" in the text, isn't a chapter. Gives paragraph ids.
+    """
+    found: set[int] = set()
+    last: int | None = None
+    for paragraph in paragraphs:
+        value = numeral_value(paragraph.text) if len(paragraph.lines) == 1 else None
+        if value is None:
+            continue
+        if last is None or value == 1 or 0 < value - last <= MAX_SKIP:
+            found.add(id(paragraph))
+            last = value
+    return found if len(found) >= MIN_NUMBERED else set()
 
 
 def is_set_off(title: list[Paragraph], following: list[Paragraph], column: Layout) -> bool:
@@ -85,6 +113,7 @@ def is_title_part(paragraph: Paragraph, title: list[Paragraph], column: Layout, 
         and (not tall or all(is_tall(line, column) for line in paragraph.lines))
         and is_title(paragraph, column)
         and not is_label(paragraph, column)
+        and numeral_value(paragraph.text) is None
         and (not title or paragraph.page == title[-1].page)
     )
 
