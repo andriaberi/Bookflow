@@ -13,6 +13,7 @@ from .layout import (
     text_column,
 )
 from .models import Paragraph
+from .verse import find_verse
 
 
 def build_paragraphs(pages: list[Page]) -> list[Paragraph]:
@@ -27,13 +28,23 @@ def build_paragraphs(pages: list[Page]) -> list[Paragraph]:
         if not page.lines:
             continue
         layout = fit(measure(page), column)
+        verse = find_verse(page.lines, layout)
         for index, line in enumerate(page.lines):
             above = page.lines[index - 1] if index else None
-            if not paragraphs or starts_paragraph(line, above, layout, previous):
-                paragraphs.append(Paragraph(line.text, page.number, [line]))
+            if index in verse:
+                # Verse goes on line by line until a stanza ends; text never joins it.
+                starts = verse[index] or not paragraphs or not paragraphs[-1].verse
+            else:
+                starts = (
+                    not paragraphs
+                    or paragraphs[-1].verse
+                    or starts_paragraph(line, above, layout, previous)
+                )
+            if starts:
+                paragraphs.append(Paragraph(line.text, page.number, [line], index in verse))
             else:
                 last = paragraphs[-1]
-                last.text = join(last.text, line.text)
+                last.text = f"{last.text} {line.text}" if last.verse else join(last.text, line.text)
                 last.lines.append(line)
             previous = (line, layout)
 
