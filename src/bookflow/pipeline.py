@@ -8,7 +8,7 @@ from bookflow.cover import Cover, CoverError, find_cover, load_cover
 from bookflow.epub import Metadata, write_epub
 from bookflow.paragraphs import build_paragraphs
 from bookflow.pdf import ReadError, read_pdf
-from bookflow.structure import Section, build_sections
+from bookflow.structure import Section, build_sections, drop_printed_contents
 
 
 def run(args: Args) -> int:
@@ -28,8 +28,9 @@ def run(args: Args) -> int:
         identifier=book_identifier(pdf),
     )
 
-    paragraphs = build_paragraphs(book.pages)
-    sections = drop_title_page_reprints(build_sections(paragraphs, book.pages))
+    pages = drop_printed_contents(book.pages)
+    paragraphs = build_paragraphs(pages)
+    sections = drop_title_page_reprints(build_sections(paragraphs, pages))
     sections = drop_repeated_title(sections, metadata)
 
     # The book's own cover comes first; --cover is for books without one.
