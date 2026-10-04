@@ -17,8 +17,16 @@ class Heading:
 
 
 @dataclass
+class Note:
+    id: str  # "note-12", the same nowhere else in the book
+    mark: str  # "12", as printed in the text: "ფრეილინა[12]"
+    text: str
+
+
+@dataclass
 class Section:
     """A heading and the paragraphs up to the next one. Front matter has no heading."""
 
     heading: Heading | None
     paragraphs: list[Paragraph] = field(default_factory=list)
+    notes: dict[str, Note] = field(default_factory=dict)  # the notes its marks refer to
