@@ -20,16 +20,18 @@ full list of commands.
 | `make bump TO=patch\|minor\|major\|1.2.3` | Set the version in `src/bookflow/__init__.py`. |
 | `make build` | Build the package into `dist/`. |
 
-Run the converter from the clone with `.venv/bin/bookflow book.pdf` or
-`.venv/bin/python -m bookflow book.pdf`.
+Run the converter from the clone with `.venv/bin/bookflow book.pdf`, or
+`.venv/bin/bookflow` alone for the window. The window's tests skip themselves when Tk
+or a display is missing.
 
 ## Layout
 
 ```
 src/bookflow/
-  __main__.py      entry point
+  __main__.py      entry point: the window without arguments, the CLI with a PDF
   cli/             command-line options (Args)
-  pipeline.py      runs the stages; title-page clean-up
+  gui/             the Tk window (form.py holds its logic, testable without a screen)
+  pipeline.py      runs the stages (convert); title-page clean-up
   labels.py        division words: ტომი, ნაწილი, წიგნი, თავი, Volume, Part, ...
   pdf/             PDF → pages of clean lines (reader, text, noise, language)
   paragraphs/      lines → paragraphs (layout rules, verse)
@@ -38,6 +40,10 @@ src/bookflow/
   epub/            sections → EPUB 3 (pages, contents, style, fonts)
 tests/             one folder per package, plus test_pipeline.py
 ```
+
+`pipeline.convert` runs a conversion and returns a `Result` or raises `ConvertError`; it
+reports each step to a `progress` callback. The CLI (`run`) prints the result; the
+window runs `convert` in a background thread and shows the steps as they come.
 
 Each package only uses the ones before it in the pipeline:
 `pdf` ← `paragraphs` ← `structure` ← `epub`. `labels.py` sits outside them all because

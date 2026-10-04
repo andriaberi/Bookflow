@@ -21,6 +21,31 @@ Or from a clone, for working on it: `make install` (see [Development](docs/devel
 
 ## Use
 
+### The window
+
+```sh
+bookflow
+```
+
+Run alone, `bookflow` opens a window:
+
+1. Click **Choose…** and pick the PDF. **Save as** fills in next to it; **Change…** picks
+   another place.
+2. Optionally fill in the **Book details**: title, author, language, pages and a cover
+   image.
+3. Click **Convert** (or press Enter). The status line follows each step and ends with
+   what was found. **Show in folder** opens the folder with the EPUB.
+
+The window needs Tk. The python.org installers for Windows and macOS include it. On
+Linux, install it once:
+
+```sh
+sudo apt install python3-tk      # Debian, Ubuntu
+sudo dnf install python3-tkinter # Fedora
+```
+
+### The command line
+
 ```sh
 bookflow book.pdf
 ```
@@ -31,7 +56,7 @@ This writes `book.epub` next to the PDF and prints what it found:
 Wrote book.epub: 160 headings, 5977 paragraphs, 206 notes, cover from the PDF
 ```
 
-### Options
+Options work the same as the window's fields:
 
 | Option | What it does |
 |---|---|
