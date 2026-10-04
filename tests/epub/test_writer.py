@@ -6,7 +6,7 @@ from xml.etree import ElementTree
 from bookflow.cover import Cover
 from bookflow.epub import Metadata, write_epub
 from bookflow.paragraphs import Paragraph
-from bookflow.structure import Heading, Section
+from bookflow.structure import Heading, Note, Section
 
 METADATA = Metadata(title="საბრალონი", author="ვიქტორ ჰიუგო", language="ka", identifier="urn:x")
 
@@ -127,3 +127,25 @@ def test_no_cover_without_one(tmp_path: Path) -> None:
     epub = written(tmp_path)
     assert "EPUB/cover.xhtml" not in epub.namelist()
     assert "cover-image" not in epub.read("EPUB/content.opf").decode()
+
+
+def test_notes_get_a_page_and_marks_link_to_them(tmp_path: Path) -> None:
+    note = Note("note-1", "1", "ფრეილინა – მხლებელი.")
+    chapter = Section(Heading(1, "თავი პირველი"), [paragraph("ფრეილინა[1] & [2].")])
+    chapter.notes["1"] = note
+    path = tmp_path / "book.epub"
+    write_epub(path, [chapter], METADATA, notes=[note])
+    epub = zipfile.ZipFile(path)
+
+    text = epub.read("EPUB/text/section-0001.xhtml").decode()
+    assert 'id="ref-note-1" href="../notes.xhtml#note-1">1</a> &amp; [2].' in text
+    notes = epub.read("EPUB/notes.xhtml").decode()
+    assert '<aside id="note-1" epub:type="endnote"' in notes
+    assert 'href="text/section-0001.xhtml#ref-note-1"' in notes
+    minidom.parseString(notes)
+    assert '<itemref idref="notes"/>' in epub.read("EPUB/content.opf").decode()
+    assert '<a href="notes.xhtml">' in epub.read("EPUB/nav.xhtml").decode()
+
+
+def test_no_notes_page_without_notes(tmp_path: Path) -> None:
+    assert "EPUB/notes.xhtml" not in written(tmp_path).namelist()

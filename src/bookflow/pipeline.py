@@ -8,7 +8,7 @@ from bookflow.cover import Cover, CoverError, find_cover, load_cover
 from bookflow.epub import Metadata, write_epub
 from bookflow.paragraphs import build_paragraphs
 from bookflow.pdf import ReadError, read_pdf
-from bookflow.structure import Section, build_sections, drop_printed_contents
+from bookflow.structure import Section, build_sections, drop_printed_contents, extract_notes
 
 
 def run(args: Args) -> int:
@@ -32,19 +32,21 @@ def run(args: Args) -> int:
     paragraphs = build_paragraphs(pages)
     sections = drop_title_page_reprints(build_sections(paragraphs, pages))
     sections = drop_repeated_title(sections, metadata)
+    notes = extract_notes(sections)
 
     # The book's own cover comes first; --cover is for books without one.
     cover, source = choose_cover(find_cover(args.pdf), fallback_cover)
 
     output = Path(args.output) if args.output else pdf.with_suffix(".epub")
     try:
-        write_epub(output, sections, metadata, cover)
+        write_epub(output, sections, metadata, cover, notes)
     except OSError as e:
         print(f"bookflow: can't write {output}: {e.strerror}", file=sys.stderr)
         return 1
 
     headings = sum(1 for section in sections if section.heading)
-    print(f"Wrote {output}: {headings} headings, {len(paragraphs)} paragraphs, {source}")
+    found = f"{headings} headings, {len(paragraphs)} paragraphs, {len(notes)} notes"
+    print(f"Wrote {output}: {found}, {source}")
     return 0
 
 

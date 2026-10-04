@@ -230,4 +230,34 @@ nav a {
   color: inherit;
   text-decoration: none;
 }
+
+/* Notes: small raised marks in the text, a plain list at the end. */
+
+a.noteref {
+  font-size: 0.7em;
+  line-height: 0;
+  vertical-align: super;
+  text-decoration: none;
+}
+
+.notes h1 {
+  margin: 1.5em 0 1.5em;
+}
+
+.notes aside {
+  margin: 0 0 0.6em;
+}
+
+.notes p {
+  text-indent: 0;
+}
+
+.notes .mark {
+  font-weight: bold;
+}
+
+.notes .mark a {
+  color: inherit;
+  text-decoration: none;
+}
 """

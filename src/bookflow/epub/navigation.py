@@ -7,6 +7,7 @@ from .pages import page
 Entry = tuple[int, Heading, str]  # level, heading, file
 
 CONTENTS = {"ka": "სარჩევი", "en": "Contents"}
+NOTES = {"ka": "შენიშვნები", "en": "Notes"}
 
 
 def entries(sections: list[Section], files: list[str]) -> list[Entry]:
@@ -20,6 +21,10 @@ def entries(sections: list[Section], files: list[str]) -> list[Entry]:
 
 def contents_title(language: str) -> str:
     return CONTENTS.get(language.split("-")[0], CONTENTS["en"])
+
+
+def notes_title(language: str) -> str:
+    return NOTES.get(language.split("-")[0], NOTES["en"])
 
 
 def nav_document(toc: list[Entry], language: str) -> str:
