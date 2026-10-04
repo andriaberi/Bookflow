@@ -106,10 +106,14 @@ def split_title(paragraph: Paragraph, column: Layout) -> tuple[str, Paragraph] |
 
 def is_title_part(paragraph: Paragraph, title: list[Paragraph], column: Layout, tall: bool) -> bool:
     lines = sum(len(part.lines) for part in title) + len(paragraph.lines)
-    # "…ხელზე და უთხრა:" leads into speech; a title never does.
+    # "…ხელზე და უთხრა:" leads into speech, "– მოვიდნენ!" is speech and "…იწვა." ends a
+    # sentence: titles do none of these, though they may ask ("სად მიდიან?") or trail off.
+    text = paragraph.text
     return (
         lines <= MAX_TITLE_LINES
-        and not paragraph.text.endswith(":")
+        and not text.endswith(":")
+        and not (text.endswith(".") and not text.endswith(".."))
+        and not text.startswith(("-", "–", "—"))
         and (not tall or all(is_tall(line, column) for line in paragraph.lines))
         and is_title(paragraph, column)
         and not is_label(paragraph, column)

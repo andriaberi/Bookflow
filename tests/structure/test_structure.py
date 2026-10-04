@@ -177,6 +177,14 @@ def test_numbers_out_of_step_are_text() -> None:
     assert [s.heading.label for s in sections if s.heading] == ["I", "II", "III"]
 
 
+def test_sentence_after_a_chapter_number_is_not_its_title() -> None:
+    paragraphs = numbered("I", "II", "III")
+    paragraphs.insert(1, flush("ლევინმა სასმისი გამოცალა.", 120, x1=250))
+    sections = build_sections(paragraphs, PAGES)
+    assert sections[0].heading == Heading(1, "I")
+    assert sections[0].paragraphs[0].text == "ლევინმა სასმისი გამოცალა."
+
+
 def flush(text: str, y: float, page: int = 1, x1: float = 160) -> Paragraph:
     """A short line set at the paragraph indent, as digital books often set headings."""
     return Paragraph(text, page, [Line(text, 50, y, x1, y + 11)])
