@@ -1,8 +1,7 @@
 import re
 
+from bookflow.labels import label_level
 from bookflow.pdf import Page
-
-from .headings import label_level
 
 # Words a printed table of contents is headed with.
 TITLES = {"სარჩევი", "შინაარსი", "contents", "table of contents"}
