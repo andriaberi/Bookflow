@@ -4,11 +4,13 @@ from .layout import (
     Layout,
     ends_page_early,
     ends_paragraph,
+    fit,
     has_gap_before,
     is_indented,
     is_set_apart,
     is_tall,
     measure,
+    text_column,
 )
 from .models import Paragraph
 
@@ -17,11 +19,14 @@ def build_paragraphs(pages: list[Page]) -> list[Paragraph]:
     """Join the lines of all pages into paragraphs, across page breaks too."""
     paragraphs: list[Paragraph] = []
     previous: tuple[Line, Layout] | None = None
+    if not any(page.lines for page in pages):
+        return paragraphs
+    column = text_column(pages)
 
     for page in pages:
         if not page.lines:
             continue
-        layout = measure(page)
+        layout = fit(measure(page), column)
         for index, line in enumerate(page.lines):
             above = page.lines[index - 1] if index else None
             if not paragraphs or starts_paragraph(line, above, layout, previous):

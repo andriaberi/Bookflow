@@ -91,3 +91,25 @@ def test_page_ending_early_ends_the_paragraph() -> None:
     first = page(1, line(300, "თბილისი — 1963", x0=170, x1=260))
     second = page(2, line(300, "ფრანგულიდან თარგმნა", x0=170, x1=260))
     assert texts([first, second]) == ["თბილისი — 1963", "ფრანგულიდან თარგმნა"]
+
+
+def full_page(number: int) -> Page:
+    """Ordinary text, so the book's column can be measured."""
+    return page(number, *(line(40 + 14 * row, "ტექსტი") for row in range(12)))
+
+
+def test_page_of_short_lines_keeps_the_books_margins() -> None:
+    # Measured alone, this page would take the indent for its margin and miss it.
+    p = page(
+        2,
+        line(100, "ხელი მოაწერინა:", INDENT, 200),
+        line(112, "„ბატონო ტენარდიე,", INDENT, 150),
+        line(124, "ჩააბარეთ ჩემი კოზეტი.", INDENT, 200),
+        line(136, "ფანტინი“.", INDENT, 120),
+    )
+    assert texts([full_page(1), p])[1:] == [
+        "ხელი მოაწერინა:",
+        "„ბატონო ტენარდიე,",
+        "ჩააბარეთ ჩემი კოზეტი.",
+        "ფანტინი“.",
+    ]
