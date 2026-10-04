@@ -83,11 +83,19 @@ def is_centred(line: Line, layout: Layout) -> bool:
     )
 
 
+def is_full_line(line: Line, layout: Layout) -> bool:
+    """A line of running text: from the left margin (or an indent) to the right edge."""
+    return line.x0 < layout.left + 2 * layout.line_height and not is_short(line, layout)
+
+
 def is_label(paragraph: Paragraph, layout: Layout) -> bool:
-    """A label alone on a short line, centred or not: books set headings either way."""
+    """A label alone on a line set any way but as running text.
+
+    Books set headings centred, flush left or right, so only a full line is ruled out.
+    """
     return (
         len(paragraph.lines) == 1
-        and is_short(paragraph.lines[0], layout)
+        and not is_full_line(paragraph.lines[0], layout)
         and label_level(paragraph.text) is not None
     )
 

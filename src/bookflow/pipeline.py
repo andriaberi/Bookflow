@@ -71,13 +71,27 @@ def drop_title_page_reprints(sections: list[Section]) -> list[Section]:
 
 
 def drop_repeated_title(sections: list[Section], metadata: Metadata) -> list[Section]:
-    """The title page already shows the title and author; don't print them again."""
+    """The title page already shows the title and author; don't print them again.
+
+    The PDF often doesn't say what its title is, so the book's own title page goes
+    too, however it spells the title ("ალბერ კამიუ - უცხო").
+    """
     if not sections or sections[0].heading:
         return sections
     repeated = {metadata.title.casefold(), (metadata.author or "").casefold()}
     front = sections[0]
     front.paragraphs = [p for p in front.paragraphs if p.text.casefold() not in repeated]
-    return sections if front.paragraphs else sections[1:]
+    return sections if front.paragraphs and not is_title_page(front) else sections[1:]
+
+
+def is_title_page(section: Section) -> bool:
+    """A few lines on the first page, names rather than sentences: author, title."""
+    paragraphs = section.paragraphs
+    return (
+        len(paragraphs) <= TITLE_PAGE
+        and all(p.page == paragraphs[0].page for p in paragraphs)
+        and not any(p.text.endswith((".", "!", "?", "…")) for p in paragraphs)
+    )
 
 
 def book_identifier(pdf: Path) -> str:
