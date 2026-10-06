@@ -90,7 +90,7 @@ def choose_cover(own: Cover | None, fallback: Cover | None) -> tuple[Cover | Non
     if own:
         return own, "cover from the PDF"
     if fallback:
-        return fallback, "cover from --cover"
+        return fallback, "cover from the given image"
     return None, "no cover"
 
 

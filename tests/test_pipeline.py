@@ -78,7 +78,7 @@ def test_cover_flag_is_used_without_a_cover_in_the_pdf(
     pymupdf.open().new_page().get_pixmap().save(image)
     output = tmp_path / "out.epub"
     assert run(Args(pdf=make_pdf([["Hello."]]), cover=str(image), output=str(output))) == 0
-    assert "cover from --cover" in capsys.readouterr().out
+    assert "cover from the given image" in capsys.readouterr().out
     assert "EPUB/images/cover.jpg" in zipfile.ZipFile(output).namelist()
 
 
