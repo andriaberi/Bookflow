@@ -27,6 +27,8 @@ at the top of each module.
   image covering half the page) lose OCR junk lines and edge specks; on a born-digital
   page an odd line is the book's own text.
 - **Language:** the PDF's `/Lang`, else the main script (Georgian → `ka`, Latin → `en`).
+  When `/Lang` and the script disagree on whether the book is Georgian, the script wins:
+  PDFs made on an English system often tag Georgian books `en-US`.
 
 ## 2. Printed contents (`structure/contents.py`)
 

@@ -49,7 +49,7 @@ Wrote book.epub: 172 headings, 6317 paragraphs, 206 notes, no cover
 | `--pages SPEC` | Convert only some pages, 1-based: `1-3,7,10-12`. |
 | `--title TEXT` | The book's title. Default: the PDF's metadata, else the file name. |
 | `--author TEXT` | The book's author. Default: the PDF's metadata. |
-| `--language CODE` | The book's language, such as `ka` or `en`. Default: the PDF's language tag, else detected. |
+| `--language CODE` | The book's language, such as `ka` or `en`. Default: detected from the text and the PDF's language tag. |
 | `--cover IMAGE` | A cover image, used only when the PDF has no cover of its own. |
 | `--version` | Print Rebind's version. |
 
