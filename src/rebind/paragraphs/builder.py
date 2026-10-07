@@ -35,6 +35,8 @@ def build_paragraphs(pages: list[Page]) -> list[Paragraph]:
     column = text_column(pages)
     # The paragraph started far below the text above it: it may be a heading.
     apart = False
+    # The number of the last numbered section started: "28. ...".
+    section: int | None = None
 
     texts = [page for page in pages if page.lines]
     for number, page in enumerate(texts):
@@ -61,6 +63,7 @@ def build_paragraphs(pages: list[Page]) -> list[Paragraph]:
                     not paragraphs
                     or paragraphs[-1].verse
                     or titled
+                    or starts_next_section(line, previous, section)
                     or starts_paragraph(line, above, layout, previous, heading, below)
                 )
             if starts:
@@ -72,6 +75,8 @@ def build_paragraphs(pages: list[Page]) -> list[Paragraph]:
                     and ends_sentence(above.text)
                 )
                 paragraphs[-1].apart = apart
+                if opening := SECTION_NUMBER.match(line.text):
+                    section = int(opening.group(1))
             else:
                 last = paragraphs[-1]
                 last.text = f"{last.text} {line.text}" if last.verse else join(last.text, line.text)
@@ -158,6 +163,9 @@ CLOSES = re.compile(r"^(?:[.!?;:)»](?!\.)|,(?!,)|“(?=[\s.,;:!?)]))")
 
 OPENING_QUOTES = ("„", "«")
 
+# A numbered section's opening: "29. როდესაც კროჲსოსმა ...".
+SECTION_NUMBER = re.compile(r"^(\d{1,3})\. ")
+
 # Note marks at the end of a line: "...mon cher, taut miux.[10]".
 NOTE_MARKS = re.compile(r"\[\d+\]")
 
@@ -174,6 +182,23 @@ MAX_HEADING_WIDTH = 0.8
 
 # A line ending in these is a clause or a sentence, not a heading set in the text.
 TITLE_ENDS = (".", ",", ":", ";", "!", "?", "…", "-", "–", "—", "“", "»", '"', ")")
+
+
+def starts_next_section(
+    line: Line, previous: tuple[Line, Layout] | None, section: int | None
+) -> bool:
+    """The next numbered section, "29. როდესაც ...", after section 28's last sentence.
+
+    Some books number their sections and set them apart only by space, which a page
+    break hides, or not at all.
+    """
+    number = SECTION_NUMBER.match(line.text)
+    return (
+        number is not None
+        and previous is not None
+        and ends_sentence(previous[0].text)
+        and int(number.group(1)) in {1, (section or 0) + 1}
+    )
 
 
 def ends_heading(paragraph: Paragraph, line: Line, layout: Layout) -> bool:

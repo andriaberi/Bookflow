@@ -418,6 +418,21 @@ def test_first_line_after_a_space_is_not_a_heading() -> None:
     )
 
 
+def test_next_numbered_section_starts_a_paragraph() -> None:
+    first = page(1, line(500, "28. It was so."), line(514, "And the Lydians were subdued."))
+    second = page(2, line(40, "29. When Croesus had subdued them,"), line(54, "Sardis grew."))
+    assert texts([first, second]) == [
+        "28. It was so. And the Lydians were subdued.",
+        "29. When Croesus had subdued them, Sardis grew.",
+    ]
+
+
+def test_number_out_of_sequence_carries_on() -> None:
+    first = page(1, line(500, "28. It was so."), line(514, "In the year"))
+    second = page(2, line(40, "546. they came.", x1=150))
+    assert texts([first, second]) == ["28. It was so. In the year 546. they came."]
+
+
 def test_heading_in_capitals_before_its_translation() -> None:
     p = justified_page(
         (460, "The feeling had long gone.", RIGHT),
