@@ -1,8 +1,5 @@
-# One stylesheet for every page, so the whole book is set the same way.
-#
-# Clean and conservative, after the reference converter: sizes, weight and
-# centring sit on the heading elements themselves, and nothing relies on
-# pseudo-elements or colour, which many readers ignore.
+# One stylesheet for every page. Nothing relies on pseudo-elements or colour, which
+# many readers ignore.
 STYLESHEET = """\
 @charset "utf-8";
 
@@ -84,11 +81,14 @@ div.verse p {
   hyphens: none;
 }
 
-/* Headings: big, bold, centred, never hyphenated or left alone at a page end. */
-
+/* Headings: big, bold, centred, never hyphenated or left alone at a page end.
+   Sizes go by role, not by tag, so a chapter looks the same whether the book
+   has chapters only (h1) or parts, books and chapters (h3). */
 h1,
 h2,
 h3 {
+  margin: 3.5em 0 2em;
+  font-size: 1.6em;
   font-weight: bold;
   line-height: 1.25;
   text-align: center;
@@ -100,16 +100,6 @@ h3 {
   break-after: avoid;
   page-break-inside: avoid;
   break-inside: avoid;
-}
-
-/* Sizes go by role, not by tag, so a chapter looks the same whether the book
-   has chapters only (h1) or parts, books and chapters (h3). */
-
-h1,
-h2,
-h3 {
-  font-size: 1.6em;
-  margin: 3.5em 0 2em;
 }
 
 /* "თავი პირველი" above the title: smaller, plain, spaced out. */

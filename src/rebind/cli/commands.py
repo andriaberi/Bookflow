@@ -46,13 +46,4 @@ def parse_args(argv: Sequence[str] | None = None) -> Args:
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
 
-    args = parser.parse_args(argv)
-    return Args(
-        pdf=args.pdf,
-        pages=args.pages,
-        title=args.title,
-        author=args.author,
-        language=args.language,
-        output=args.output,
-        cover=args.cover,
-    )
+    return Args(**vars(parser.parse_args(argv)))

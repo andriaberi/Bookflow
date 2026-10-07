@@ -30,12 +30,7 @@ def notes_title(language: str) -> str:
 def nav_document(toc: list[Entry], language: str) -> str:
     """The table of contents, nested by heading level. It is also a page of the book."""
     title = contents_title(language)
-    nested = any(level > 1 for level, _, _ in toc)
-    shape = "nested" if nested else "flat"
-    lines = [
-        f'<nav epub:type="toc" id="toc" class="contents {shape}">',
-        f"<h1>{escape(title)}</h1>",
-    ]
+    lines = ['<nav epub:type="toc" id="toc">', f"<h1>{escape(title)}</h1>"]
     depth = 0
     for index, (level, heading, file) in enumerate(toc):
         level = min(level, depth + 1)  # a level can only go one deeper than the last

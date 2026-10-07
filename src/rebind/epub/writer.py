@@ -48,8 +48,9 @@ def write_epub(
     """
     files = [f"text/section-{number:04}.xhtml" for number in range(1, len(sections) + 1)]
     toc = entries(sections, files)
+    notes_heading = notes_title(metadata.language)
     if notes:
-        toc.append((1, Heading(1, notes_title(metadata.language)), NOTES_FILE))
+        toc.append((1, Heading(1, notes_heading), NOTES_FILE))
 
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as epub:
         # The mimetype must come first and stay uncompressed.
@@ -71,8 +72,9 @@ def write_epub(
         for section, file in zip(sections, files, strict=True):
             epub.writestr(f"EPUB/{file}", section_page(section, metadata))
         if notes:
-            title = notes_title(metadata.language)
-            page = notes_page(notes, note_sources(sections, files), title, metadata.language)
+            page = notes_page(
+                notes, note_sources(sections, files), notes_heading, metadata.language
+            )
             epub.writestr(f"EPUB/{NOTES_FILE}", page)
 
 
@@ -85,9 +87,7 @@ def note_sources(sections: list[Section], files: list[str]) -> dict[str, str]:
     return sources
 
 
-def package_document(
-    files: list[str], metadata: Metadata, has_cover: bool, has_notes: bool = False
-) -> str:
+def package_document(files: list[str], metadata: Metadata, has_cover: bool, has_notes: bool) -> str:
     modified = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     creator = f"<dc:creator>{escape(metadata.author)}</dc:creator>\n" if metadata.author else ""
     items = "\n".join(
