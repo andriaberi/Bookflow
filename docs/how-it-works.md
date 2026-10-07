@@ -20,7 +20,7 @@ at the top of each module.
   from where each letter starts. Inside a word a letter always moves the next by its
   own width, so a larger step starts a new word.
 - **Text:** Unicode NFC, ligatures spelled out, invisible characters removed, OCR dash
-  runs ("–-") made one em dash.
+  runs ("–-") made one em dash, and a letter-spaced heading line ("IV წ ი გ ნ ი") joined.
 - **Noise:** page numbers, running headers and footers (edge lines repeating on several
   pages), and footnote blocks at the foot of a page are removed. A chapter label at a
   page edge is a header only if it is on two pages in a row. Only scanned pages (an
