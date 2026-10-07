@@ -336,3 +336,23 @@ def test_heading_set_in_the_text_without_space() -> None:
     paragraphs = build_paragraphs([p])
     assert paragraphs[-2].text == "Hippe"
     assert paragraphs[-2].apart
+
+
+def test_heading_in_capitals_before_its_translation() -> None:
+    p = justified_page(
+        (460, "The feeling had long gone.", RIGHT),
+        (474, "OPERATIONES SPIRITUALES", 200),
+        (488, "(Spiritual exercises (Lat.).) Naphta was born in a small town", RIGHT),
+    )
+    paragraphs = build_paragraphs([p])
+    assert paragraphs[-2].text == "OPERATIONES SPIRITUALES"
+    assert paragraphs[-2].apart
+
+
+def test_text_before_a_bracketed_translation_carries_on() -> None:
+    p = justified_page(
+        (460, "The feeling had long gone.", RIGHT),
+        (474, "nothing but prima materia", 200),
+        (488, "(the first matter (Lat.).) and so it went on and on and on", RIGHT),
+    )
+    assert "gone. nothing but prima materia (the first matter" in texts([p])[-1]
