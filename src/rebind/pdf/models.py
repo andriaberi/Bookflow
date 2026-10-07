@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -20,7 +20,6 @@ class Page:
     width: float
     height: float
     lines: list[Line]
-    footnotes: list[Line] = field(default_factory=list)
     # A scan with an OCR text layer: its text may hold misreads to clean up.
     scanned: bool = False
 

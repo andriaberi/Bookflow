@@ -62,7 +62,7 @@ def remove_noise(pages: list[Page]) -> list[Page]:
 
     for page in pages:
         # Footnote marks look like specks, so clean the edges only once footnotes are out.
-        split_footnotes(page)
+        drop_footnotes(page)
         if page.scanned:
             for line in page.lines:
                 line.text = strip_edge_debris(line.text)
@@ -206,8 +206,8 @@ def strip_glued_page_number(page: Page, printed: int) -> None:
         page.lines[0].text = page.lines[0].text.removeprefix(number).lstrip()
 
 
-def split_footnotes(page: Page) -> None:
-    """Move the footnote block at the bottom of the page from its lines to its footnotes.
+def drop_footnotes(page: Page) -> None:
+    """Remove the footnote block at the bottom of the page.
 
     Runs after page numbers are gone, so the footnotes are the last lines. The block
     starts at the highest wide gap in the bottom of the page whose next line opens
@@ -234,7 +234,6 @@ def split_footnotes(page: Page) -> None:
             start = index
 
     if start is not None and not runs_on(lines[-1], lines):
-        page.footnotes = lines[start:]
         page.lines = lines[:start]
 
 
