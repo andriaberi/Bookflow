@@ -6,11 +6,11 @@ from rebind.pdf.text import script_of
 
 from .layout import (
     OPENINGS,
-    SENTENCE_END,
     TITLE_LINES,
     Layout,
     ends_page_early,
     ends_paragraph,
+    ends_sentence,
     fit,
     has_gap_before,
     is_indented,
@@ -181,10 +181,6 @@ def in_latin_capitals(text: str) -> bool:
     """Its Latin letters, two or more, all capitals: "OPERATIონეშ შპIღIთუალეშ" as printed."""
     latin = [c for c in text if script_of(c) == "LATIN"]
     return len(latin) >= 2 and all(c.isupper() for c in latin)
-
-
-def ends_sentence(text: str) -> bool:
-    return text.endswith((*SENTENCE_END, ")", "]"))
 
 
 def is_set_title(

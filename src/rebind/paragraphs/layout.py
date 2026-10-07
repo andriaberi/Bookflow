@@ -99,15 +99,16 @@ def text_column(pages: list[Page]) -> Layout:
     layouts = [measure(page) for page in pages if len(page.lines) >= 10] or [
         measure(page) for page in pages if page.lines
     ]
+    step, loose = spacing(pages)
     return Layout(
         left=statistics.median(layout.left for layout in layouts),
         right=statistics.median(layout.right for layout in layouts),
         line_height=statistics.median(layout.line_height for layout in layouts),
         gap=statistics.median(layout.gap for layout in layouts),
         height=statistics.median(layout.height for layout in layouts),
-        paragraph_step=paragraph_step(pages),
+        paragraph_step=step,
         indents=indents(pages),
-        loose=loose_spacing(pages),
+        loose=loose,
         justified=is_justified(pages),
     )
 
@@ -145,23 +146,20 @@ def indents(pages: list[Page]) -> bool:
     return indented >= MIN_INDENTED * lines if lines else False
 
 
-def paragraph_step(pages: list[Page]) -> float | None:
-    """The line step that starts a paragraph, if the book marks paragraphs by space."""
-    found = wide_steps(pages)
-    if found is None or not found[2]:
-        return None
-    usual, wide, _ = found
-    return (usual + statistics.median(step for step, _ in wide)) / 2
-
-
-def loose_spacing(pages: list[Page]) -> bool:
-    """Whether the book has space between lines that isn't a paragraph's.
+def spacing(pages: list[Page]) -> tuple[float | None, bool]:
+    """The line step that starts a paragraph, if the book marks paragraphs by space,
+    and whether the book has space between lines that isn't a paragraph's.
 
     A Word export with a hard break every few lines puts the paragraph space after
     each of them, mid-sentence too: "...მთელი ორი-სამი" / "დღით მოსვენებას...".
     """
     found = wide_steps(pages)
-    return found is not None and not found[2]
+    if found is None:
+        return None, False
+    usual, wide, marks_paragraphs = found
+    if not marks_paragraphs:
+        return None, True
+    return (usual + statistics.median(step for step, _ in wide)) / 2, False
 
 
 def wide_steps(pages: list[Page]) -> tuple[float, list[tuple[float, Line]], bool] | None:
@@ -182,7 +180,7 @@ def wide_steps(pages: list[Page]) -> tuple[float, list[tuple[float, Line]], bool
     ]
     if len(wide) < MIN_SPACED * len(steps):
         return None
-    after_sentence = sum(above.text.endswith((*SENTENCE_END, ")", "]")) for _, above in wide)
+    after_sentence = sum(ends_sentence(above.text) for _, above in wide)
     return usual, wide, after_sentence >= SPACED_AFTER_SENTENCE * len(wide)
 
 
@@ -206,6 +204,11 @@ def fit(layout: Layout, column: Layout) -> Layout:
     )
 
 
+def ends_sentence(text: str) -> bool:
+    """Ends a sentence, a bracket or a note mark: "...იწვა.", "...miux.[10]"."""
+    return text.endswith((*SENTENCE_END, ")", "]"))
+
+
 def is_indented(line: Line, layout: Layout) -> bool:
     return line.x0 - layout.left > INDENT * layout.line_height
 
@@ -220,7 +223,7 @@ def has_gap_before(line: Line, previous: Line, layout: Layout) -> bool:
         return False
     runs_on = (
         layout.loose
-        and not previous.text.endswith((*SENTENCE_END, ")", "]"))
+        and not ends_sentence(previous.text)
         and previous.x1 - previous.x0 > LONG_LINE * (layout.right - layout.left)
         and not line.text.startswith(OPENINGS)
     )
@@ -236,7 +239,7 @@ def is_spaced_apart(line: Line, above: Line, layout: Layout) -> bool:
     step = layout.paragraph_step
     if step is None or line.y0 - above.y0 < step:
         return False
-    return above.text.endswith((*SENTENCE_END, ")", "]")) or line.text.startswith(OPENINGS)
+    return ends_sentence(above.text) or line.text.startswith(OPENINGS)
 
 
 def stands_apart(line: Line, above: Line, layout: Layout) -> bool:

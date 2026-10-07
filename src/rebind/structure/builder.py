@@ -8,16 +8,22 @@ from rebind.labels import (
 )
 from rebind.paragraphs import Paragraph
 from rebind.paragraphs.builder import join
-from rebind.paragraphs.layout import TITLE_SPACE, Layout, is_tall, stands_apart, text_column
+from rebind.paragraphs.layout import (
+    TITLE_LINES,
+    TITLE_SPACE,
+    Layout,
+    is_short,
+    is_tall,
+    stands_apart,
+    text_column,
+)
 from rebind.pdf import Page
 
 from .headings import (
-    MAX_TITLE_LINES,
     gap_after,
     is_centred,
     is_label,
     is_named_section,
-    is_short,
     is_title,
     run_in_label,
 )
@@ -152,7 +158,7 @@ def is_subheading(paragraph: Paragraph, following: Paragraph | None, column: Lay
     return (
         paragraph.apart
         and text.casefold() not in NOTES_TITLES
-        and len(paragraph.lines) <= MAX_TITLE_LINES
+        and len(paragraph.lines) <= TITLE_LINES
         and is_short(paragraph.lines[-1], column)
         and not paragraph.verse
         and not paragraph.scene_break
@@ -181,7 +187,7 @@ def is_long_title(paragraph: Paragraph, following: Paragraph | None, column: Lay
     step = following.lines[0].y0 - paragraph.lines[-1].y0
     usual = column.line_height + column.gap
     return (
-        len(paragraph.lines) <= MAX_TITLE_LINES
+        len(paragraph.lines) <= TITLE_LINES
         and not text.endswith(TEXT_ENDS)
         and not text.startswith(("-", "–", "—", "„", "«", '"'))
         and not paragraph.verse
@@ -199,7 +205,7 @@ def is_title_part(paragraph: Paragraph, title: list[Paragraph], column: Layout, 
     # sentence: titles do none of these, though they may ask ("სად მიდიან?") or trail off.
     text = paragraph.text
     return (
-        lines <= MAX_TITLE_LINES
+        lines <= TITLE_LINES
         and not paragraph.scene_break
         and not text.endswith(":")
         and not (text.endswith(".") and not text.endswith(".."))

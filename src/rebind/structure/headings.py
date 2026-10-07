@@ -1,15 +1,7 @@
 from rebind.labels import is_section_name, label_level, split_label
 from rebind.paragraphs import Paragraph
-from rebind.paragraphs.layout import TITLE_LINES, Layout
+from rebind.paragraphs.layout import TITLE_LINES, Layout, is_short
 from rebind.pdf import Line
-
-# A title is a line or a few, never a paragraph of text.
-MAX_TITLE_LINES = TITLE_LINES
-
-
-def is_short(line: Line, layout: Layout) -> bool:
-    """Stops well before the right margin, as a heading set flush left does."""
-    return line.x1 < layout.right - 2 * layout.line_height
 
 
 def is_centred(line: Line, layout: Layout) -> bool:
@@ -58,7 +50,7 @@ def run_in_label(paragraph: Paragraph, layout: Layout) -> tuple[str, str] | None
 
 def is_title(paragraph: Paragraph, layout: Layout) -> bool:
     """A line or a few, each centred or short, or all in capitals: never running text."""
-    if len(paragraph.lines) > MAX_TITLE_LINES:
+    if len(paragraph.lines) > TITLE_LINES:
         return False
     if paragraph.text.isupper():
         return True
