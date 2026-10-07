@@ -41,11 +41,13 @@ Rebind first learns how the book marks paragraphs (`layout.text_column`): by ind
 extra space between lines, or neither. It also learns whether lines are justified, and
 whether the book has stray space mid-sentence, as Word exports with hard line breaks do.
 
-A line then starts a new paragraph when it is indented, set below a gap or a
-paragraph's space, follows a short line ending a sentence, follows a heading line, or
-is a scene break or a tall line. A line never starts one after a word broken at the
-line end, which is rejoined. A page that is mostly dialogue or verse would mistake its
-indent for its margin, so it uses the book's column instead.
+A line then starts a new paragraph when it is indented, set below a gap or a paragraph's
+space, follows a short line ending a sentence, follows a heading line, or is a scene
+break or a tall line. A line never starts one after a word broken at the line end, which
+is rejoined, or after a quote opened at the line end. Nor does a short line between an
+unfinished sentence and a line opening with closing punctuation: some books set a
+foreign word on a line of its own mid-sentence. A page that is mostly dialogue or verse
+would mistake its indent for its margin, so it uses the book's column instead.
 
 A paragraph that starts well below a finished sentence is marked `apart`: it may be a
 heading set in the text.

@@ -300,6 +300,43 @@ def test_line_opening_with_a_full_stop_ends_the_sentence_above() -> None:
     assert texts([p]) == ["Est modus in rebus. დიახ, სადილსაც კი ბოლო უნდა ჰქონდეს."]
 
 
+def test_word_set_apart_mid_sentence_carries_on() -> None:
+    p = page(
+        1,
+        line(100, "მელოტს. ყველაფერს საზღვარი უნდა ჰქონდეს", x1=230),
+        line(114, "Est modus in rebus", x0=INDENT, x1=150),
+        line(128, ". დიახ, სადილსაც კი ბოლო უნდა ჰქონდეს. ვაშლის ქადა", x0=INDENT),
+        line(142, "ძალიან გიყვართ.", x1=150),
+    )
+    assert texts([p]) == [
+        "მელოტს. ყველაფერს საზღვარი უნდა ჰქონდეს Est modus in rebus. დიახ, სადილსაც კი"
+        " ბოლო უნდა ჰქონდეს. ვაშლის ქადა ძალიან გიყვართ."
+    ]
+
+
+def test_quote_opened_at_a_line_end_carries_on() -> None:
+    p = page(
+        1,
+        line(100, "გამოაქანდაკეს სიტყვა „აღსდგა“ - „", x1=200),
+        line(114, "Redivivus", x0=INDENT, x1=100),
+        line(128, "“; პიე, რომელიც ცხოვრობდა ტერეზის ქ. #4-ში, ამზადებდა", x0=INDENT),
+        line(142, "კრებებს.", x1=150),
+    )
+    assert texts([p]) == [
+        "გამოაქანდაკეს სიტყვა „აღსდგა“ - „Redivivus“; პიე, რომელიც ცხოვრობდა ტერეზის ქ."
+        " #4-ში, ამზადებდა კრებებს."
+    ]
+
+
+def test_english_opening_quote_starts_a_paragraph() -> None:
+    p = page(
+        1,
+        line(100, "He said nothing.", x1=150),
+        line(114, "“Come in,” she said.", x0=INDENT, x1=200),
+    )
+    assert texts([p]) == ["He said nothing.", "“Come in,” she said."]
+
+
 def test_dash_alone_on_its_line_opens_the_speech_below() -> None:
     p = page(1, line(100, "-", x0=INDENT, x1=70), line(114, "Vermis sum.", x0=INDENT, x1=150))
     assert texts([p]) == ["- Vermis sum."]
