@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Bookflow developer CLI, driven by the Makefile. Run `tools/cli.sh help` for usage.
+# Rebind developer CLI, driven by the Makefile. Run `tools/cli.sh help` for usage.
 
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
 VENV=${VENV:-.venv}
 PYTHON=${PYTHON:-$VENV/bin/python}
-VERSION_FILE=src/bookflow/__init__.py
+VERSION_FILE=src/rebind/__init__.py
 
 # Style
 
@@ -142,7 +142,7 @@ need_venv() {
     sync_install
 }
 
-# The `bookflow` command and the dependencies are generated from pyproject.toml at
+# The `rebind` command and the dependencies are generated from pyproject.toml at
 # install time, so reinstall whenever it has changed since the last install.
 STAMP=$VENV/.installed
 sync_install() {
@@ -158,10 +158,10 @@ current_version() { sed -n 's/^__version__ = "\(.*\)"$/\1/p' "$VERSION_FILE"; }
 cmd_help() {
     local A=$ACCENT R=$RESET B=$BOLD D=$DIM
     cat <<EOF
-${B}Bookflow${R} ${D}— make <command>${R}
+${B}Rebind${R} ${D}— make <command>${R}
 
 ${B}Setup${R}
-  ${A}install${R}     Create $VENV and install Bookflow with its dev tools
+  ${A}install${R}     Create $VENV and install Rebind with its dev tools
 
 ${B}Develop${R}
   ${A}format${R}      Format code and fix what can be fixed
@@ -183,7 +183,7 @@ ${B}Release${R}
   ${A}build${R}       Build the package into dist/
   ${A}clean${R}       Remove build files and caches
 
-${D}Run Bookflow: bookflow book.pdf [options]  (or python -m bookflow)${R}
+${D}Run Rebind: rebind book.pdf [options]  (or python -m rebind)${R}
 EOF
 }
 

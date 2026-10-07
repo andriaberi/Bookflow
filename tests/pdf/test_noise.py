@@ -1,7 +1,7 @@
 import pytest
 
-from bookflow.pdf.models import Line, Page
-from bookflow.pdf.noise import is_junk, is_page_number, remove_noise
+from rebind.pdf.models import Line, Page
+from rebind.pdf.noise import is_junk, is_page_number, remove_noise
 
 
 def page(number: int, *rows: tuple[float, str], scanned: bool = True) -> Page:
