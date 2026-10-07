@@ -395,6 +395,29 @@ def test_heading_set_in_the_text_without_space() -> None:
     assert paragraphs[-2].apart
 
 
+def test_word_left_before_a_paragraph_space_is_not_a_heading() -> None:
+    p = justified_page(
+        (460, "The section ends.", 300),
+        (474, "Hephaestus", 80),
+        (502, "152. This Psammetichus had fled before,", RIGHT),
+    )
+    paragraphs = build_paragraphs([p])
+    assert not any(x.apart for x in paragraphs)
+
+
+def test_first_line_after_a_space_is_not_a_heading() -> None:
+    p = justified_page(
+        (460, "The section ends.", 200),
+        (510, "3. Then, when the Ionians asked Histiaeus why", RIGHT - 40),
+        (524, "he had urged Aristagoras on so eagerly, he hid", RIGHT),
+        (538, "the reason.", 120),
+    )
+    assert texts([p])[-1] == (
+        "3. Then, when the Ionians asked Histiaeus why he had urged Aristagoras on so eagerly,"
+        " he hid the reason."
+    )
+
+
 def test_heading_in_capitals_before_its_translation() -> None:
     p = justified_page(
         (460, "The feeling had long gone.", RIGHT),

@@ -168,6 +168,10 @@ CLAUSE_BREAK = re.compile(r"[.,;:]\s")
 SET_TITLE_WORDS = 6
 SET_TITLE_WIDTH = 0.6
 
+# A heading run into the text ends well short of the margin, at most this share of
+# the column; a paragraph's first line stops only a word or two short.
+MAX_HEADING_WIDTH = 0.8
+
 # A line ending in these is a clause or a sentence, not a heading set in the text.
 TITLE_ENDS = (".", ",", ":", ";", "!", "?", "…", "-", "–", "—", "“", "»", '"', ")")
 
@@ -175,13 +179,16 @@ TITLE_ENDS = (".", ",", ":", ";", "!", "?", "…", "-", "–", "—", "“", "»
 def ends_heading(paragraph: Paragraph, line: Line, layout: Layout) -> bool:
     """A heading set apart above but run straight into the text below it.
 
-    It is a line or a few, the last one short, and the text below starts with a
-    full line: "ტინაპელებთან ცხოვრებისა და ... / ამბავი" then the chapter's text,
-    on the same page or the next.
+    It is a line or a few, the last one well short of the margin, and the text below
+    starts with a full line: "ტინაპელებთან ცხოვრებისა და ... / ამბავი" then the
+    chapter's text, on the same page or the next. A paragraph's first line stopping
+    a few words short is not one: "3. შემდეგ, როდესაც ჰისტიაჲოსს ... თუ რატომ".
     """
+    last = paragraph.lines[-1]
     return (
         len(paragraph.lines) <= TITLE_LINES
-        and is_short(paragraph.lines[-1], layout)
+        and is_short(last, layout)
+        and last.x1 - last.x0 < MAX_HEADING_WIDTH * (layout.right - layout.left)
         and not is_short(line, layout)
     )
 
@@ -224,6 +231,9 @@ def is_set_title(
         and not any(is_glued(word) for word in text.split())
         and below is not None
         and not is_short(below, layout)
+        # It runs straight into the text: a stray word before a paragraph's space isn't
+        # a heading, "ჰეფაჲსტოსის" / "152. ადრე ეს ფსმეტიქოსი ...".
+        and not has_gap_before(below, line, layout)
         # A bracketed translation goes on the text, "(პირველქმნილი მატერია (ლათ.).)",
         # unless it translates a heading in capitals: "OPERATIONES SPIRITUALES".
         and (not below.text.startswith("(") or in_latin_capitals(text))

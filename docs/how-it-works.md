@@ -50,7 +50,8 @@ foreign word on a line of its own mid-sentence. A page that is mostly dialogue o
 would mistake its indent for its margin, so it uses the book's column instead.
 
 A paragraph that starts well below a finished sentence is marked `apart`: it may be a
-heading set in the text.
+heading set in the text. Such a heading runs straight into the text below it, with no
+space, and its last line stops well short of the margin.
 
 **Verse** (`verse.py`): a run of at least four short lines, or two after a line ending
 with a colon or a short line ending with a comma, where at most half end a sentence and
