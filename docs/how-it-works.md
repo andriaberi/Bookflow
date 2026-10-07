@@ -72,8 +72,9 @@ than the verse's own starts a new stanza.
   level.
 - **Headings set in the text:** short `apart` paragraphs that run straight into the text.
 
-The short centred or capitalised paragraphs after a label are its **title**. Levels are
-renumbered from 1, and the label word is put in the same place throughout.
+The short centred, flush-right or capitalised paragraphs after a label are its
+**title**. Levels are renumbered from 1, and the label word is put in the same place
+throughout.
 
 **Front matter** (`front.py`): the book's title page, its reprints before later
 volumes, and text before the first heading are dropped, unless that text is over a
