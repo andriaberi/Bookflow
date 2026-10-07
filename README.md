@@ -75,7 +75,8 @@ Wrote book.epub: 172 headings, 6317 paragraphs, 206 notes, no cover
 - A heading needs a label word (თავი, ნაწილი, Chapter, Part, ...) and a number, a
   chapter number alone ("XII", "7."), or a section name (წინათქმა, Epilogue, ...).
 - Footnotes at the foot of a page are removed, not linked.
-- Verse needs at least four lines, or two after a line ending with a colon.
+- Verse needs at least four lines, or two after a line leading into it (ending with a
+  colon, or broken short after a comma).
 - Bold, italics and pictures inside the book are not kept.
 - Only Georgian and English are detected. Other languages need `--language`.
 

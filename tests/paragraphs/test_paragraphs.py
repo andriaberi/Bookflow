@@ -172,6 +172,26 @@ def test_two_short_lines_without_a_colon_are_text() -> None:
     assert verse_of(build_paragraphs([full_page(1), p])) == []
 
 
+def test_two_lines_after_a_short_line_ending_in_a_comma_are_verse() -> None:
+    p = page(
+        2,
+        line(86, "მაგიდაზე წესრიგი სუფევდა და მაგიდის ქვეშ კი - უწესობა."),
+        line(100, "მოლიერისა არ იყოს,", x1=200),
+        line(114, "ისეთ რამეს აკეთებდნენ მაგიდის ქვეშ ფეხით,", INDENT, 180),
+        line(128, "ყველაფერი ზანზარებდა, გრგვინვა იყო მეხის.", INDENT, 180),
+    )
+    assert verse_of(build_paragraphs([full_page(1), p])) == [
+        ["ისეთ რამეს აკეთებდნენ მაგიდის ქვეშ ფეხით,", "ყველაფერი ზანზარებდა, გრგვინვა იყო მეხის."]
+    ]
+
+
+def test_narration_after_verse_is_left_out() -> None:
+    song = ["ვერაფრით წინ ვერ წავედი,", "ესეც ვოლტერის ბრალია,", "ჩემს ბედს გაუტყდა ბორბალი,"]
+    song.append("ესეც სულ რუსოს ბრალია.")
+    p = verse_page(*song, "გავროში მღეროდა, ისინი ესროდნენ.")
+    assert verse_of(build_paragraphs([full_page(1), p])) == [song]
+
+
 def test_speech_inside_a_song_stays_in_it() -> None:
     song = [
         "ო, თეთრო ვარდო, პაწაწინა ყვავილო,",

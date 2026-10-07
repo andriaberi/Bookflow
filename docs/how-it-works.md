@@ -53,8 +53,10 @@ A paragraph that starts well below a finished sentence is marked `apart`: it may
 heading set in the text.
 
 **Verse** (`verse.py`): a run of at least four short lines, or two after a line ending
-with a colon, where at most half end a sentence and at most a third are speech, keeps
-its line breaks. A wider gap than the verse's own starts a new stanza.
+with a colon or a short line ending with a comma, where at most half end a sentence and
+at most a third are speech, keeps its line breaks. A sentence of three words or more
+after a line that already ended one is narration, not part of the verse. A wider gap
+than the verse's own starts a new stanza.
 
 ## 4. Structure (`structure/`)
 
