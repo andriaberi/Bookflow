@@ -66,6 +66,7 @@ def find_label(text: str) -> tuple[int, str] | None:
 SECTION_NAMES = {
     "წინათქმა",  # foreword
     "წინასიტყვაობა",  # preface
+    "წინასიტყვა",  # preface
     "შესავალი",  # introduction
     "პროლოგი",
     "ეპილოგი",
@@ -79,9 +80,18 @@ SECTION_NAMES = {
 }
 
 
+# Named sections left out of the EPUB: no one reads them.
+PREFACE_NAMES = {"წინათქმა", "წინასიტყვაობა", "წინასიტყვა", "foreword", "preface"}
+
+
 def is_section_name(text: str) -> bool:
     """A named section's heading: "წინათქმა", "Prologue", "EPILOGUE"."""
     return text.strip().casefold() in SECTION_NAMES
+
+
+def is_preface(text: str) -> bool:
+    """A foreword's or preface's heading: "წინასიტყვაობა", "Preface"."""
+    return text.strip().casefold() in PREFACE_NAMES
 
 
 # The number of a label printed with its title on one line: "თავი მეშვიდე ...".

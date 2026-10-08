@@ -1,7 +1,7 @@
 import re
 from difflib import SequenceMatcher
 
-from pdf2epub.labels import LABELS
+from pdf2epub.labels import LABELS, is_preface
 
 from .models import Section
 
@@ -40,9 +40,24 @@ MAX_FRONT_MATTER = 0.1
 
 def drop_front_matter(sections: list[Section], title: str, author: str | None) -> list[Section]:
     """Leave out the book's own title pages; the EPUB opens with a title page of its own."""
+    sections = drop_prefaces(sections)
     sections = drop_title_page_reprints(sections)
     sections = drop_repeated_title(sections, title, author)
     return drop_text_before_first_heading(sections)
+
+
+def drop_prefaces(sections: list[Section]) -> list[Section]:
+    """Leave out forewords and prefaces, with any sections under them."""
+    kept: list[Section] = []
+    preface_level = None
+    for section in sections:
+        heading = section.heading
+        if heading and preface_level is not None and heading.level > preface_level:
+            continue
+        preface_level = heading.level if heading and is_preface(heading.label) else None
+        if preface_level is None:
+            kept.append(section)
+    return kept
 
 
 def drop_title_page_reprints(sections: list[Section]) -> list[Section]:
