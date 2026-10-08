@@ -159,3 +159,16 @@ def test_verse_keeps_its_line_breaks(tmp_path: Path) -> None:
     write_epub(path, [Section(Heading(1, "თავი პირველი"), [verse])], METADATA)
     text = zipfile.ZipFile(path).read("EPUB/text/section-0001.xhtml").decode()
     assert '<div class="verse"><p>ერთი,</p><p>ორი &amp; სამი</p></div>' in text
+
+
+def test_epigraph_is_set_apart_with_its_source(tmp_path: Path) -> None:
+    quote = Paragraph("დაყოვნება საქმეს შველის.", 1, epigraph=True)
+    source = Paragraph("ენიუსი", 1, epigraph=True, attribution=True)
+    path = tmp_path / "book.epub"
+    sections = [Section(Heading(1, "V", "მოლაპარაკება"), [quote, source, paragraph("ტექსტი.")])]
+    write_epub(path, sections, METADATA)
+    text = zipfile.ZipFile(path).read("EPUB/text/section-0001.xhtml").decode()
+    assert (
+        '<div class="epigraph"><p>დაყოვნება საქმეს შველის.</p>'
+        '<p class="attribution">ენიუსი</p></div>\n<p>ტექსტი.</p>'
+    ) in text
