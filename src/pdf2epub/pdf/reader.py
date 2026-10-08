@@ -111,7 +111,7 @@ def text_lines(page: pymupdf.Page) -> list[dict[str, Any]]:
 
 def glyphs(line: dict[str, Any]) -> list[Glyph]:
     return [
-        Glyph(char["c"], char["origin"][0], span["size"], span["font"])
+        Glyph(char["c"], char["origin"][0], span["size"], span["font"], char["bbox"][2])
         for span in line["spans"]
         for char in span["chars"]
     ]

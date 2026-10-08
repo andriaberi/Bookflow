@@ -39,6 +39,7 @@ class Glyph(NamedTuple):
     x: float  # where the letter starts
     size: float
     font: str
+    right: float | None = None  # where its box ends
 
 
 # A letter's usual advance in a font, in font sizes: (font, char) -> advance.
@@ -122,7 +123,11 @@ def is_word_break(
         return True
     usual = advances.get((glyph.font, glyph.char))
     if usual is None:
-        return spaced
+        # A font too rare to learn from: its spaces, or a gap between the letters'
+        # boxes where it has none (boxes may overlap where widths are wrong).
+        if spaced or glyph.right is None:
+            return spaced
+        return (following.x - glyph.right) / glyph.size - tracking > WORD_GAP
     return advance(glyph, following) - usual - tracking > WORD_GAP
 
 

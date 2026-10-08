@@ -62,3 +62,9 @@ def test_letter_spaced_words_stay_whole() -> None:
 def test_a_few_letters_tell_no_letter_spacing() -> None:
     glyphs = [Glyph(c, 8.0 * i, SIZE, "Serif") for i, c in enumerate("ab")]
     assert letter_spacing(glyphs, learn_advances(LINES)) is None
+
+
+def test_a_rare_font_is_spaced_by_the_gap_between_letters() -> None:
+    glyphs = [Glyph(c, 6.0 * i, SIZE, "Bold", 6.0 * i + 5.5) for i, c in enumerate("ab")]
+    glyphs += [Glyph(c, 6.0 * i + 15.0, SIZE, "Bold", 6.0 * i + 20.5) for i, c in enumerate("ba")]
+    assert spaced_text(glyphs, learn_advances(LINES)) == "ab ba"
