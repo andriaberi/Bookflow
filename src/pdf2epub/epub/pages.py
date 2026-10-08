@@ -131,9 +131,10 @@ def notes_page(notes: list[Note], sources: dict[str, str], title: str, language:
         mark = escape(note.mark)
         if note.id in sources:
             mark = f'<a href="{sources[note.id]}#ref-{note.id}" role="doc-backlink">{mark}</a>'
+        # A note no mark in the text was linked to has no number to show.
+        shown = f'<span class="mark">{mark}</span> ' if mark else ""
         parts.append(
-            f'<li id="{note.id}" epub:type="endnote">'
-            f'<p><span class="mark">{mark}</span> {escape(note.text)}</p></li>'
+            f'<li id="{note.id}" epub:type="endnote"><p>{shown}{escape(note.text)}</p></li>'
         )
     parts.append("</ol>\n</section>")
     return page(title, "\n".join(parts), language)

@@ -148,6 +148,15 @@ def test_notes_get_a_page_and_marks_link_to_them(tmp_path: Path) -> None:
     assert '<a href="notes.xhtml">' in epub.read("EPUB/nav.xhtml").decode()
 
 
+def test_note_without_a_mark_shows_no_number(tmp_path: Path) -> None:
+    note = Note("note-1", "", "მერი _ ქალაქის უფროსი.")
+    path = tmp_path / "book.epub"
+    chapter = Section(Heading(1, "თავი პირველი"), [paragraph("ტექსტი.")])
+    write_epub(path, [chapter], METADATA, notes=[note])
+    notes = zipfile.ZipFile(path).read("EPUB/notes.xhtml").decode()
+    assert '<li id="note-1" epub:type="endnote"><p>მერი _ ქალაქის უფროსი.</p></li>' in notes
+
+
 def test_no_notes_page_without_notes(tmp_path: Path) -> None:
     assert "EPUB/notes.xhtml" not in written(tmp_path).namelist()
 
