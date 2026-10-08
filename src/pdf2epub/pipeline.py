@@ -85,7 +85,8 @@ def convert(args: Args, progress: Callable[[str], None] = lambda step: None) -> 
         raise ConvertError(f"can't write {output}: {e.strerror}") from None
 
     headings = sum(1 for section in sections if section.heading)
-    return Result(output, headings, len(paragraphs), len(notes), source)
+    written = sum(len(section.paragraphs) for section in sections)
+    return Result(output, headings, written, len(notes), source)
 
 
 def choose_cover(own: Cover | None, fallback: Cover | None) -> tuple[Cover | None, str]:
