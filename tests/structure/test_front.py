@@ -1,6 +1,6 @@
-from rebind.paragraphs import Paragraph
-from rebind.structure import Heading, Section
-from rebind.structure.front import (
+from pdf2epub.paragraphs import Paragraph
+from pdf2epub.structure import Heading, Section
+from pdf2epub.structure.front import (
     drop_repeated_title,
     drop_text_before_first_heading,
     drop_title_page_reprints,
