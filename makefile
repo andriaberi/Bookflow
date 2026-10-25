@@ -12,6 +12,9 @@ MANAGE := $(PYTHON) $(BACKEND_DIR)/manage.py
 NPX_BIN := $(FRONTEND_DIR)/node_modules/.bin
 SASS    := npx sass --silence-deprecation=import src/css/styles.scss:src/css/styles.css
 
+# SASS runs only once the frontend has src/css/styles.scss
+HAS_SCSS := $(wildcard $(FRONTEND_DIR)/src/css/styles.scss)
+
 # PHONY targets
 .PHONY: help install install-backend install-frontend \
         dev run-backend run-frontend \
@@ -71,10 +74,14 @@ run-backend: migrate
 	$(MANAGE) runserver
 
 run-frontend:
+ifneq ($(HAS_SCSS),)
 	cd $(FRONTEND_DIR) && $(SASS) --no-source-map
 	cd $(FRONTEND_DIR) && npx concurrently --names react,sass \
 		"npm start" \
 		"$(SASS) --watch"
+else
+	cd $(FRONTEND_DIR) && npm start
+endif
 
 # Database
 migrations:
@@ -104,7 +111,9 @@ deploy: frontend copy collect migrate restart
 
 frontend:
 	cd $(FRONTEND_DIR) && npm install
+ifneq ($(HAS_SCSS),)
 	cd $(FRONTEND_DIR) && $(SASS) --no-source-map
+endif
 	cd $(FRONTEND_DIR) && npm run build
 
 copy:
