@@ -1,0 +1,17 @@
+import { Link } from 'react-router-dom';
+import { useSettings } from '../helpers/settings';
+
+function NotFound() {
+    const { t } = useSettings();
+
+    return (
+        <section className="container bf-section text-center bf-soon">
+            <div className="bf-display bf-accent-text fw-bold mb-2" style={ { fontSize: 72 } }>404</div>
+            <h1 className="bf-display bf-section-title mb-3">{ t.notFound.title }</h1>
+            <p className="bf-muted fs-5 mb-4">{ t.notFound.text }</p>
+            <Link to="/" className="btn btn-ghost px-4">{ t.notFound.home }</Link>
+        </section>
+    );
+}
+
+export default NotFound;
