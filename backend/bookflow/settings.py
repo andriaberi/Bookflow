@@ -95,3 +95,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Largest PDF the converter accepts, in megabytes
 MAX_PDF_SIZE_MB = int(os.getenv("MAX_PDF_SIZE_MB", "100"))
+
+# Read uploaded books in a background thread; tests turn this off to read right away.
+CONVERTER_BACKGROUND = True
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"converter": {"handlers": ["console"], "level": "INFO"}},
+}

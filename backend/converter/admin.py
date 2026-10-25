@@ -5,21 +5,21 @@ from . import models
 
 @admin.register(models.Conversion)
 class ConversionAdmin(admin.ModelAdmin):
-    list_display    = ("pdf", "title", "status", "headings", "paragraphs", "created_at")
+    list_display    = ("name", "status", "pages", "size", "created_at")
     list_filter     = ("status",)
-    search_fields   = ("pdf", "title", "author")
-    readonly_fields = ("id", "status", "error", "headings", "paragraphs", "notes",
-                       "created_at", "finished_at")
+    search_fields   = ("name",)
+    readonly_fields = ("id", "name", "size", "pages", "status", "step", "error",
+                       "created_at", "updated_at")
+    exclude         = ("book",)
 
     fieldsets = (
         ("Files", {
-            "fields": ("id", "pdf", "epub")
+            "fields": ("id", "pdf", "cover")
         }),
-        ("Options", {
-            "fields": ("title", "author", "language", "pages")
+        ("PDF", {
+            "fields": ("name", "size", "pages")
         }),
-        ("Result", {
-            "fields": ("status", "error", "headings", "paragraphs", "notes",
-                       "created_at", "finished_at")
+        ("Reading", {
+            "fields": ("status", "step", "error", "created_at", "updated_at")
         }),
     )

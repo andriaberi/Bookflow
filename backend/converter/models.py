@@ -3,39 +3,43 @@ import uuid
 from django.db import models
 
 
+def pdf_path(conversion, filename):
+    return f"conversions/{conversion.id}/{filename}"
+
+
+def cover_path(conversion, filename):
+    return f"conversions/{conversion.id}/cover.jpg"
+
+
 class Conversion(models.Model):
     STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("running", "Running"),
-        ("done",    "Done"),
+        ("reading", "Reading"),
+        ("ready",   "Ready"),
         ("failed",  "Failed"),
     ]
 
     # Public id, so conversions can't be guessed by counting
-    id       = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id     = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    pdf      = models.FileField(upload_to="conversions/pdf/")
-    epub     = models.FileField(upload_to="conversions/epub/", blank=True)
+    pdf    = models.FileField(upload_to=pdf_path)
+    name   = models.CharField(max_length=255, help_text="The PDF's file name, without .pdf")
+    size   = models.PositiveBigIntegerField(help_text="In bytes")
+    pages  = models.PositiveIntegerField()
 
-    # Options passed to the engine; blank means "find it in the PDF"
-    title    = models.CharField(max_length=300, blank=True)
-    author   = models.CharField(max_length=200, blank=True)
-    language = models.CharField(max_length=20, blank=True)
-    pages    = models.CharField(max_length=100, blank=True, help_text='Page range, e.g. "5-120"')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="reading")
+    # Which of pdf2epub's reading steps is running, from 0
+    step   = models.PositiveSmallIntegerField(default=0)
+    error  = models.TextField(blank=True)
 
-    status   = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
-    error    = models.TextField(blank=True)
+    # The book as pdf2epub's Book.to_dict() gives it, without the cover image
+    book   = models.JSONField(null=True, blank=True)
+    cover  = models.FileField(upload_to=cover_path, blank=True)
 
-    # What the engine found
-    headings   = models.PositiveIntegerField(default=0)
-    paragraphs = models.PositiveIntegerField(default=0)
-    notes      = models.PositiveIntegerField(default=0)
-
-    created_at  = models.DateTimeField(auto_now_add=True)
-    finished_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.pdf.name} ({self.status})"
+        return f"{self.name} ({self.status})"
