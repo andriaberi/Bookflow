@@ -12,7 +12,7 @@ const en = {
     },
     footer: {
         poweredBy: 'Powered by',
-        madeBy: 'Made by Andria Beridze',
+        copyright: '© {year} Andria Beridze',
     },
     home: {
         badge: 'Georgian and English books',

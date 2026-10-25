@@ -1,14 +1,29 @@
+import { useEffect, useState } from 'react';
+import { getInfo } from '../helpers/api';
+import { fill } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
 
 function Footer() {
     const { t } = useSettings();
+    const [engine, setEngine] = useState('');
+
+    // The version of the engine the server actually runs.
+    useEffect(() => {
+        // A development build's version ends in +g<commit>; the part before is enough.
+        getInfo().then((info) => setEngine((info.engine || '').split('+')[0])).catch(() => setEngine(''));
+    }, []);
 
     return (
         <footer className="bf-footer">
-            <div className="container d-flex flex-wrap justify-content-center justify-content-lg-between align-items-center gap-2 gap-lg-3 py-4 small text-center text-lg-start">
-                <span className="bf-display fw-bold fs-6">Bookflow</span>
+            {/* One line from lg up; below that, the two parts stack with a gap between them. */}
+            <div className="container d-flex flex-column flex-lg-row justify-content-lg-between align-items-center gap-2 gap-lg-3 py-4 small text-center text-lg-start">
                 <span>
-                    { t.footer.poweredBy } <a href="https://github.com/andriaberi/PDF2EPUB">PDF2EPUB</a> · { t.footer.madeBy }
+                    <span className="bf-display fw-bold fs-6 me-2">Bookflow</span>
+                    { fill(t.footer.copyright, { year: new Date().getFullYear() }) }
+                </span>
+                <span>
+                    { t.footer.poweredBy } <a href="https://github.com/andriaberi/PDF2EPUB">PDF2EPUB</a>
+                    { engine && <span className="bf-version"> { engine }</span> }
                 </span>
             </div>
         </footer>

@@ -12,7 +12,7 @@ const ka = {
     },
     footer: {
         poweredBy: 'ძრავა:',
-        madeBy: 'შექმნა ანდრია ბერიძემ',
+        copyright: '© {year} ანდრია ბერიძე',
     },
     home: {
         badge: 'ქართული და ინგლისური წიგნები',
