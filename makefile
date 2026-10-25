@@ -10,10 +10,6 @@ PYTHON ?= .venv/bin/python
 MANAGE := $(PYTHON) $(BACKEND_DIR)/manage.py
 
 NPX_BIN := $(FRONTEND_DIR)/node_modules/.bin
-SASS    := npx sass --silence-deprecation=import src/css/styles.scss:src/css/styles.css
-
-# SASS runs only once the frontend has src/css/styles.scss
-HAS_SCSS := $(wildcard $(FRONTEND_DIR)/src/css/styles.scss)
 
 # PHONY targets
 .PHONY: help install install-backend install-frontend \
@@ -28,9 +24,9 @@ help:
 	@echo "  make install -------> Create .venv, install backend + frontend dependencies"
 	@echo ""
 	@echo "Development:"
-	@echo "  make dev -----------> Run Django, React and the SASS watcher together"
+	@echo "  make dev -----------> Run Django and React together"
 	@echo "  make run-backend ---> Migrate and run the Django dev server (:8000)"
-	@echo "  make run-frontend --> Run React + SASS watcher (:3000, proxies /api to :8000)"
+	@echo "  make run-frontend --> Run React (:3000, proxies /api and /media to :8000)"
 	@echo ""
 	@echo "Database:"
 	@echo "  make migrations ----> Make migrations for both apps"
@@ -73,15 +69,9 @@ dev:
 run-backend: migrate
 	$(MANAGE) runserver
 
+# React compiles the SCSS itself (index.js imports styles.scss), so no watcher is needed.
 run-frontend:
-ifneq ($(HAS_SCSS),)
-	cd $(FRONTEND_DIR) && $(SASS) --no-source-map
-	cd $(FRONTEND_DIR) && npx concurrently --names react,sass \
-		"npm start" \
-		"$(SASS) --watch"
-else
 	cd $(FRONTEND_DIR) && npm start
-endif
 
 # Database
 migrations:
@@ -111,9 +101,6 @@ deploy: frontend copy collect migrate restart
 
 frontend:
 	cd $(FRONTEND_DIR) && npm install
-ifneq ($(HAS_SCSS),)
-	cd $(FRONTEND_DIR) && $(SASS) --no-source-map
-endif
 	cd $(FRONTEND_DIR) && npm run build
 
 copy:
