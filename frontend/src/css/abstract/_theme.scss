@@ -1,0 +1,78 @@
+// Colors for both themes. Bootstrap switches its own colors on data-bs-theme;
+// these follow the same attribute, which settings.js sets on <html>.
+
+:root,
+[data-bs-theme="light"] {
+    --bf-bg: #f6f7fb;
+    --bf-surface: #ffffff;
+    --bf-surface-2: #fbfbfd;
+    --bf-well: #f6f7fb;
+    --bf-text: #0d0e14;
+    --bf-muted: #5b5e6b;
+    --bf-line: #e3e5ee;
+    --bf-line-strong: #c9ccd8;
+    --bf-soft: #e8ecff;
+    --bf-soft-text: #1d2240;
+    --bf-chip: #f0f2ff;
+    --bf-chip-text: #1a2fb0;
+    --bf-link: #2340e0;
+    --bf-mark: #3b5bff;
+    --bf-pill: #f0f2ff;
+    --bf-empty: #eceef4;
+    --bf-seg-on-bg: #0d0e14;
+    --bf-seg-on-text: #ffffff;
+    --bf-reader-bg: #fbfaf7;
+    --bf-reader-text: #1d1d22;
+    --bf-reader-track: #e3e5ee;
+    --bf-pdf-bg: #ffffff;
+    --bf-pdf-border: #d9dbe4;
+    --bf-pdf-line: #d9dbe4;
+    --bf-pdf-ink: #0d0e14;
+    --bf-pdf-note: #5b5e6b;
+    --bf-backdrop: rgba(13, 14, 20, 0.4);
+}
+
+[data-bs-theme="dark"] {
+    --bf-bg: #0b0c11;
+    --bf-surface: #15161f;
+    --bf-surface-2: #111219;
+    --bf-well: #0f1016;
+    --bf-text: #f2f3f7;
+    --bf-muted: #a3a7b7;
+    --bf-line: #2a2c38;
+    --bf-line-strong: #3a3d4a;
+    --bf-soft: #1b2040;
+    --bf-soft-text: #d6dcff;
+    --bf-chip: #1b2040;
+    --bf-chip-text: #c3ccff;
+    --bf-link: #9fb0ff;
+    --bf-mark: #7d93ff;
+    --bf-pill: rgba(255, 255, 255, 0.08);
+    --bf-empty: #2b2d38;
+    --bf-seg-on-bg: #ffffff;
+    --bf-seg-on-text: #0d0e14;
+    --bf-reader-bg: #1c1d24;
+    --bf-reader-text: #e8e6e1;
+    --bf-reader-track: #33353f;
+    --bf-pdf-bg: #1c1d24;
+    --bf-pdf-border: #2f313c;
+    --bf-pdf-line: #3a3d4a;
+    --bf-pdf-ink: #e8e6e1;
+    --bf-pdf-note: #a3a7b7;
+    --bf-backdrop: rgba(0, 0, 0, 0.6);
+}
+
+// Fixed colors, the same in both themes
+:root {
+    --bf-cobalt: #3b5bff;
+    --bf-cobalt-hover: #2340e0;
+    --bf-cobalt-active: #1a2fb0;
+    --bf-cobalt-tint: #e3e8ff;
+    --bf-ink: #0d0e14;
+    // "Wrong" text and the PDF tag: red, so they never read as the brand color
+    --bf-error-bg: #fde2e2;
+    --bf-error-text: #991b1b;
+    --bf-font: Inter, 'Noto Sans Georgian', system-ui, sans-serif;
+    --bf-font-display: 'Bricolage Grotesque', 'Noto Sans Georgian', Inter, sans-serif;
+    --bs-body-font-family: var(--bf-font);
+}
