@@ -42,5 +42,10 @@
     "concurrently": "^10.0.6",
     "http-proxy-middleware": "^2.0.11",
     "sass": "^1.106.1"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+    }
   }
 }
