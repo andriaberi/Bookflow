@@ -1,0 +1,468 @@
+// Hero
+
+.bf-hero {
+    background: var(--bf-surface);
+    border-bottom: 1px solid var(--bf-line);
+    border-radius: 0 0 40px 40px;
+    padding-top: 56px;
+    padding-bottom: 88px;
+
+    @media (max-width: 767.98px) {
+        border-radius: 0 0 28px 28px;
+        padding-top: 32px;
+        padding-bottom: 48px;
+    }
+}
+
+.bf-hero-title {
+    font-size: clamp(40px, 6.5vw, 76px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+
+    // Georgian words run longer, so the same line needs a smaller size.
+    :lang(ka) & {
+        font-size: clamp(34px, 5vw, 60px);
+    }
+}
+
+.bf-hero-text {
+    max-width: 500px;
+}
+
+// On phones the two buttons fill the width, one under the other.
+.bf-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    @media (max-width: 575.98px) {
+        flex-direction: column;
+        gap: 12px;
+
+        .btn {
+            justify-content: center;
+        }
+    }
+}
+
+.bf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--bf-pill);
+    color: var(--bf-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.bf-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bf-cobalt);
+}
+
+// Hero art: the PDF page, the arrow and the reader always stay in one row and never
+// overlap. Every size is a multiple of --s, so on a phone the whole picture shrinks
+// evenly instead of wrapping.
+
+.bf-hero-art {
+    --s: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(16px * var(--s));
+
+    // Laptops: the hero is two columns but each is narrow (~460px).
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+        --s: 0.84;
+    }
+
+    @media (max-width: 575.98px) {
+        --s: 0.62;
+    }
+
+    @media (max-width: 379.98px) {
+        --s: 0.54;
+    }
+}
+
+.bf-pdf-page {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: calc(210px * var(--s));
+    height: calc(296px * var(--s));
+    padding: calc(16px * var(--s));
+    border: 1px solid var(--bf-pdf-border);
+    border-radius: calc(12px * var(--s));
+    background: var(--bf-pdf-bg);
+    color: var(--bf-pdf-ink);
+}
+
+.bf-pdf-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc(16px * var(--s));
+}
+
+.bf-pdf-tag {
+    padding: 0 calc(8px * var(--s));
+    border-radius: 4px;
+    background: var(--bf-error-bg);
+    color: var(--bf-error-text);
+    font-size: calc(11px * var(--s));
+    font-weight: 600;
+}
+
+.bf-pdf-note {
+    color: var(--bf-pdf-note);
+    font-size: calc(11px * var(--s));
+}
+
+.bf-pdf-heading {
+    width: calc(60px * var(--s));
+    height: calc(7px * var(--s));
+    margin: 0 auto calc(16px * var(--s));
+    border-radius: 4px;
+    background: var(--bf-pdf-ink);
+}
+
+.bf-pdf-lines {
+    display: flex;
+    flex-direction: column;
+    gap: calc(8px * var(--s));
+}
+
+.bf-pdf-line {
+    height: calc(4px * var(--s));
+    border-radius: 4px;
+    background: var(--bf-pdf-line);
+}
+
+.bf-pdf-indent {
+    width: 94%;
+    margin-top: calc(8px * var(--s));
+    margin-left: 6%;
+}
+
+.bf-pdf-number {
+    margin-top: auto;
+    text-align: center;
+}
+
+.bf-hero-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: calc(48px * var(--s));
+    height: calc(48px * var(--s));
+    border-radius: 50%;
+    background: var(--bf-cobalt);
+    color: #fff;
+
+    svg {
+        width: calc(22px * var(--s));
+        height: calc(22px * var(--s));
+    }
+}
+
+.bf-reader {
+    flex-shrink: 0;
+    width: calc(214px * var(--s));
+    height: calc(380px * var(--s));
+    padding: calc(10px * var(--s));
+    border-radius: calc(30px * var(--s));
+    background: #2b2d38;
+}
+
+.bf-reader-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: calc(20px * var(--s)) calc(16px * var(--s));
+    border-radius: calc(22px * var(--s));
+    background: var(--bf-reader-bg);
+    color: var(--bf-reader-text);
+    font-family: Georgia, 'Noto Serif Georgian', serif;
+    overflow: hidden;
+
+    p {
+        margin-bottom: calc(8px * var(--s));
+        font-size: calc(11px * var(--s));
+        line-height: 1.6;
+        text-indent: 1.2em;
+    }
+}
+
+.bf-reader-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: calc(16px * var(--s));
+    color: var(--bf-muted);
+    font-family: var(--bf-font);
+    font-size: calc(10px * var(--s));
+}
+
+.bf-reader-heading {
+    margin-bottom: calc(16px * var(--s));
+    font-size: calc(19px * var(--s));
+    font-weight: 700;
+    text-align: center;
+}
+
+.bf-reader-progress {
+    display: flex;
+    align-items: center;
+    gap: calc(8px * var(--s));
+    margin-top: auto;
+    color: var(--bf-muted);
+    font-family: var(--bf-font);
+    font-size: calc(10px * var(--s));
+
+    > div {
+        flex-grow: 1;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--bf-reader-track);
+
+        > div {
+            width: 8%;
+            height: 3px;
+            border-radius: 999px;
+            background: var(--bf-cobalt);
+        }
+    }
+}
+
+// How it works: three columns on desktop; below that each step is a full-width
+// card with its number beside the text.
+
+.bf-step {
+    height: 100%;
+    padding: 24px;
+    border: 1px solid var(--bf-line);
+    border-radius: 1.5rem;
+    background: var(--bf-surface);
+
+    p {
+        color: var(--bf-muted);
+    }
+
+    // Stacked layout: full-width cards, the number above the title, centered.
+    @media (max-width: 991.98px) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 20px;
+        text-align: center;
+
+        .bf-step-number {
+            margin-bottom: 0;
+            font-size: 44px;
+        }
+    }
+}
+
+.bf-step-number {
+    margin-bottom: 16px;
+    color: var(--bf-cobalt);
+    font-size: 56px;
+    line-height: 1;
+}
+
+.bf-step-accent {
+    border-color: var(--bf-cobalt);
+    background: var(--bf-cobalt);
+    color: #fff;
+
+    p {
+        color: #e3e8ff;
+    }
+
+    .bf-step-number {
+        color: #fff;
+    }
+}
+
+// The editor example
+
+.bf-well {
+    border: 1px solid var(--bf-line);
+    border-radius: 1.5rem;
+    background: var(--bf-well);
+}
+
+.bf-block {
+    padding: 16px;
+    border: 1px solid var(--bf-line);
+    border-radius: 12px;
+    background: var(--bf-surface);
+}
+
+.bf-block-selected {
+    border: 2px solid var(--bf-cobalt);
+}
+
+.bf-block-out {
+    border-style: dashed;
+}
+
+.bf-level {
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--bf-cobalt);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.bf-mark-wrong {
+    padding: 0 4px;
+    border-radius: 4px;
+    background: var(--bf-error-bg);
+    color: var(--bf-error-text);
+    text-decoration: line-through;
+}
+
+.bf-mark-right {
+    padding: 0 4px;
+    border-radius: 4px;
+    background: #dff5e8;
+    color: #14532d;
+    font-weight: 600;
+}
+
+.bf-switch-off {
+    position: relative;
+    flex-shrink: 0;
+    width: 34px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--bf-line);
+
+    span {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--bf-surface);
+    }
+}
+
+// Library and suggestions: the shelf holds four covers in a row at any width.
+
+.bf-shelf {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 96px));
+    gap: 16px;
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+    }
+}
+
+.bf-shelf-book {
+    width: 100%;
+    aspect-ratio: 96 / 136;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.bf-shelf-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bf-empty);
+    color: var(--bf-muted);
+}
+
+// Support
+
+.bf-support {
+    border-radius: 2rem;
+    background: var(--bf-cobalt);
+    color: #fff;
+
+    p {
+        color: var(--bf-cobalt-tint);
+    }
+}
+
+// The text on the left, the two buttons stacked on the right, vertically centered.
+// In the stacked layout the buttons go under the text and everything is centered.
+.bf-support-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+
+    @media (max-width: 991.98px) {
+        flex-direction: column;
+        gap: 28px;
+        text-align: center;
+    }
+}
+
+.bf-support-text {
+    flex: 1 1 auto;
+    max-width: 640px;
+}
+
+// A one-column grid sized to the widest label, so both buttons are the same width.
+.bf-support-actions {
+    display: grid;
+    flex-shrink: 0;
+    gap: 12px;
+
+    .btn {
+        white-space: nowrap;
+    }
+
+    @media (max-width: 991.98px) {
+        width: 100%;
+        max-width: 360px;
+    }
+}
+
+// Once the hero stacks into one column (below lg), text and buttons are centered.
+// The editor example stays left-aligned, as the real editor is.
+@media (max-width: 991.98px) {
+    .bf-center-stacked {
+        align-items: center;
+        text-align: center;
+
+        .bf-section-title,
+        .bf-hero-text {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bf-chips,
+        .bf-cta {
+            justify-content: center;
+        }
+
+        .bf-shelf {
+            align-self: stretch;
+            justify-content: center;
+        }
+    }
+}
+
+// Panels have less padding on a phone.
+@media (max-width: 575.98px) {
+    .bf-panel,
+    .bf-panel-soft,
+    .bf-support {
+        border-radius: 1.5rem;
+    }
+}
