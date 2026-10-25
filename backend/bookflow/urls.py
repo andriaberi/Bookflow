@@ -7,6 +7,7 @@ from .views import index
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/library/", include("library.urls")),
 ]
 
 # Serve uploads in development
