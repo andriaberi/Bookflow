@@ -1,0 +1,170 @@
+// The bar stays at the top of the screen while the page scrolls.
+.bf-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: var(--bf-surface);
+    border-bottom: 1px solid var(--bf-line);
+}
+
+.bf-navbar-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 68px;
+}
+
+.bf-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--bf-text);
+    font-family: var(--bf-font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-decoration: none;
+
+    &:hover {
+        color: var(--bf-text);
+        opacity: 1;
+    }
+}
+
+.bf-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--bf-cobalt);
+    color: #fff;
+}
+
+// Desktop
+
+.bf-nav-items {
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.bf-nav-link {
+    padding: 10px 14px;
+    border-radius: 999px;
+    color: var(--bf-muted);
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+        color: var(--bf-text);
+        opacity: 1;
+    }
+
+    &.active {
+        background: var(--bf-pill);
+        color: var(--bf-text);
+        font-weight: 600;
+    }
+}
+
+.bf-heart {
+    color: var(--bf-mark);
+}
+
+// Phones and tablets: a panel under the bar, over a dimmed page that can't be used
+// until the menu closes.
+
+// Starts right under the bar (the sticky header is its containing block), so the bar
+// itself is never dimmed.
+.bf-menu-backdrop {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 100dvh;
+    background: var(--bf-backdrop);
+    animation: bf-fade 0.15s ease-out;
+}
+
+.bf-mobile-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: calc(100dvh - 68px);
+    overflow-y: auto;
+    padding: 12px 0 24px;
+    border-bottom: 1px solid var(--bf-line);
+    border-radius: 0 0 24px 24px;
+    background: var(--bf-surface);
+    box-shadow: 0 24px 48px rgba(13, 14, 20, 0.18);
+    animation: bf-drop 0.18s ease-out;
+}
+
+.bf-menu-links {
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+}
+
+.bf-menu-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 56px;
+    padding: 0 16px;
+    border-radius: 14px;
+    color: var(--bf-text);
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    svg {
+        color: var(--bf-muted);
+    }
+
+    &:hover {
+        background: var(--bf-pill);
+        color: var(--bf-text);
+        opacity: 1;
+    }
+
+    &.active {
+        background: var(--bf-soft);
+        color: var(--bf-soft-text);
+
+        svg {
+            color: var(--bf-mark);
+        }
+    }
+}
+
+// The language switch and the theme button, side by side as on desktop.
+.bf-menu-settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--bf-line);
+}
+
+@keyframes bf-fade {
+    from { opacity: 0; }
+}
+
+@keyframes bf-drop {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bf-menu-backdrop,
+    .bf-mobile-menu {
+        animation: none;
+    }
+}
