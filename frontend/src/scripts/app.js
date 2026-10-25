@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './includes/navbar';
 import Footer from './includes/footer';
 import Home from './pages/home';
+import Convert from './pages/convert';
+import Reading from './pages/reading';
 import ComingSoon from './pages/coming-soon';
 import NotFound from './pages/not-found';
 
@@ -12,7 +14,9 @@ function App() {
             <main className="bf-main">
                 <Routes>
                     <Route path="/" element={ <Home /> } />
-                    <Route path="/convert" element={ <ComingSoon page="converter" /> } />
+                    <Route path="/convert" element={ <Convert /> } />
+                    <Route path="/convert/:id" element={ <Reading /> } />
+                    <Route path="/convert/:id/edit" element={ <ComingSoon page="editor" /> } />
                     <Route path="/library" element={ <ComingSoon page="library" /> } />
                     <Route path="/suggest" element={ <ComingSoon page="suggest" /> } />
                     <Route path="*" element={ <NotFound /> } />

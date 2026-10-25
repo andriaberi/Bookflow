@@ -49,6 +49,21 @@ export const Menu = (props) => (
     <Icon { ...props }><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></Icon>
 );
 
+export const FileUp = (props) => (
+    <Icon { ...props }>
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" />
+        <path d="M12 18v-6" /><path d="m9 15 3-3 3 3" />
+    </Icon>
+);
+
+export const FileIcon = (props) => (
+    <Icon { ...props }><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /></Icon>
+);
+
+export const Check = (props) => (
+    <Icon strokeWidth={ 3 } { ...props }><path d="M20 6 9 17l-5-5" /></Icon>
+);
+
 export const Close = (props) => (
     <Icon { ...props }><path d="M6 6l12 12" /><path d="M18 6 6 18" /></Icon>
 );

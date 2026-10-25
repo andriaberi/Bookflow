@@ -131,3 +131,13 @@
     background: var(--bf-cobalt);
     color: #fff;
 }
+
+// An error the page shows, such as a refused upload
+.bf-alert {
+    padding: 12px 16px;
+    border: 1px solid var(--bf-error-text);
+    border-radius: 12px;
+    background: var(--bf-error-bg);
+    color: var(--bf-error-text);
+    font-weight: 500;
+}

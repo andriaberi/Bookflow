@@ -1,0 +1,415 @@
+// Upload
+
+.bf-convert {
+    // The upload page keeps its original, roomier gap (phones keep the phone gap).
+    @media (min-width: 576px) {
+        --bf-fill-pad: clamp(24px, 6vh, 56px);
+    }
+
+    // The same above and below, and smaller on short screens so the page still fits.
+    padding-top: var(--bf-fill-pad);
+    padding-bottom: var(--bf-fill-pad);
+}
+
+.bf-drop {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    min-height: clamp(220px, 38vh, 420px);
+    padding: clamp(24px, 5vh, 56px) 24px;
+    gap: 16px;
+    border: 2px dashed var(--bf-line-strong);
+    border-radius: 2rem;
+    background: var(--bf-surface);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+
+    &:hover,
+    &.over {
+        border-color: var(--bf-cobalt);
+        background: var(--bf-soft);
+    }
+
+    &.busy {
+        cursor: progress;
+        border-style: solid;
+        border-color: var(--bf-cobalt);
+    }
+
+    // Keyboard focus lands on the hidden input; show it on the drop zone.
+    &:focus-within {
+        outline: 3px solid rgba(59, 91, 255, 0.4);
+        outline-offset: 3px;
+    }
+}
+
+.bf-drop-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(64px, 10vh, 92px);
+    height: clamp(64px, 10vh, 92px);
+    border-radius: 24px;
+    background: var(--bf-cobalt);
+    color: #fff;
+}
+
+.bf-drop-title {
+    font-size: clamp(24px, 3vw, 32px);
+}
+
+.bf-drop-browse {
+    color: var(--bf-link);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.bf-drop-bar {
+    display: block;
+    width: min(320px, 100%);
+    height: 8px;
+    border-radius: 999px;
+    background: var(--bf-pill);
+    overflow: hidden;
+
+    span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: var(--bf-cobalt);
+        transition: width 0.2s;
+    }
+}
+
+// The card beside the drop zone: as tall as it, its content centered in it.
+.bf-looks {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(24px, 5vh, 48px) !important;
+
+    ul {
+        gap: clamp(14px, 2.6vh, 24px) !important;
+    }
+
+    // Short desktop screens (laptops): the names alone, so the page fits one screen
+    // and stays evenly spaced.
+    @media (min-width: 992px) and (max-height: 760px) {
+        .bf-looks-text {
+            display: none;
+        }
+
+        .fw-semibold {
+            margin-bottom: 0 !important;
+        }
+    }
+}
+
+.bf-convert-header {
+    margin-bottom: clamp(24px, 4.5vh, 48px);
+}
+
+.bf-looks-mark {
+    flex-shrink: 0;
+    width: 28px;
+    color: var(--bf-mark);
+    font-size: 22px;
+    text-align: center;
+}
+
+// Reading
+
+.bf-reading {
+    // The same above and below, and smaller on short screens so the page still fits.
+    padding-top: var(--bf-fill-pad);
+    padding-bottom: var(--bf-fill-pad);
+}
+
+// Large on desktop, body size on a phone.
+.bf-reading-lead {
+    font-size: clamp(1rem, 2.6vw, 1.25rem);
+}
+
+.bf-reading-title {
+    font-size: clamp(28px, min(3.6vw, 6vh), 44px);
+    line-height: 1.08;
+}
+
+// Cover and text side by side from lg up; stacked (and centered) below, like every page.
+.bf-reading-card {
+    display: flex;
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid var(--bf-line);
+    border-radius: 2rem;
+    background: var(--bf-surface);
+}
+
+.bf-reading-cover {
+    display: flex;
+    flex: 0 0 380px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: clamp(28px, 6vh, 56px) 40px;
+    background: var(--bf-well);
+    border-right: 1px solid var(--bf-line);
+
+    img {
+        height: clamp(220px, 36vh, 312px);
+        aspect-ratio: 220 / 312;
+        border-radius: 12px;
+        object-fit: cover;
+        box-shadow: 0 16px 32px rgba(13, 14, 20, 0.18);
+    }
+
+    @media (max-width: 991.98px) {
+        border-right: 0;
+        border-bottom: 1px solid var(--bf-line);
+    }
+}
+
+@media (max-width: 991.98px) {
+    .bf-reading-card {
+        flex-direction: column;
+    }
+
+    .bf-reading-cover {
+        flex-basis: auto;
+        padding-top: clamp(20px, 3vh, 32px);
+        padding-bottom: clamp(20px, 3vh, 32px);
+
+        // Stacked above the text, the cover is smaller, so the card fits the screen.
+        img,
+        .bf-reading-file {
+            height: clamp(150px, 20vh, 240px);
+        }
+    }
+
+    .bf-reading-file-line {
+        justify-content: center;
+    }
+}
+
+// Phones: the cover becomes a small thumbnail in a row with its badge, so a whole
+// conversion (reading, failed or ready) fits one screen.
+@media (max-width: 575.98px) {
+    .bf-reading-cover {
+        flex-direction: row;
+        gap: 16px;
+        padding: 12px 20px;
+
+        img,
+        .bf-reading-file {
+            height: 88px;
+        }
+
+        .bf-reading-file svg {
+            width: 32px;
+            height: 32px;
+        }
+    }
+}
+
+.bf-reading-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: clamp(220px, 36vh, 312px);
+    aspect-ratio: 220 / 312;
+    border: 1px dashed var(--bf-line-strong);
+    border-radius: 12px;
+    color: var(--bf-muted);
+}
+
+.bf-reading-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: clamp(32px, 6vh, 56px);
+    align-self: center;
+
+    @media (max-width: 991.98px) {
+        align-self: stretch;
+    }
+
+    @media (max-width: 575.98px) {
+        padding: 24px 20px;
+
+        // Tighter spacing between the sections on a phone.
+        .mb-4 {
+            margin-bottom: 1rem !important;
+        }
+    }
+}
+
+.bf-reading-file-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+}
+
+.bf-reading-name {
+    color: var(--bf-text);
+    overflow-wrap: anywhere;
+}
+
+.bf-steps-bar {
+    display: flex;
+    gap: 8px;
+
+    span {
+        flex: 1;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--bf-pill);
+
+        &.done {
+            background: var(--bf-cobalt);
+        }
+
+        // The running step can't say how far along it is, so it shows that it's busy:
+        // a short highlight sliding across it, rather than a fill that looks stuck.
+        &.now {
+            position: relative;
+            overflow: hidden;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 40%;
+                border-radius: 999px;
+                background: var(--bf-cobalt);
+                animation: bf-busy 1.2s ease-in-out infinite;
+            }
+        }
+    }
+}
+
+@keyframes bf-busy {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(250%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bf-steps-bar span.now {
+        background: var(--bf-cobalt);
+        opacity: 0.45;
+
+        &::after {
+            display: none;
+        }
+    }
+}
+
+.bf-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        &.now {
+            font-weight: 600;
+        }
+
+        &.next {
+            color: var(--bf-muted);
+        }
+    }
+}
+
+.bf-step-mark {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+
+    .done & {
+        background: var(--bf-cobalt);
+        color: #fff;
+    }
+
+    .now & .spinner-border {
+        width: 28px;
+        height: 28px;
+        border-width: 3px;
+        color: var(--bf-cobalt);
+    }
+
+    .next & {
+        border: 2px dashed var(--bf-line-strong);
+    }
+}
+
+.bf-counts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+
+    @media (max-width: 575.98px) {
+        gap: 8px;
+
+        .small {
+            font-size: 0.8rem;
+        }
+    }
+
+    > div {
+        padding: clamp(8px, 1.4vh, 12px);
+        border: 1px solid var(--bf-line);
+        border-radius: 14px;
+        text-align: center;
+    }
+}
+
+.bf-count {
+    font-size: clamp(24px, 4.5vh, 34px);
+    line-height: 1.1;
+}
+
+// Phones: the two buttons stack, full width, at normal height (not large), so the
+// ready page fits one screen even on a small phone.
+@media (max-width: 575.98px) {
+    .bf-cta.bf-reading-actions {
+        gap: 8px;
+
+        .btn {
+            --bs-btn-padding-y: 0.55rem;
+            --bs-btn-font-size: 1rem;
+        }
+    }
+}
+
+// Laptops and desktops: the card grows to fill the screen, so only the even gap is
+// left above and below it. On very tall screens it stops growing at a sensible height
+// and stays centered.
+@media (min-width: 992px) {
+    .bf-reading-card {
+        min-height: min(calc(100dvh - var(--bf-nav-height) - 2 * var(--bf-fill-pad)), 860px);
+    }
+}
