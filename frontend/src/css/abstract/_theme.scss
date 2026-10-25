@@ -74,5 +74,7 @@
     --bf-error-text: #991b1b;
     --bf-font: Inter, 'Noto Sans Georgian', system-ui, sans-serif;
     --bf-font-display: 'Bricolage Grotesque', 'Noto Sans Georgian', Inter, sans-serif;
+    // The navbar's full height, its bottom border included
+    --bf-nav-height: 69px;
     --bs-body-font-family: var(--bf-font);
 }

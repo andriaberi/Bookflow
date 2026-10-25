@@ -433,31 +433,6 @@
     }
 }
 
-// Once the hero stacks into one column (below lg), text and buttons are centered.
-// The editor example stays left-aligned, as the real editor is.
-@media (max-width: 991.98px) {
-    .bf-center-stacked {
-        align-items: center;
-        text-align: center;
-
-        .bf-section-title,
-        .bf-hero-text {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .bf-chips,
-        .bf-cta {
-            justify-content: center;
-        }
-
-        .bf-shelf {
-            align-self: stretch;
-            justify-content: center;
-        }
-    }
-}
-
 // Panels have less padding on a phone.
 @media (max-width: 575.98px) {
     .bf-panel,

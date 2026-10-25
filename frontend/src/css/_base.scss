@@ -25,7 +25,31 @@ a {
 }
 
 .bf-main {
+    display: flex;
     flex: 1;
+    flex-direction: column;
+}
+
+// A one-screen page (converter, placeholders): its content is centered between the
+// navbar and the bottom of the screen, and the footer starts below the fold.
+.bf-fill {
+    --bf-fill-pad: clamp(20px, 4.5vh, 44px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    min-height: calc(100dvh - var(--bf-nav-height));
+
+    @media (max-width: 575.98px) {
+        --bf-fill-pad: clamp(16px, 3vh, 32px);
+    }
+}
+
+// A heading's line box has room above its letters, so a page that starts with one
+// looks lower than it is. This lifts it to sit as far from the navbar as the content
+// ends from the bottom of the screen.
+.bf-optical-top {
+    margin-top: -0.12em;
 }
 
 .bf-display {
@@ -75,5 +99,44 @@ a {
     &:lang(ka) {
         letter-spacing: 0.02em;
         text-transform: none;
+    }
+}
+
+// The title of a page that isn't the home page
+.bf-page-title {
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    max-width: 640px;
+}
+
+.bf-page-lead {
+    max-width: 720px;
+}
+
+// Pages are two columns from lg up. Below that they stack, and the blocks marked
+// .bf-center-stacked center their text and buttons.
+@media (max-width: 991.98px) {
+    .bf-center-stacked {
+        align-items: center;
+        text-align: center;
+
+        .bf-section-title,
+        .bf-page-title,
+        .bf-page-lead,
+        .bf-hero-text {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bf-chips,
+        .bf-cta {
+            justify-content: center;
+        }
+
+        .bf-shelf {
+            align-self: stretch;
+            justify-content: center;
+        }
     }
 }
