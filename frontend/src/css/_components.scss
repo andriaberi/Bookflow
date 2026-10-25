@@ -1,0 +1,133 @@
+// Buttons, panels and small pieces used across pages
+
+.btn {
+    --bs-btn-font-weight: 600;
+    --bs-btn-border-radius: 999px;
+}
+
+.btn-cobalt {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--bf-cobalt);
+    --bs-btn-border-color: var(--bf-cobalt);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--bf-cobalt-hover);
+    --bs-btn-hover-border-color: var(--bf-cobalt-hover);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--bf-cobalt-active);
+    --bs-btn-active-border-color: var(--bf-cobalt-active);
+}
+
+.btn-ghost {
+    --bs-btn-color: var(--bf-text);
+    --bs-btn-border-color: var(--bf-line-strong);
+    --bs-btn-hover-color: var(--bf-text);
+    --bs-btn-hover-bg: var(--bf-pill);
+    --bs-btn-hover-border-color: var(--bf-line-strong);
+    --bs-btn-active-color: var(--bf-text);
+    --bs-btn-active-bg: var(--bf-pill);
+    --bs-btn-active-border-color: var(--bf-line-strong);
+}
+
+// On the blue support banner, in both themes
+.btn-white {
+    --bs-btn-color: var(--bf-cobalt-active);
+    --bs-btn-bg: #fff;
+    --bs-btn-border-color: #fff;
+    --bs-btn-hover-color: var(--bf-cobalt-active);
+    --bs-btn-hover-bg: var(--bf-cobalt-tint);
+    --bs-btn-hover-border-color: var(--bf-cobalt-tint);
+    --bs-btn-active-color: var(--bf-cobalt-active);
+    --bs-btn-active-bg: var(--bf-cobalt-tint);
+}
+
+.btn-white-outline {
+    --bs-btn-color: #fff;
+    --bs-btn-border-color: rgba(255, 255, 255, 0.6);
+    --bs-btn-hover-color: var(--bf-cobalt-active);
+    --bs-btn-hover-bg: #fff;
+    --bs-btn-hover-border-color: #fff;
+    --bs-btn-active-color: var(--bf-cobalt-active);
+    --bs-btn-active-bg: #fff;
+}
+
+.bf-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid var(--bf-line-strong);
+    background: transparent;
+    color: var(--bf-text);
+
+    &:hover {
+        background: var(--bf-pill);
+    }
+}
+
+.bf-seg {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--bf-pill);
+
+    button {
+        min-width: 44px;
+        height: 36px;
+        padding: 0 10px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--bf-muted);
+        font-size: 13px;
+        font-weight: 600;
+
+        &.on {
+            background: var(--bf-seg-on-bg);
+            color: var(--bf-seg-on-text);
+        }
+    }
+}
+
+.bf-panel {
+    background: var(--bf-surface);
+    border: 1px solid var(--bf-line);
+    border-radius: 2rem;
+}
+
+.bf-panel-soft {
+    background: var(--bf-soft);
+    color: var(--bf-soft-text);
+    border-radius: 2rem;
+}
+
+.bf-chip {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: var(--bf-chip);
+    color: var(--bf-chip-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.bf-outline-chip {
+    display: inline-block;
+    padding: 0.25rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--bf-line);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.bf-icon-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--bf-cobalt);
+    color: #fff;
+}

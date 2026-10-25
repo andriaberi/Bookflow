@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    background: var(--bf-bg);
+    color: var(--bf-text);
+    font-family: var(--bf-font);
+}
+
+a {
+    color: var(--bf-link);
+
+    &:hover {
+        color: var(--bf-link);
+        opacity: 0.85;
+    }
+}
+
+.container {
+    max-width: 1160px;
+}
+
+.bf {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+.bf-main {
+    flex: 1;
+}
+
+.bf-display {
+    font-family: var(--bf-font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.bf-muted {
+    color: var(--bf-muted);
+}
+
+// The main bright blue, the same in both themes (large text only, like the hero highlight)
+.bf-accent-text {
+    color: var(--bf-cobalt);
+}
+
+.bf-section {
+    padding-top: 48px;
+    padding-bottom: 48px;
+
+    @media (max-width: 767.98px) {
+        padding-top: 28px;
+        padding-bottom: 28px;
+    }
+}
+
+.bf-section-title {
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.08;
+    max-width: 720px;
+}
+
+.bf-card-title {
+    font-size: clamp(26px, 3vw, 36px);
+    line-height: 1.08;
+}
+
+.bf-eyebrow {
+    color: var(--bf-link);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+
+    // Uppercasing Georgian turns it into Mtavruli capitals, which isn't how labels are written.
+    &:lang(ka) {
+        letter-spacing: 0.02em;
+        text-transform: none;
+    }
+}
