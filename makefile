@@ -11,8 +11,14 @@ MANAGE := $(PYTHON) $(BACKEND_DIR)/manage.py
 
 NPX_BIN := $(FRONTEND_DIR)/node_modules/.bin
 
+# The conversion engine. backend/.env sets PDF2EPUB_SOURCE: a folder (installed
+# editable, so changes there show up right away) or anything pip installs, such as a
+# git tag. Without it, the pinned release is used.
+-include $(BACKEND_DIR)/.env
+PDF2EPUB_SOURCE ?= git+https://github.com/andriaberi/PDF2EPUB.git@v2026.1025.1
+
 # PHONY targets
-.PHONY: help install install-backend install-frontend \
+.PHONY: help install install-backend install-engine install-frontend \
         dev run-backend run-frontend \
         migrations migrate superuser shell check test \
         frontend copy collect deploy restart clean
@@ -22,6 +28,7 @@ help:
 	@echo ""
 	@echo "Setup:"
 	@echo "  make install -------> Create .venv, install backend + frontend dependencies"
+	@echo "  make install-engine > Install PDF2EPUB from PDF2EPUB_SOURCE in backend/.env"
 	@echo ""
 	@echo "Development:"
 	@echo "  make dev -----------> Run Django and React together"
@@ -39,7 +46,7 @@ help:
 	@echo "  make test ----------> Run Django tests"
 	@echo ""
 	@echo "Production:"
-	@echo "  make deploy --------> Build frontend, copy files, collect static, restart services"
+	@echo "  make deploy --------> Install, build frontend, copy files, collect static, restart services"
 	@echo "  make frontend ------> Install & build frontend (React)"
 	@echo "  make copy ----------> Copy frontend build into Django templates"
 	@echo "  make collect -------> Django collectstatic"
@@ -56,6 +63,15 @@ install-backend:
 	$(PYTHON) -m pip install -q --upgrade pip
 	$(PYTHON) -m pip install -q -r $(BACKEND_DIR)/requirements.txt
 	@[ -f $(BACKEND_DIR)/.env ] || cp $(BACKEND_DIR)/.env.example $(BACKEND_DIR)/.env
+	$(MAKE) install-engine
+
+install-engine:
+	@if [ -d "$(PDF2EPUB_SOURCE)" ]; then \
+		$(PYTHON) -m pip install -q -e "$(PDF2EPUB_SOURCE)"; \
+	else \
+		$(PYTHON) -m pip install -q "$(PDF2EPUB_SOURCE)"; \
+	fi
+	@$(PYTHON) -c "import pdf2epub; print('PDF2EPUB', pdf2epub.__version__, 'from', pdf2epub.__file__)"
 
 install-frontend:
 	cd $(FRONTEND_DIR) && npm install
@@ -96,7 +112,7 @@ test:
 	$(MANAGE) test $(BACKEND_DIR)
 
 # Production Deployment
-deploy: frontend copy collect migrate restart
+deploy: install-backend frontend copy collect migrate restart
 	@echo "Production deployment completed"
 
 frontend:

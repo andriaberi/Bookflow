@@ -1,6 +1,7 @@
+# PDF2EPUB, the conversion engine, is installed by `make install-engine` from
+# PDF2EPUB_SOURCE in backend/.env.
 Django==6.0
 django-cors-headers==4.9.0
-pdf2epub @ git+https://github.com/andriaberi/PDF2EPUB.git@v2026.1025.1
 pillow==13.0.0
 python-dotenv==1.2.4
 whitenoise==6.12.0
