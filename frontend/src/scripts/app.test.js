@@ -72,14 +72,14 @@ test('picking a page in the phone menu goes there and closes the menu', async ()
     await renderAt('/');
     fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
     const menu = screen.getByRole('dialog', { name: 'Menu' });
-    fireEvent.click(within(menu).getByRole('link', { name: /Library/ }));
+    await act(async () => fireEvent.click(within(menu).getByRole('link', { name: /Library/ })));
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('The library is on its way.');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Library');
 });
 
 test('pages not built yet say so', async () => {
-    await renderAt('/library');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('The library is on its way.');
+    await renderAt('/suggest');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Suggestions are on their way.');
 });
 
 test('an unknown address shows the not-found page', async () => {

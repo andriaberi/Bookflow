@@ -203,8 +203,14 @@ const en = {
             server: 'Something went wrong on our side. Please try again.',
         },
     },
+    library: {
+        title: 'Library',
+        lead: 'Books already converted and corrected by hand, ready to download as EPUB.',
+        empty: 'There are no books here yet. Know one that belongs here?',
+        error: 'The library couldn’t be loaded. Please try again.',
+        download: 'Download EPUB',
+    },
     soon: {
-        library: 'The library is on its way.',
         suggest: 'Suggestions are on their way.',
         text: 'This page is being built. Check back soon.',
         home: 'Back to home',
