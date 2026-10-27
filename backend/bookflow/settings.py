@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -15,9 +16,19 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set")
 
-if DEBUG:
-    # Dev environment only
-    CORS_ALLOW_ALL_ORIGINS = True
+TESTING = sys.argv[1:2] == ["test"]
+
+# The site's address, for links in emails and the origin forms are posted from
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000").rstrip("/")
+CSRF_TRUSTED_ORIGINS = [SITE_URL]
+
+if not DEBUG:
+    # Served over HTTPS behind nginx, which says so in X-Forwarded-Proto.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+    SECURE_REFERRER_POLICY = "same-origin"
 
 # Application definition
 INSTALLED_APPS = [
@@ -27,14 +38,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "corsheaders",
     "converter",
     "library",
     "contact",
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -85,12 +94,13 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Static files: React's build (make frontend), once there is one
+BUILD_DIR = FRONTEND_DIR / "build"
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [FRONTEND_DIR / "build" / "static"]
+STATICFILES_DIRS = [BUILD_DIR / "static"] if BUILD_DIR.exists() else []
 STATIC_ROOT = BASE_DIR / "staticfiles"
-# The files React's build puts at the site's root: the tab icons and the app manifest
-WHITENOISE_ROOT = FRONTEND_DIR / "build"
+# The files the build puts at the site's root: the tab icons and the app manifest
+WHITENOISE_ROOT = BUILD_DIR if BUILD_DIR.exists() else None
 
 # Uploaded PDFs, converted EPUBs and library covers
 MEDIA_URL = "/media/"
@@ -115,11 +125,13 @@ if not EMAIL_HOST_PASSWORD:
 DEFAULT_FROM_EMAIL = f"Bookflow <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else "Bookflow <bookflow@localhost>"
 # Who hears about new suggestions and messages
 NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL", EMAIL_HOST_USER)
-# The site's address, for links in emails
-SITE_URL = os.getenv("SITE_URL", "http://localhost:8000").rstrip("/")
 # Send emails in a background thread, so a form never waits on the mail server; tests
 # turn this off.
 MAIL_BACKGROUND = True
+
+# How often one visitor may post each form, per hour (bookflow/public.py); tests
+# post freely.
+POSTS_PER_HOUR = {} if TESTING else {"upload": 30, "suggestion": 10, "message": 10}
 
 LOGGING = {
     "version": 1,
@@ -128,5 +140,7 @@ LOGGING = {
     "loggers": {
         "converter": {"handlers": ["console"], "level": "INFO"},
         "bookflow": {"handlers": ["console"], "level": "INFO"},
+        # Server errors, with their tracebacks, in the service's log
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }

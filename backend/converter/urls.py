@@ -1,13 +1,11 @@
 from django.urls import path
 
 from .views import (
-    book, conversion_create, conversion_detail, conversion_left, conversion_seen, cover, csrf, epub, epub_file, page,
-    preview,
+    book, conversion_create, conversion_detail, conversion_left, conversion_seen, cover, epub, epub_file, page, preview,
 )
 
 urlpatterns = [
     path("", conversion_create, name="conversion-create"),
-    path("csrf", csrf, name="csrf"),
     path("<uuid:pk>", conversion_detail, name="conversion-detail"),
     path("<uuid:pk>/seen", conversion_seen, name="conversion-seen"),
     path("<uuid:pk>/left", conversion_left, name="conversion-left"),

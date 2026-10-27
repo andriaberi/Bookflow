@@ -1,9 +1,7 @@
-from bookflow import mail
+from bookflow import mail, public
 from bookflow.responses import error
 from converter import engine
 from converter.uploads import UploadError, check_pdf
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
@@ -45,21 +43,15 @@ LANGS = {"en", "ka"}
 
 
 @require_POST
+@public.limited("suggestion")
 def suggestion_create(request):
-    fields = {name: request.POST.get(name, "").strip() for name in ("title", "author", "note", "rights", "holder", "email")}
-    # A field people never see: only bots fill it in. They're told it worked.
-    if request.POST.get("website"):
-        return JsonResponse({}, status=201)
-
+    fields = public.fields(request, "title", "author", "note", "rights", "holder", "email")
     if not fields["title"]:
         return error("no_title", "The book's title is needed")
     if len(fields["title"]) > 300 or max(len(fields["author"]), len(fields["holder"])) > 200 or len(fields["note"]) > MAX_NOTE:
         return error("too_long", f"Notes up to {MAX_NOTE} characters")
-    if fields["email"]:
-        try:
-            validate_email(fields["email"])
-        except ValidationError:
-            return error("bad_email", "That isn't an email address")
+    if fields["email"] and not public.is_email(fields["email"]):
+        return error("bad_email", "That isn't an email address")
 
     pdf = request.FILES.get("pdf")
     if pdf:
@@ -85,4 +77,4 @@ def suggestion_create(request):
         mail.admin_url(suggestion),
     ]
     mail.notify(f"Book suggested: {suggestion.title}", "\n\n".join(line for line in lines if line), reply_to=suggestion.email)
-    return JsonResponse({}, status=201)
+    return public.created()

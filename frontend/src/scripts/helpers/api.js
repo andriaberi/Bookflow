@@ -16,7 +16,7 @@ function cookie(name) {
 // Django wants its CSRF token back on every POST. In production the page comes from
 // Django and already has the cookie; the React dev server asks the API for it.
 async function csrfToken() {
-    if (!cookie('csrftoken')) await fetch('/api/convert/csrf', { credentials: 'same-origin' });
+    if (!cookie('csrftoken')) await fetch('/api/csrf', { credentials: 'same-origin' });
     return cookie('csrftoken');
 }
 

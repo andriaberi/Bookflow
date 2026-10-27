@@ -8,10 +8,6 @@ from . import models
 from . import emails
 from .forms import BookForm
 
-admin.site.site_header = "Bookflow Admin"
-admin.site.site_title = "Bookflow"
-admin.site.index_title = "Content management"
-
 
 @admin.register(models.Book)
 class BookAdmin(admin.ModelAdmin):

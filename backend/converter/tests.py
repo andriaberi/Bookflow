@@ -106,7 +106,7 @@ class ConversionTests(TestCase):
         self.assertEqual(response.status_code, 405)
 
     def test_csrf_endpoint_sets_the_cookie(self):
-        response = self.client.get("/api/convert/csrf")
+        response = self.client.get("/api/csrf")
         self.assertIn("csrftoken", response.cookies)
 
 

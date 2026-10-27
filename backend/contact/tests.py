@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.core import mail
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 
 from .models import Message
@@ -52,6 +53,12 @@ class ContactTests(TestCase):
     def test_no_owner_address_sends_nothing(self):
         self.send(text="Hello")
         self.assertEqual(mail.outbox, [])
+
+    @override_settings(POSTS_PER_HOUR={"message": 2})
+    def test_one_visitor_may_post_only_so_often(self):
+        cache.clear()
+        self.assertEqual([self.send(text="Hi").status_code for _ in range(3)], [201, 201, 429])
+        self.assertEqual(self.client.post("/api/contact/", {"text": "Hi"}, HTTP_X_REAL_IP="10.0.0.3").status_code, 201)
 
     def test_only_post(self):
         self.assertEqual(self.client.get("/api/contact/").status_code, 405)

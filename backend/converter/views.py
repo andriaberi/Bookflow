@@ -3,11 +3,11 @@ from functools import wraps
 from pathlib import Path
 from urllib.parse import quote
 
+from bookflow import public
 from bookflow.responses import error
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from pdf2epub import ConvertError
 
@@ -47,14 +47,8 @@ def _serialize(c: Conversion) -> dict:
     }
 
 
-# The React dev server doesn't come from Django, so it asks here for the CSRF cookie.
-@require_GET
-@ensure_csrf_cookie
-def csrf(request):
-    return JsonResponse({})
-
-
 @require_POST
+@public.limited("upload", trap=False)
 def conversion_create(request):
     pdf = request.FILES.get("pdf")
     if not pdf:
