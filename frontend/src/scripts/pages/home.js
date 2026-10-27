@@ -93,7 +93,7 @@ function Home() {
                             <h2 className="bf-display bf-card-title mb-3">{ t.home.libraryTitle }</h2>
                             <p className="bf-muted mb-4">{ t.home.libraryText }</p>
                             <div className="bf-shelf mb-4" aria-hidden="true">
-                                { shelf.map((book) => <img key={ book.slug } src={ book.cover_url } alt="" className="bf-shelf-book" />) }
+                                { shelf.map((book) => <img key={ book.id } src={ book.cover_url } alt="" className="bf-shelf-book" />) }
                                 { Array.from({ length: empty }, (_, i) => (
                                     <div key={ i } className="bf-shelf-book bf-shelf-empty"><BookIcon size={ 28 } /></div>
                                 )) }

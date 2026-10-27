@@ -1,12 +1,143 @@
-// The library: a grid of covers, each with its title, author and download button.
+// The library: a storefront (search, the newest book, then every book as a cover) and
+// a page for each book.
 
 .bf-library-header {
-    margin-bottom: clamp(24px, 4.5vh, 48px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px 32px;
+    margin-bottom: clamp(24px, 4vh, 40px);
+
+    @media (max-width: 991.98px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
-.bf-library {
+.bf-search {
+    position: relative;
+    flex: 0 1 360px;
+    margin: 0;
+    color: var(--bf-muted);
+
+    svg {
+        position: absolute;
+        top: 50%;
+        left: 16px;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    .form-control {
+        padding: 0.7rem 1rem 0.7rem 2.75rem;
+        border-color: var(--bf-line-strong);
+        border-radius: 999px;
+        background-color: var(--bf-surface);
+        color: var(--bf-text);
+
+        &:focus {
+            border-color: var(--bf-cobalt);
+            box-shadow: 0 0 0 0.2rem rgba(59, 91, 255, 0.25);
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        flex-basis: auto;
+    }
+}
+
+// Covers
+
+.bf-cover {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(13, 14, 20, 0.16);
+}
+
+.bf-cover-none {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 2 / 3;
+    background: var(--bf-empty);
+    color: var(--bf-muted);
+    box-shadow: none;
+}
+
+// In the grid every cover takes the same shape, so the titles line up.
+.bf-cover-grid {
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+// The newest book
+
+.bf-featured {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: 200px minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(24px, 4vw, 48px);
+    margin-bottom: clamp(32px, 5vh, 56px);
+    padding: clamp(24px, 4vw, 40px);
+    border: 1px solid var(--bf-line);
+    border-radius: 2rem;
+    background: var(--bf-soft);
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        text-align: center;
+
+        .bf-featured-cover {
+            width: 160px;
+        }
+
+        .bf-cta {
+            justify-content: center;
+        }
+    }
+}
+
+.bf-featured-cover {
+    display: block;
+    width: 100%;
+}
+
+.bf-featured-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    max-width: 640px;
+    overflow: hidden;
+}
+
+// The toolbar and the grid
+
+.bf-library-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--bf-line);
+}
+
+.bf-library-sort {
+    width: auto;
+    margin-left: auto;
+    border-color: var(--bf-line-strong);
+    border-radius: 999px;
+    background-color: var(--bf-surface);
+    color: var(--bf-text);
+}
+
+.bf-book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 32px 24px;
     margin: 0;
     padding: 0;
@@ -18,27 +149,111 @@
     }
 }
 
-.bf-library-book {
+.bf-book-card {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
+    color: var(--bf-text);
+    text-decoration: none;
+
+    .bf-cover {
+        margin-bottom: 8px;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    &:hover .bf-cover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 28px rgba(13, 14, 20, 0.22);
+    }
+
+    &:hover .bf-book-card-title {
+        color: var(--bf-cobalt);
+    }
 }
 
-.bf-library-cover {
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    border-radius: 8px;
-    object-fit: cover;
-    box-shadow: 0 6px 16px rgba(13, 14, 20, 0.15);
+.bf-book-card-title {
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-.bf-library-description {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+@media (prefers-reduced-motion: reduce) {
+    .bf-book-card .bf-cover {
+        transition: none;
+    }
 }
 
-.bf-library-book .btn {
-    align-self: flex-start;
+// A book's page
+
+.bf-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 24px;
+    color: var(--bf-muted);
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+        color: var(--bf-cobalt);
+    }
+}
+
+.bf-book-page {
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(32px, 5vw, 64px);
+
+    @media (max-width: 767.98px) {
+        grid-template-columns: minmax(0, 1fr);
+
+        .bf-cover-large {
+            width: min(240px, 70%);
+            margin: 0 auto;
+        }
+
+        .bf-book-info {
+            text-align: center;
+        }
+
+        .bf-facts {
+            justify-content: center;
+        }
+
+        .bf-book-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+}
+
+.bf-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+    margin-bottom: 24px;
+    padding: 16px 0;
+    border-top: 1px solid var(--bf-line);
+    border-bottom: 1px solid var(--bf-line);
+
+    dt {
+        color: var(--bf-muted);
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    dd {
+        margin: 0;
+        font-weight: 600;
+    }
+}
+
+.bf-book-description {
+    max-width: 680px;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.bf-more {
+    margin-top: clamp(48px, 8vh, 80px);
 }

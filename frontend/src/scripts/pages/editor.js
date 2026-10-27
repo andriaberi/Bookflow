@@ -323,7 +323,7 @@ function BookDetails({ t, id, book, coverUrl, setCoverUrl, setBook }) {
             <label className="form-label small fw-medium mb-1" htmlFor="bf-language">{ t.editor.language }</label>
             <select id="bf-language" className="form-select form-select-sm" value={ metadata.language } onChange={ (e) => set('language', e.target.value) }>
                 { languages.map((code) => (
-                    <option key={ code } value={ code }>{ t.editor.languages[code] ? `${t.editor.languages[code]} (${code})` : code }</option>
+                    <option key={ code } value={ code }>{ t.languages[code] ? `${t.languages[code]} (${code})` : code }</option>
                 )) }
             </select>
         </section>

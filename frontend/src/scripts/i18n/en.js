@@ -1,4 +1,5 @@
 const en = {
+    languages: { ka: 'Georgian', en: 'English' },
     nav: {
         converter: 'Converter',
         library: 'Library',
@@ -161,7 +162,6 @@ const en = {
         author: 'Author',
         authorPlaceholder: 'Not in the PDF',
         language: 'Language',
-        languages: { ka: 'Georgian', en: 'English' },
         inEpub: 'In the EPUB',
         roles: {
             contents: 'Printed contents',
@@ -206,9 +206,28 @@ const en = {
     library: {
         title: 'Library',
         lead: 'Books already converted and corrected by hand, ready to download as EPUB.',
+        search: 'Search by title or author',
+        featured: 'New in the library',
+        details: 'About this book',
+        all: 'All',
+        sort: 'Sort by',
+        sorts: { newest: 'Newest', title: 'Title', author: 'Author' },
+        count: '{n} books',
+        countOne: '1 book',
+        noResults: 'No books match “{query}”.',
+        clearSearch: 'Clear search',
         empty: 'There are no books here yet. Know one that belongs here?',
         error: 'The library couldn’t be loaded. Please try again.',
         download: 'Download EPUB',
+        back: 'Library',
+        language: 'Language',
+        chapters: 'Chapters',
+        size: 'EPUB size',
+        mb: '{mb} MB',
+        readers: 'Opens in Apple Books, Google Play Books, Kobo and most e-readers.',
+        more: 'More from the library',
+        notFound: 'This book isn’t in the library.',
+        notFoundLead: 'It may have been taken down, or the address is wrong.',
     },
     soon: {
         suggest: 'Suggestions are on their way.',

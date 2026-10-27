@@ -86,6 +86,10 @@ export async function uploadPdf(file, onProgress = () => {}) {
     });
 }
 
+export function getLibraryBook(id) {
+    return getJson(`/api/library/${id}`);
+}
+
 export function getConversion(id) {
     return getJson(`/api/convert/${id}`);
 }

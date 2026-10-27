@@ -6,6 +6,7 @@ import Convert from './pages/convert';
 import Reading from './pages/reading';
 import Editor from './pages/editor';
 import Library from './pages/library';
+import LibraryBook from './pages/library-book';
 import ComingSoon from './pages/coming-soon';
 import NotFound from './pages/not-found';
 
@@ -20,6 +21,7 @@ function App() {
                     <Route path="/convert/:id" element={ <Reading /> } />
                     <Route path="/convert/:id/edit" element={ <Editor /> } />
                     <Route path="/library" element={ <Library /> } />
+                    <Route path="/library/:id" element={ <LibraryBook /> } />
                     <Route path="/suggest" element={ <ComingSoon page="suggest" /> } />
                     <Route path="*" element={ <NotFound /> } />
                 </Routes>
