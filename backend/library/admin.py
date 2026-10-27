@@ -67,6 +67,7 @@ class SuggestionAdmin(admin.ModelAdmin):
                 name=suggestion.title,
                 size=len(data),
                 pages=engine.count_pages(data),
+                keep=True,
             )
             engine.start(conversion)
             link = format_html('<a href="/convert/{}">{}</a>', conversion.pk, suggestion.title)

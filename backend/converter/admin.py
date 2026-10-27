@@ -8,11 +8,12 @@ from . import engine, models
 
 @admin.register(models.Conversion)
 class ConversionAdmin(admin.ModelAdmin):
-    list_display    = ("name", "status", "pages", "size", "created_at")
-    list_filter     = ("status",)
+    list_display    = ("name", "status", "pages", "size", "keep", "last_seen", "created_at")
+    list_filter     = ("status", "keep")
+    list_editable   = ("keep",)
     search_fields   = ("name",)
     readonly_fields = ("id", "name", "size", "pages", "status", "step", "error",
-                       "created_at", "updated_at")
+                       "last_seen", "created_at", "updated_at")
     exclude         = ("book",)
     actions         = ("add_to_library",)
 
@@ -24,7 +25,7 @@ class ConversionAdmin(admin.ModelAdmin):
             "fields": ("name", "size", "pages")
         }),
         ("Reading", {
-            "fields": ("status", "step", "error", "created_at", "updated_at")
+            "fields": ("status", "step", "error", "keep", "last_seen", "created_at", "updated_at")
         }),
     )
 

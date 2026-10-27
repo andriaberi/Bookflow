@@ -20,7 +20,7 @@ PDF2EPUB_SOURCE ?= git+https://github.com/andriaberi/PDF2EPUB.git@v2026.1025.3
 # PHONY targets
 .PHONY: help install install-backend install-engine install-frontend \
         dev run-backend run-frontend \
-        migrations migrate superuser shell check test \
+        migrations migrate superuser shell cleanup check test \
         frontend copy collect deploy restart clean
 
 # Help (default)
@@ -40,6 +40,7 @@ help:
 	@echo "  make migrate -------> Apply migrations"
 	@echo "  make superuser -----> Create an admin user"
 	@echo "  make shell ---------> Django shell"
+	@echo "  make cleanup -------> Delete conversions whose page was closed"
 	@echo ""
 	@echo "Checks:"
 	@echo "  make check ---------> Django system check + tests"
@@ -101,6 +102,9 @@ superuser:
 
 shell:
 	$(MANAGE) shell
+
+cleanup:
+	$(MANAGE) cleanup_conversions
 
 # Checks
 check:

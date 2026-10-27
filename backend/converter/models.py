@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 
 def pdf_path(conversion, filename):
@@ -34,6 +35,10 @@ class Conversion(models.Model):
     # The book as pdf2epub's Book.to_dict() gives it, without the cover image
     book   = models.JSONField(null=True, blank=True)
     cover  = models.FileField(upload_to=cover_path, blank=True)
+
+    # When the page using it last said it's open; see cleanup.py
+    last_seen  = models.DateTimeField(default=timezone.now)
+    keep       = models.BooleanField(default=False, help_text="Never deleted for being left (the admin's own)")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

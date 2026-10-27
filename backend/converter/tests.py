@@ -1,10 +1,15 @@
 import shutil
 import tempfile
+from pathlib import Path
+from unittest import mock
 
 import pymupdf
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
+from django.utils import timezone
 
+from . import cleanup
 from .models import Conversion
 
 MEDIA = tempfile.mkdtemp(prefix="bookflow-test-media-")
@@ -266,3 +271,60 @@ class EditorTests(TestCase):
         self.assertEqual(response.status_code, 404)
         response = self.client.get(f"/api/convert/{self.id}/epub-files/EPUB/nothing.xhtml")
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(MEDIA_ROOT=MEDIA, CONVERTER_BACKGROUND=False)
+class CleanupTests(TestCase):
+    def setUp(self):
+        self.id = self.client.post("/api/convert/", {"pdf": upload()}).json()["id"]
+        self.folder = Path(Conversion.objects.get(pk=self.id).pdf.path).parent
+
+    def later(self, delta):
+        """Run the cleanup as if `delta` had passed."""
+        with mock.patch("converter.cleanup.timezone.now", return_value=timezone.now() + delta):
+            return cleanup.remove_left()
+
+    def exists(self):
+        return Conversion.objects.filter(pk=self.id).exists()
+
+    def test_a_left_conversion_goes_after_the_grace(self):
+        self.assertEqual(self.client.post(f"/api/convert/{self.id}/left").status_code, 204)
+
+        self.assertEqual(self.later(cleanup.GRACE / 2), 0)
+        self.assertEqual(self.later(cleanup.GRACE * 2), 1)
+        self.assertFalse(self.exists())
+        self.assertFalse(self.folder.exists())
+
+    def test_a_reload_keeps_it(self):
+        self.client.post(f"/api/convert/{self.id}/left")
+        self.client.post(f"/api/convert/{self.id}/seen")
+
+        self.later(cleanup.GRACE * 2)
+
+        self.assertTrue(self.exists())
+
+    def test_an_open_page_keeps_it_and_a_silent_one_doesnt(self):
+        self.assertEqual(self.later(cleanup.EXPIRY / 2), 0)
+        self.later(cleanup.EXPIRY * 2)
+        self.assertFalse(self.exists())
+
+    def test_the_admins_conversions_are_kept(self):
+        self.client.force_login(User.objects.create_superuser("admin", "admin@example.com", "pw"))
+        kept = self.client.post("/api/convert/", {"pdf": upload()}).json()["id"]
+
+        self.later(cleanup.EXPIRY * 2)
+
+        self.assertTrue(Conversion.objects.filter(pk=kept).exists())
+        self.assertFalse(self.exists())
+
+    def test_a_book_being_read_is_left_alone_unless_stuck(self):
+        Conversion.objects.filter(pk=self.id).update(status="reading")
+        self.later(cleanup.EXPIRY * 2)
+        self.assertTrue(self.exists())
+        self.later(cleanup.STUCK * 2)
+        self.assertFalse(self.exists())
+
+    def test_a_gone_conversion_is_404(self):
+        self.later(cleanup.EXPIRY * 2)
+        self.assertEqual(self.client.post(f"/api/convert/{self.id}/seen").status_code, 404)
+        self.assertEqual(self.client.get(f"/api/convert/{self.id}").status_code, 404)

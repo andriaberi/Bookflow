@@ -11,7 +11,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from pdf2epub import ConvertError
 
-from . import engine
+from . import cleanup, engine
 from .models import Conversion
 from .uploads import MB, UploadError, check_pdf
 
@@ -64,16 +64,35 @@ def conversion_create(request):
     except UploadError as e:
         return error(e.code, str(e))
 
+    cleanup.now_and_then()
     conversion = Conversion.objects.create(
         pdf=pdf,
         name=Path(pdf.name).stem,
         size=pdf.size,
         pages=pages,
+        keep=request.user.is_staff,
     )
     engine.start(conversion)
     conversion.refresh_from_db()
 
     return JsonResponse(_serialize(conversion), status=201)
+
+
+@require_POST
+def conversion_seen(request, pk):
+    """The conversion's page is still open."""
+    conversion = get_object_or_404(Conversion, pk=pk)
+    cleanup.seen(conversion)
+    cleanup.now_and_then()
+    return JsonResponse({})
+
+
+@require_POST
+def conversion_left(request, pk):
+    """The conversion's page was closed: delete it soon. Sent by navigator.sendBeacon."""
+    conversion = get_object_or_404(Conversion, pk=pk)
+    cleanup.left(conversion)
+    return HttpResponse(status=204)
 
 
 @require_GET
