@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getBooks } from '../helpers/api';
+import { ENGINE_URL } from '../helpers/links';
 import { useSettings } from '../helpers/settings';
 import { ArrowRight, BookIcon, Plus } from '../includes/icons';
 
@@ -8,13 +9,7 @@ const SHELF_SIZE = 4;
 
 function Home() {
     const { t } = useSettings();
-    const location = useLocation();
     const [books, setBooks] = useState([]);
-
-    // "/#support" from the navbar scrolls to that section once the page is shown.
-    useEffect(() => {
-        if (location.hash) document.querySelector(location.hash)?.scrollIntoView({ behavior: 'smooth' });
-    }, [location]);
 
     useEffect(() => {
         getBooks().then(setBooks).catch(() => {});
@@ -112,7 +107,7 @@ function Home() {
                 </div>
             </section>
 
-            <section id="support" className="container bf-section pb-5">
+            <section className="container bf-section pb-5">
                 <div className="bf-support p-4 p-lg-5">
                     <div className="bf-support-inner">
                         <div className="bf-support-text">
@@ -120,9 +115,8 @@ function Home() {
                             <p className="fs-5 mb-0">{ t.home.supportText }</p>
                         </div>
                         <div className="bf-support-actions">
-                            {/* TODO: point at the real donation page once there is one */}
-                            <a href="#support" className="btn btn-lg btn-white px-4 py-3">{ t.home.supportButton }</a>
-                            <a href="https://github.com/andriaberi/PDF2EPUB" className="btn btn-lg btn-white-outline px-4 py-3">{ t.home.star }</a>
+                            <Link to="/support" className="btn btn-lg btn-white px-4 py-3">{ t.home.supportButton }</Link>
+                            <a href={ ENGINE_URL } className="btn btn-lg btn-white-outline px-4 py-3">{ t.home.star }</a>
                         </div>
                     </div>
                 </div>

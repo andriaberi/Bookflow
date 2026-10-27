@@ -22,7 +22,7 @@ function Navbar() {
     const close = useCallback(() => setOpen(false), []);
 
     // Picking a page closes the menu.
-    useEffect(close, [location.pathname, location.hash, close]);
+    useEffect(close, [location.pathname, close]);
 
     // While the menu is open the page behind it is disabled: it can't be scrolled,
     // clicked, focused or read by a screen reader.
@@ -55,7 +55,6 @@ function Navbar() {
     }, [open]);
 
     const dark = theme === 'dark';
-    const support = { pathname: '/', hash: '#support' };
 
     const languageSwitch = (
         <div className="bf-seg" role="group" aria-label={ t.nav.language }>
@@ -83,7 +82,7 @@ function Navbar() {
                     { PAGES.map((page) => (
                         <NavLink key={ page.to } to={ page.to } className="bf-nav-link">{ t.nav[page.key] }</NavLink>
                     )) }
-                    <Link to={ support } className="btn btn-ghost px-3 d-inline-flex align-items-center gap-2">
+                    <Link to="/support" className="btn btn-ghost px-3 d-inline-flex align-items-center gap-2">
                         <Heart size={ 16 } className="bf-heart" />
                         { t.nav.support }
                     </Link>
@@ -121,7 +120,7 @@ function Navbar() {
                                 )) }
                             </ul>
 
-                            <Link to={ support } className="btn btn-cobalt btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
+                            <Link to="/support" className="btn btn-cobalt btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
                                 <Heart size={ 18 } />
                                 { t.nav.support }
                             </Link>

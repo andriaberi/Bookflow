@@ -1,0 +1,46 @@
+// Support: donating (when there's somewhere to), the other ways to help, and what
+// Bookflow promises.
+
+.bf-support-page {
+    padding-top: var(--bf-fill-pad);
+    padding-bottom: var(--bf-fill-pad);
+}
+
+.bf-ways {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+
+    @media (max-width: 1199.98px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+}
+
+.bf-way {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px;
+}
+
+.bf-promises {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    padding: 24px 28px;
+    border-radius: 1.5rem;
+    background: var(--bf-soft);
+
+    @media (max-width: 767.98px) {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+}

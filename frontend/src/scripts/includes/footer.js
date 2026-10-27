@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getInfo } from '../helpers/api';
 import { fill } from '../helpers/format';
+import { ENGINE_URL } from '../helpers/links';
 import { useSettings } from '../helpers/settings';
 
 function Footer() {
@@ -22,7 +23,7 @@ function Footer() {
                     { fill(t.footer.copyright, { year: new Date().getFullYear() }) }
                 </span>
                 <span>
-                    { t.footer.poweredBy } <a href="https://github.com/andriaberi/PDF2EPUB">PDF2EPUB</a>
+                    { t.footer.poweredBy } <a href={ ENGINE_URL }>PDF2EPUB</a>
                     { engine && <span className="bf-version"> { engine }</span> }
                 </span>
             </div>
