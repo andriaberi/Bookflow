@@ -44,14 +44,14 @@ RIGHTS = {choice for choice, _ in Suggestion.RIGHTS_CHOICES}
 
 @require_POST
 def suggestion_create(request):
-    fields = {name: request.POST.get(name, "").strip() for name in ("title", "author", "note", "rights", "email")}
+    fields = {name: request.POST.get(name, "").strip() for name in ("title", "author", "note", "rights", "holder", "email")}
     # A field people never see: only bots fill it in. They're told it worked.
     if request.POST.get("website"):
         return JsonResponse({}, status=201)
 
     if not fields["title"]:
         return error("no_title", "The book's title is needed")
-    if len(fields["title"]) > 300 or len(fields["author"]) > 200 or len(fields["note"]) > MAX_NOTE:
+    if len(fields["title"]) > 300 or max(len(fields["author"]), len(fields["holder"])) > 200 or len(fields["note"]) > MAX_NOTE:
         return error("too_long", f"Notes up to {MAX_NOTE} characters")
     if fields["email"]:
         try:
@@ -69,6 +69,10 @@ def suggestion_create(request):
             return error("no_rights", "Say whether the PDF may be shared")
     else:
         fields["rights"] = ""
+    if fields["rights"] != "permission":
+        fields["holder"] = ""
+    elif not fields["holder"]:
+        return error("no_holder", "Say who holds the rights")
 
     Suggestion.objects.create(pdf=pdf or "", **fields)
     return JsonResponse({}, status=201)

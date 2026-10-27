@@ -48,6 +48,17 @@ class SuggestionTests(TestCase):
         self.suggest(title="No PDF", rights="permission")
         self.assertEqual(Suggestion.objects.get().rights, "")
 
+    def test_permission_says_who_holds_the_rights(self):
+        response = self.suggest(title="My Book", pdf=pdf_upload(), rights="permission")
+        self.assertEqual(response.json()["error"], "no_holder")
+
+        self.suggest(title="My Book", pdf=pdf_upload(), rights="permission", holder="The translator")
+        self.assertEqual(Suggestion.objects.get().holder, "The translator")
+
+    def test_only_permission_keeps_a_holder(self):
+        self.suggest(title="Old Book", pdf=pdf_upload(), rights="public_domain", holder="Someone")
+        self.assertEqual(Suggestion.objects.get().holder, "")
+
     def test_bad_suggestions_are_refused(self):
         self.assertEqual(self.suggest(title="  ").json()["error"], "no_title")
         self.assertEqual(self.suggest(title="A", note="x" * 2001).json()["error"], "too_long")
@@ -66,7 +77,7 @@ class SuggestionTests(TestCase):
         self.assertFalse(Suggestion.objects.exists())
 
     def test_a_suggested_pdf_can_be_read_in_the_converter(self):
-        self.suggest(title="My Book", pdf=pdf_upload(), rights="permission")
+        self.suggest(title="My Book", pdf=pdf_upload(), rights="permission", holder="Me")
         self.client.force_login(User.objects.create_superuser("admin", "admin@example.com", "pw"))
 
         response = self.client.post("/admin/library/suggestion/", {"action": "convert", "_selected_action": [Suggestion.objects.get().pk]}, follow=True)

@@ -59,6 +59,8 @@ class Suggestion(models.Model):
     pdf        = models.FileField(upload_to=suggestion_path, blank=True)
     # Asked only when a PDF is sent
     rights     = models.CharField(max_length=20, choices=RIGHTS_CHOICES, blank=True)
+    # Asked only of those with permission
+    holder     = models.CharField(max_length=200, blank=True, help_text="Who holds the rights")
     email      = models.EmailField(blank=True, help_text="To tell them when the book is added")
 
     status     = models.CharField(max_length=10, choices=STATUS_CHOICES, default="new")

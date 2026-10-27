@@ -47,7 +47,7 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_filter     = ("status", "rights")
     list_editable   = ("status",)
     search_fields   = ("title", "author", "note", "email")
-    readonly_fields = ("title", "author", "note", "pdf", "rights", "email", "created_at")
+    readonly_fields = ("title", "author", "note", "pdf", "rights", "holder", "email", "created_at")
     actions         = ("convert",)
 
     @admin.display(boolean=True, description="PDF")

@@ -83,6 +83,32 @@ test('a PDF needs an answer about its rights', async () => {
     expect(sent.fields.pdf).toBeInstanceOf(File);
 });
 
+test('permission asks who holds the rights', async () => {
+    await renderSuggest();
+    type('Title', 'My Book');
+    attach(pdf());
+    fireEvent.click(screen.getByLabelText('Yes, I hold the rights or have permission'));
+    fireEvent.click(screen.getByRole('button', { name: 'Send suggestion' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Say who holds the rights.');
+
+    type('Who holds the rights?', 'The translator');
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Send suggestion' })));
+    expect(sent.fields).toMatchObject({ rights: 'permission', holder: 'The translator' });
+});
+
+test('another answer drops the holder', async () => {
+    await renderSuggest();
+    type('Title', 'My Book');
+    attach(pdf());
+    fireEvent.click(screen.getByLabelText('Yes, I hold the rights or have permission'));
+    type('Who holds the rights?', 'Me');
+    fireEvent.click(screen.getByLabelText('I’m not sure'));
+
+    expect(screen.queryByLabelText('Who holds the rights?')).toBeNull();
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Send suggestion' })));
+    expect(sent.fields.holder).toBeUndefined();
+});
+
 test('a removed PDF takes the rights question with it', async () => {
     await renderSuggest();
     attach(pdf());

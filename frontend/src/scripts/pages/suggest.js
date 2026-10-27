@@ -7,7 +7,7 @@ import { useSettings } from '../helpers/settings';
 import { Check, Close, FileIcon } from '../includes/icons';
 import SideList from '../includes/side-list';
 
-const EMPTY = { title: '', author: '', note: '', rights: '', email: '', website: '' };
+const EMPTY = { title: '', author: '', note: '', rights: '', holder: '', email: '', website: '' };
 const RIGHTS = ['public_domain', 'permission', 'unsure'];
 // The same limit the server checks
 const MAX_NOTE = 2000;
@@ -21,6 +21,7 @@ function Suggest() {
     const [sent, setSent] = useState(false);
 
     const sending = progress !== null;
+    const permission = pdf && fields.rights === 'permission';
     const set = (name) => (e) => setFields((old) => ({ ...old, [name]: e.target.value }));
 
     function pickPdf(file) {
@@ -36,10 +37,11 @@ function Suggest() {
         if (sending) return;
         if (!fields.title.trim()) return setError('no_title');
         if (pdf && !fields.rights) return setError('no_rights');
+        if (permission && !fields.holder.trim()) return setError('no_holder');
         setError('');
         setProgress(0);
         try {
-            await suggestBook({ ...fields, rights: pdf ? fields.rights : '', pdf }, setProgress);
+            await suggestBook({ ...fields, rights: pdf ? fields.rights : '', holder: permission ? fields.holder : '', pdf }, setProgress);
             setSent(true);
         } catch (e) {
             setError(errorCode(e, t.suggest.errors));
@@ -118,6 +120,13 @@ function Suggest() {
                                             </div>
                                         )) }
                                     </fieldset>
+                                ) }
+
+                                { permission && (
+                                    <div className="col-12">
+                                        <FieldLabel htmlFor="bf-s-holder">{ t.suggest.holder }</FieldLabel>
+                                        <input id="bf-s-holder" className="form-control" maxLength={ 200 } placeholder={ t.suggest.holderPlaceholder } value={ fields.holder } onChange={ set('holder') } />
+                                    </div>
                                 ) }
 
                                 <div className="col-12">
