@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "converter",
     "library",
+    "contact",
 ]
 
 MIDDLEWARE = [

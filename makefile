@@ -36,7 +36,7 @@ help:
 	@echo "  make run-frontend --> Run React (:3000, proxies /api and /media to :8000)"
 	@echo ""
 	@echo "Database:"
-	@echo "  make migrations ----> Make migrations for both apps"
+	@echo "  make migrations ----> Make migrations for the apps"
 	@echo "  make migrate -------> Apply migrations"
 	@echo "  make superuser -----> Create an admin user"
 	@echo "  make shell ---------> Django shell"
@@ -92,7 +92,7 @@ run-frontend:
 
 # Database
 migrations:
-	$(MANAGE) makemigrations converter library
+	$(MANAGE) makemigrations converter library contact
 
 migrate:
 	$(MANAGE) migrate
