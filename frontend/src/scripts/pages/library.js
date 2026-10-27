@@ -5,6 +5,7 @@ import { fill } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
 import { BookCover, BookGrid, DownloadButton } from '../includes/books';
 import { Search } from '../includes/icons';
+import { PageHeader, usePageTitle } from '../includes/page';
 
 const SORTS = {
     title: (a, b) => a.title.localeCompare(b.title),
@@ -13,6 +14,7 @@ const SORTS = {
 
 function Library() {
     const { t } = useSettings();
+    usePageTitle(t.library.title);
     const [books, setBooks] = useState(null);
     const [failed, setFailed] = useState(false);
     const [query, setQuery] = useState('');
@@ -35,16 +37,12 @@ function Library() {
 
     return (
         <section className="container bf-section bf-library">
-            <header className="bf-library-header">
-                <div className="bf-center-stacked">
-                    <h1 className="bf-display bf-page-title bf-optical-top mb-2">{ t.library.title }</h1>
-                    <p className="fs-5 bf-muted bf-page-lead mb-0">{ t.library.lead }</p>
-                </div>
+            <PageHeader title={ t.library.title } lead={ t.library.lead }>
                 <label className="bf-search">
                     <Search size={ 18 } />
                     <input type="search" className="form-control" placeholder={ t.library.search } aria-label={ t.library.search } value={ query } onChange={ (e) => setQuery(e.target.value) } />
                 </label>
-            </header>
+            </PageHeader>
 
             { failed && <div className="bf-alert" role="alert">{ t.library.error }</div> }
 

@@ -77,3 +77,11 @@ test('beside the form are the other places to go', async () => {
     expect(main.getByRole('link', { name: 'Bookflow' })).toHaveAttribute('href', 'https://github.com/andriaberi/Bookflow');
     expect(main.getByRole('link', { name: 'PDF2EPUB' })).toHaveAttribute('href', 'https://github.com/andriaberi/PDF2EPUB');
 });
+
+test('the email address sits beside the send button, and the tab says Contact', async () => {
+    mockApi();
+    await renderAt('/contact');
+
+    expect(screen.getByRole('link', { name: 'andria24b@gmail.com' })).toHaveAttribute('href', 'mailto:andria24b@gmail.com');
+    expect(document.title).toBe('Contact · Bookflow');
+});

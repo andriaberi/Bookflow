@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useSettings } from '../helpers/settings';
+import { usePageTitle } from '../includes/page';
 
 function NotFound() {
     const { t } = useSettings();
+    usePageTitle(t.notFound.title);
 
     return (
         <section className="container bf-section bf-fill text-center bf-message">

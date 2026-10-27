@@ -5,10 +5,6 @@
     @media (min-width: 576px) {
         --bf-fill-pad: clamp(24px, 6vh, 56px);
     }
-
-    // The same above and below, and smaller on short screens so the page still fits.
-    padding-top: var(--bf-fill-pad);
-    padding-bottom: var(--bf-fill-pad);
 }
 
 .bf-drop {
@@ -110,10 +106,6 @@
     }
 }
 
-.bf-convert-header {
-    margin-bottom: clamp(24px, 4.5vh, 48px);
-}
-
 // The same line height as the item's name, so the two line up.
 .bf-looks-mark {
     flex-shrink: 0;
@@ -125,12 +117,6 @@
 }
 
 // Reading
-
-.bf-reading {
-    // The same above and below, and smaller on short screens so the page still fits.
-    padding-top: var(--bf-fill-pad);
-    padding-bottom: var(--bf-fill-pad);
-}
 
 // Large on desktop, body size on a phone.
 .bf-reading-lead {

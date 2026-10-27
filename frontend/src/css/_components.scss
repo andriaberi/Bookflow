@@ -175,6 +175,32 @@
     background-color: var(--bf-cobalt);
 }
 
+// A page with a form beside a side panel (includes/forms.js)
+.bf-form-page {
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+    // The form is the taller card: the panel starts level with its first row.
+    .bf-looks {
+        justify-content: flex-start;
+    }
+}
+
+// The send button, with a line of text beside it
+.bf-send-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+}
+
 // A form once it's sent (includes/forms.js)
 .bf-sent {
     display: flex;

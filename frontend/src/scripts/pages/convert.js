@@ -5,10 +5,12 @@ import { fill } from '../helpers/format';
 import { MAX_PDF_MB, pdfProblem } from '../helpers/files';
 import { useSettings } from '../helpers/settings';
 import { FileUp } from '../includes/icons';
+import { PageHeader, usePageTitle } from '../includes/page';
 import SideList from '../includes/side-list';
 
 function Convert() {
     const { t } = useSettings();
+    usePageTitle(t.nav.converter);
     const navigate = useNavigate();
     const [over, setOver] = useState(false);
     const [progress, setProgress] = useState(null);
@@ -42,10 +44,7 @@ function Convert() {
 
     return (
         <section className="container bf-section bf-fill bf-convert">
-            <header className="bf-center-stacked bf-convert-header">
-                <h1 className="bf-display bf-page-title bf-optical-top mb-3">{ t.convert.title }</h1>
-                <p className="fs-5 bf-muted bf-page-lead mb-0">{ t.convert.lead }</p>
-            </header>
+            <PageHeader title={ t.convert.title } lead={ t.convert.lead } />
 
             {/* The drop zone and the card share a row: same top, same bottom. */}
             <div className="row g-4">

@@ -1,24 +1,4 @@
-// Suggest a book: the form beside what happens next.
-
-.bf-suggest {
-    padding-top: var(--bf-fill-pad);
-    padding-bottom: var(--bf-fill-pad);
-
-    fieldset {
-        margin: 0;
-        padding: 0;
-        border: 0;
-    }
-
-    textarea {
-        resize: none;
-    }
-
-    // The form is the taller card: what happens next starts level with its first row.
-    .bf-looks {
-        justify-content: flex-start;
-    }
-}
+// Suggest a book: attaching the PDF.
 
 // The attached PDF, or the button to attach one
 .bf-file {

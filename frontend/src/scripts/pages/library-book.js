@@ -6,6 +6,7 @@ import { useSettings } from '../helpers/settings';
 import { BookCover, BookGrid, DownloadButton } from '../includes/books';
 import { ChevronRight } from '../includes/icons';
 import Message from '../includes/message';
+import { usePageTitle } from '../includes/page';
 
 // How many other books to suggest under the book.
 const MORE = 4;
@@ -16,6 +17,7 @@ function LibraryBook() {
     const [book, setBook] = useState(null);
     const [missing, setMissing] = useState(false);
     const [more, setMore] = useState([]);
+    usePageTitle(book?.title);
 
     useEffect(() => {
         let stale = false;

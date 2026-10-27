@@ -6,6 +6,7 @@ import { useConversionOpen } from '../helpers/presence';
 import { useSettings } from '../helpers/settings';
 import { Check, FileIcon } from '../includes/icons';
 import Message from '../includes/message';
+import { usePageTitle } from '../includes/page';
 
 // How often to ask the server how far the reading has got.
 const POLL_MS = 500;
@@ -16,6 +17,7 @@ function Reading() {
     const [conversion, setConversion] = useState(null);
     const [missing, setMissing] = useState(false);
     useConversionOpen(id);
+    usePageTitle(conversion?.name);
 
     // Ask again until the book is ready or reading has failed.
     useEffect(() => {
@@ -54,7 +56,7 @@ function Reading() {
     const status = conversion?.status || 'reading';
 
     return (
-        <section className="container bf-section bf-fill bf-reading">
+        <section className="container bf-section bf-fill">
             <div className="bf-reading-card">
                 <div className="bf-reading-cover">
                     { conversion?.cover_url ? (

@@ -100,6 +100,28 @@ a {
     }
 }
 
+// A one-screen page has the same room above and below, less on short screens.
+.bf-section.bf-fill {
+    padding-top: var(--bf-fill-pad);
+    padding-bottom: var(--bf-fill-pad);
+}
+
+// A page's title and lead (includes/page.js), with what sits beside them on the right;
+// stacked, centered, below lg.
+.bf-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px 32px;
+    margin-bottom: clamp(24px, 4.5vh, 48px);
+
+    @media (max-width: 991.98px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
 .bf-section-title {
     font-size: clamp(30px, 4vw, 44px);
     line-height: 1.08;

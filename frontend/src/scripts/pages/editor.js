@@ -10,6 +10,7 @@ import { useConversionOpen } from '../helpers/presence';
 import { useSettings } from '../helpers/settings';
 import { ChevronRight, Close } from '../includes/icons';
 import Message from '../includes/message';
+import { usePageTitle } from '../includes/page';
 
 // How long to wait after the last change before saving, and before trying a failed save again.
 const SAVE_DELAY_MS = 600;
@@ -37,6 +38,7 @@ function Editor() {
     // Goes up each time a save finishes, so the EPUB preview shows the latest edits.
     const [savedVersion, setSavedVersion] = useState(0);
     useConversionOpen(id);
+    usePageTitle(loaded?.name);
 
     useEffect(() => {
         let stale = false;

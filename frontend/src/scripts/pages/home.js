@@ -4,11 +4,13 @@ import { getBooks } from '../helpers/api';
 import { ENGINE_URL } from '../helpers/links';
 import { useSettings } from '../helpers/settings';
 import { ArrowRight, BookIcon, Plus } from '../includes/icons';
+import { usePageTitle } from '../includes/page';
 
 const SHELF_SIZE = 4;
 
 function Home() {
     const { t } = useSettings();
+    usePageTitle();
     const [books, setBooks] = useState([]);
 
     useEffect(() => {

@@ -1,20 +1,6 @@
 // The library: a storefront (search, a book picked at random, then every book as a
 // cover) and a page for each book.
 
-.bf-library-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 20px 32px;
-    margin-bottom: clamp(24px, 4vh, 40px);
-
-    @media (max-width: 991.98px) {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-
 .bf-search {
     position: relative;
     flex: 0 1 360px;
