@@ -7,6 +7,7 @@ body {
 
 a {
     color: var(--bf-link);
+    transition: color var(--bf-fast) var(--bf-ease), opacity var(--bf-fast) var(--bf-ease);
 
     &:hover {
         color: var(--bf-link);
@@ -16,6 +17,28 @@ a {
 
 .container {
     max-width: 1160px;
+}
+
+// Each page fades in as it opens (app.js keys it by address).
+.bf-page {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    animation: bf-fade var(--bf-slow) var(--bf-ease);
+}
+
+@keyframes bf-fade {
+    from { opacity: 0; }
+}
+
+// Anyone whose system asks for less motion gets none.
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
 }
 
 .bf {

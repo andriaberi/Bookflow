@@ -3,6 +3,14 @@
 .btn {
     --bs-btn-font-weight: 600;
     --bs-btn-border-radius: 999px;
+    transition: color var(--bf-fast) var(--bf-ease), background-color var(--bf-fast) var(--bf-ease),
+        border-color var(--bf-fast) var(--bf-ease), box-shadow var(--bf-fast) var(--bf-ease),
+        transform var(--bf-fast) var(--bf-ease);
+
+    // A little give when pressed
+    &:active {
+        transform: scale(0.97);
+    }
 }
 
 .btn-cobalt {
@@ -60,9 +68,14 @@
     border: 1px solid var(--bf-line-strong);
     background: transparent;
     color: var(--bf-text);
+    transition: background-color var(--bf-fast) var(--bf-ease), transform var(--bf-fast) var(--bf-ease);
 
     &:hover {
         background: var(--bf-pill);
+    }
+
+    &:active:not(:disabled) {
+        transform: scale(0.94);
     }
 }
 
@@ -82,6 +95,7 @@
         color: var(--bf-muted);
         font-size: 13px;
         font-weight: 600;
+        transition: background-color var(--bf-fast) var(--bf-ease), color var(--bf-fast) var(--bf-ease);
 
         &.on {
             background: var(--bf-seg-on-bg);

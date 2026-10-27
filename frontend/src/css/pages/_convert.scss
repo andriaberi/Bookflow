@@ -27,7 +27,7 @@
     background: var(--bf-surface);
     text-align: center;
     cursor: pointer;
-    transition: border-color 0.15s, background-color 0.15s;
+    transition: border-color var(--bf-fast) var(--bf-ease), background-color var(--bf-fast) var(--bf-ease);
 
     &:hover,
     &.over {
@@ -82,7 +82,7 @@
         height: 100%;
         border-radius: 999px;
         background: var(--bf-cobalt);
-        transition: width 0.2s;
+        transition: width var(--bf-slow) var(--bf-ease);
     }
 }
 

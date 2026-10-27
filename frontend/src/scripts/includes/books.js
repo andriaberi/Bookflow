@@ -20,8 +20,8 @@ export function DownloadButton({ t, book, className = '' }) {
 export function BookGrid({ books }) {
     return (
         <ul className="bf-book-grid">
-            { books.map((book) => (
-                <li key={ book.id }>
+            { books.map((book, index) => (
+                <li key={ book.id } style={ { '--i': index } }>
                     <Link to={ `/library/${book.id}` } className="bf-book-card" lang={ book.language || undefined }>
                         <BookCover book={ book } className="bf-cover-grid" />
                         <span className="bf-book-card-title">{ book.title }</span>

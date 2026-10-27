@@ -76,5 +76,9 @@
     --bf-font-display: 'Bricolage Grotesque', 'Noto Sans Georgian', Inter, sans-serif;
     // The navbar's full height, its bottom border included
     --bf-nav-height: 69px;
+    // Motion: one curve that starts quick and settles softly, at two speeds
+    --bf-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --bf-fast: 0.2s;
+    --bf-slow: 0.45s;
     --bs-body-font-family: var(--bf-font);
 }

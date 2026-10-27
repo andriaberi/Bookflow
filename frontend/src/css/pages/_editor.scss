@@ -71,12 +71,6 @@
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .bf-save-saving .bf-save-dot {
-        animation: none;
-    }
-}
-
 .bf-alert-close {
     display: inline-flex;
     margin-left: 8px;
