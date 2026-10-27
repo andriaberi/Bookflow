@@ -89,6 +89,8 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [FRONTEND_DIR / "build" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# The files React's build puts at the site's root: the tab icons and the app manifest
+WHITENOISE_ROOT = FRONTEND_DIR / "build"
 
 # Uploaded PDFs, converted EPUBs and library covers
 MEDIA_URL = "/media/"
