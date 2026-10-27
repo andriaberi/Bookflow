@@ -5,6 +5,7 @@ from urllib.parse import quote
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from pdf2epub import ConvertError
@@ -202,3 +203,34 @@ def _cover_url(conversion: Conversion) -> str | None:
     if not conversion.cover:
         return None
     return f"{conversion.cover.url}?v={int(conversion.updated_at.timestamp())}"
+
+
+@require_GET
+def preview(request, pk):
+    """Where the EPUB preview of a block is: the address of the EPUB page it's on."""
+    conversion, error = _ready(pk)
+    if error:
+        return error
+    try:
+        name = engine.preview_page(conversion, request.GET.get("block"))
+        engine.preview_epub(conversion)
+    except ConvertError as e:
+        return _error("problems", str(e), status=409)
+    return JsonResponse({"url": f"/api/convert/{pk}/epub-files/{name}"})
+
+
+# Shown in the editor's preview frame, which is on the same site.
+@xframe_options_sameorigin
+@require_GET
+def epub_file(request, pk, name):
+    """A file from inside the preview EPUB: a page, its stylesheet, fonts or cover."""
+    conversion, error = _ready(pk)
+    if error:
+        return error
+    try:
+        data, content_type = engine.preview_file(conversion, name)
+    except KeyError:
+        return _error("not_found", "No such file in the EPUB", status=404)
+    except ConvertError as e:
+        return _error("problems", str(e), status=409)
+    return HttpResponse(data, content_type=content_type)

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import book, conversion_create, conversion_detail, cover, csrf, epub, page
+from .views import book, conversion_create, conversion_detail, cover, csrf, epub, epub_file, page, preview
 
 urlpatterns = [
     path("", conversion_create, name="conversion-create"),
@@ -10,4 +10,6 @@ urlpatterns = [
     path("<uuid:pk>/pages/<int:number>.png", page, name="conversion-page"),
     path("<uuid:pk>/epub", epub, name="conversion-epub"),
     path("<uuid:pk>/cover", cover, name="conversion-cover"),
+    path("<uuid:pk>/preview", preview, name="conversion-preview"),
+    path("<uuid:pk>/epub-files/<path:name>", epub_file, name="conversion-epub-file"),
 ]

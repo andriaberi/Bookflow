@@ -216,3 +216,53 @@ class EditorTests(TestCase):
         response = self.client.post(f"/api/convert/{self.id}/cover", {"cover": SimpleUploadedFile("c.png", b"not an image")})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], "not_image")
+
+    def preview_url(self, block_id):
+        return self.client.get(f"/api/convert/{self.id}/preview?block={block_id}").json()["url"]
+
+    def test_each_block_previews_on_its_epub_page(self):
+        blocks = self.get_book()["blocks"]
+        headings = [block for block in blocks if block["type"] == "heading"]
+        self.assertEqual(len(headings), 2)
+        last_text = [block for block in blocks if block["type"] == "text"][-1]
+
+        self.assertTrue(self.preview_url(headings[0]["id"]).endswith("/EPUB/text/section-0001.xhtml"))
+        self.assertTrue(self.preview_url(last_text["id"]).endswith("/EPUB/text/section-0002.xhtml"))
+
+    def test_a_left_out_block_previews_where_it_would_be(self):
+        book = self.get_book()
+        second = [index for index, block in enumerate(book["blocks"]) if block["type"] == "heading"][1]
+        book["blocks"][second + 1]["include"] = False
+        self.put_book(book)
+
+        url = self.preview_url(book["blocks"][second + 1]["id"])
+
+        self.assertTrue(url.endswith("section-0002.xhtml"))
+
+    def test_the_preview_page_and_its_stylesheet_are_served(self):
+        url = self.preview_url(self.get_book()["blocks"][0]["id"])
+
+        page = self.client.get(url)
+        style = self.client.get(url.replace("text/section-0001.xhtml", "style.css"))
+
+        self.assertEqual(page.status_code, 200)
+        self.assertEqual(page["Content-Type"], "application/xhtml+xml")
+        self.assertIn(b"Chapter 1", page.content)
+        self.assertEqual(page["X-Frame-Options"], "SAMEORIGIN")
+        self.assertEqual(style["Content-Type"], "text/css")
+
+    def test_the_preview_follows_the_edits(self):
+        book = self.get_book()
+        heading = next(block for block in book["blocks"] if block["type"] == "heading")
+        url = self.preview_url(heading["id"])
+        self.client.get(url)
+        heading["label"] = "Renamed Chapter"
+        self.put_book(book)
+
+        self.assertIn("Renamed Chapter".encode(), self.client.get(url).content)
+
+    def test_only_files_inside_the_epub_are_served(self):
+        response = self.client.get(f"/api/convert/{self.id}/epub-files/../../settings.py")
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(f"/api/convert/{self.id}/epub-files/EPUB/nothing.xhtml")
+        self.assertEqual(response.status_code, 404)
