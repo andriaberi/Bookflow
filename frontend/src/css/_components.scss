@@ -141,3 +141,22 @@
     color: var(--bf-error-text);
     font-weight: 500;
 }
+
+// Form fields in the site's colors, with the accent on focus
+.bf .form-control,
+.bf .form-select {
+    border-color: var(--bf-line-strong);
+    border-radius: 10px;
+    background-color: var(--bf-surface);
+    color: var(--bf-text);
+
+    &:focus {
+        border-color: var(--bf-cobalt);
+        box-shadow: 0 0 0 0.2rem rgba(59, 91, 255, 0.25);
+    }
+}
+
+.bf .form-check-input:checked {
+    border-color: var(--bf-cobalt);
+    background-color: var(--bf-cobalt);
+}

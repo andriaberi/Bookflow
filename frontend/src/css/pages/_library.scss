@@ -31,15 +31,7 @@
 
     .form-control {
         padding: 0.7rem 1rem 0.7rem 2.75rem;
-        border-color: var(--bf-line-strong);
         border-radius: 999px;
-        background-color: var(--bf-surface);
-        color: var(--bf-text);
-
-        &:focus {
-            border-color: var(--bf-cobalt);
-            box-shadow: 0 0 0 0.2rem rgba(59, 91, 255, 0.25);
-        }
     }
 
     @media (max-width: 991.98px) {
@@ -129,10 +121,7 @@
 .bf-library-sort {
     width: auto;
     margin-left: auto;
-    border-color: var(--bf-line-strong);
     border-radius: 999px;
-    background-color: var(--bf-surface);
-    color: var(--bf-text);
 }
 
 .bf-book-grid {

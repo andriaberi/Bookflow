@@ -2,16 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { errorCode, uploadPdf } from '../helpers/api';
 import { fill } from '../helpers/format';
+import { MAX_PDF_MB, pdfProblem } from '../helpers/files';
 import { useSettings } from '../helpers/settings';
 import { FileUp } from '../includes/icons';
-
-// The same limit the server checks (MAX_PDF_SIZE_MB); checked here too, so a big file
-// is refused before it's uploaded.
-const MAX_MB = 100;
-
-function isPdf(file) {
-    return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-}
+import SideList from '../includes/side-list';
 
 function Convert() {
     const { t } = useSettings();
@@ -25,8 +19,8 @@ function Convert() {
     async function upload(file) {
         if (!file || uploading) return;
         setError('');
-        if (!isPdf(file)) return setError('not_pdf');
-        if (file.size > MAX_MB * 1024 * 1024) return setError('too_big');
+        const problem = pdfProblem(file);
+        if (problem) return setError(problem);
 
         setProgress(0);
         try {
@@ -77,7 +71,7 @@ function Convert() {
                                 <span className="bf-muted">
                                     { t.convert.or } <span className="bf-drop-browse">{ t.convert.browse }</span>
                                 </span>
-                                <span className="bf-chip">{ fill(t.convert.limit, { mb: MAX_MB }) }</span>
+                                <span className="bf-chip">{ fill(t.convert.limit, { mb: MAX_PDF_MB }) }</span>
                             </>
                         ) }
                         <input
@@ -95,26 +89,13 @@ function Convert() {
 
                     { error && (
                         <div className="bf-alert mt-3" role="alert">
-                            { fill(t.convert.errors[error], { mb: MAX_MB }) }
+                            { fill(t.convert.errors[error], { mb: MAX_PDF_MB }) }
                         </div>
                     ) }
                 </div>
 
                 <div className="col-lg-5">
-                    <div className="bf-panel bf-looks h-100 p-4 p-lg-5">
-                        <div className="bf-eyebrow mb-4">{ t.convert.looksFor }</div>
-                        <ul className="list-unstyled d-flex flex-column gap-4 mb-0">
-                            { t.convert.items.map((item) => (
-                                <li className="d-flex gap-3" key={ item.name }>
-                                    <span className="bf-display bf-looks-mark" aria-hidden="true">{ item.mark }</span>
-                                    <div>
-                                        <div className="fw-semibold mb-1">{ item.name }</div>
-                                        <div className="small bf-muted bf-looks-text">{ item.text }</div>
-                                    </div>
-                                </li>
-                            )) }
-                        </ul>
-                    </div>
+                    <SideList title={ t.convert.looksFor } items={ t.convert.items } />
                 </div>
             </div>
         </section>
