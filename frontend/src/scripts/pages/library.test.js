@@ -46,6 +46,20 @@ test('the library shows every book by title', async () => {
     expect(screen.getByText('3 books')).toBeInTheDocument();
 });
 
+test('a book picked at random is shown large, until a search', async () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0.5);
+    await renderAt('/library', api);
+
+    expect(screen.getByText('Something to read')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('ბუდენბროკები');
+    expect(screen.getByText('A family saga.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Download EPUB' })).toHaveAttribute('href', '/media/ბუდენბროკები.epub');
+
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'tolstoy' } });
+    expect(screen.queryByText('Something to read')).toBeNull();
+    Math.random.mockRestore();
+});
+
 test('books can be searched, filtered by language and sorted', async () => {
     await renderAt('/library', api);
 

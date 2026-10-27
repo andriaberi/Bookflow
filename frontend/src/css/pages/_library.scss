@@ -1,5 +1,5 @@
-// The library: a storefront (search, then every book as a cover) and a page for each
-// book.
+// The library: a storefront (search, a book picked at random, then every book as a
+// cover) and a page for each book.
 
 .bf-library-header {
     display: flex;
@@ -71,6 +71,47 @@
 .bf-cover-grid {
     aspect-ratio: 2 / 3;
     object-fit: cover;
+}
+
+// A book picked at random
+
+.bf-featured {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(24px, 4vw, 48px);
+    margin-bottom: clamp(32px, 5vh, 56px);
+    padding: clamp(24px, 4vw, 40px);
+    border: 1px solid var(--bf-line);
+    border-radius: 2rem;
+    background: var(--bf-soft);
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        text-align: center;
+
+        .bf-featured-cover {
+            width: 160px;
+        }
+
+        .bf-cta {
+            justify-content: center;
+        }
+    }
+}
+
+.bf-featured-cover {
+    display: block;
+    width: 100%;
+}
+
+.bf-featured-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    max-width: 640px;
+    overflow: hidden;
 }
 
 // The toolbar and the grid

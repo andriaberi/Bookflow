@@ -3,8 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { getBooks, getLibraryBook } from '../helpers/api';
 import { fill, megabytes } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
-import { BookCover, BookGrid } from '../includes/books';
-import { ChevronRight, Download } from '../includes/icons';
+import { BookCover, BookGrid, DownloadButton } from '../includes/books';
+import { ChevronRight } from '../includes/icons';
 import Message from '../includes/message';
 
 // How many other books to suggest under the book.
@@ -62,10 +62,7 @@ function LibraryBook() {
                     { book.author && <div className="fs-4 bf-muted mb-4">{ book.author }</div> }
                     { book.epub_url && (
                         <div className="mb-4">
-                            <a href={ book.epub_url } download className="btn btn-cobalt btn-lg px-4 d-inline-flex align-items-center gap-2">
-                                <Download size={ 18 } />
-                                { t.library.download }
-                            </a>
+                            <DownloadButton t={ t } book={ book } className="btn-lg" />
                             <p className="small bf-muted mt-2 mb-0">{ t.library.readers }</p>
                         </div>
                     ) }

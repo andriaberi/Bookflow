@@ -207,6 +207,8 @@ const en = {
         title: 'Library',
         lead: 'Books already converted and corrected by hand, ready to download as EPUB.',
         search: 'Search by title or author',
+        pick: 'Something to read',
+        details: 'About this book',
         all: 'All',
         sort: 'Sort by',
         sorts: { title: 'Title', author: 'Author' },

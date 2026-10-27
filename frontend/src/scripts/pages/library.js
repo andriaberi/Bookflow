@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getBooks } from '../helpers/api';
 import { fill } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
-import { BookGrid } from '../includes/books';
+import { BookCover, BookGrid, DownloadButton } from '../includes/books';
 import { Search } from '../includes/icons';
 
 const SORTS = {
@@ -23,6 +23,8 @@ function Library() {
         getBooks().then(setBooks).catch(() => setFailed(true));
     }, []);
 
+    // Picked once per visit, so it stays put while the page is used.
+    const pick = useMemo(() => books?.[Math.floor(Math.random() * books.length)], [books]);
     const languages = useMemo(() => [...new Set((books || []).map((book) => book.language).filter(Boolean))], [books]);
 
     const words = query.trim().toLowerCase();
@@ -55,6 +57,8 @@ function Library() {
 
             { books?.length > 0 && (
                 <>
+                    { !words && <Pick t={ t } book={ pick } /> }
+
                     <div className="bf-library-toolbar">
                         { languages.length > 1 && (
                             <div className="bf-seg" role="group" aria-label={ t.library.language }>
@@ -82,6 +86,27 @@ function Library() {
                 </>
             ) }
         </section>
+    );
+}
+
+// A book from the library, large, with its description and download.
+function Pick({ t, book }) {
+    return (
+        <article className="bf-featured" lang={ book.language || undefined }>
+            <Link to={ `/library/${book.id}` } className="bf-featured-cover" tabIndex={ -1 } aria-hidden="true">
+                <BookCover book={ book } />
+            </Link>
+            <div className="bf-featured-text">
+                <div className="bf-eyebrow mb-2">{ t.library.pick }</div>
+                <h2 className="bf-display bf-card-title mb-1">{ book.title }</h2>
+                { book.author && <div className="fs-5 bf-muted mb-3">{ book.author }</div> }
+                { book.description && <p className="bf-featured-description mb-4">{ book.description }</p> }
+                <div className="bf-cta">
+                    { book.epub_url && <DownloadButton t={ t } book={ book } /> }
+                    <Link to={ `/library/${book.id}` } className="btn btn-ghost px-4">{ t.library.details }</Link>
+                </div>
+            </div>
+        </article>
     );
 }
 
