@@ -13,7 +13,7 @@ def _serialize(b: Book) -> dict:
         "language":    b.language,
         "description": b.description,
         "cover_url":   b.cover.url if b.cover else None,
-        "epub_url":    b.epub.url,
+        "epub_url":    b.epub.url if b.epub else None,
     }
 
 
