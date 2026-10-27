@@ -97,3 +97,84 @@ class ConversionTests(TestCase):
     def test_csrf_endpoint_sets_the_cookie(self):
         response = self.client.get("/api/convert/csrf")
         self.assertIn("csrftoken", response.cookies)
+
+
+@override_settings(MEDIA_ROOT=MEDIA, CONVERTER_BACKGROUND=False)
+class EditorTests(TestCase):
+    def setUp(self):
+        self.id = self.client.post("/api/convert/", {"pdf": upload("My Book.pdf")}).json()["id"]
+
+    def get_book(self):
+        return self.client.get(f"/api/convert/{self.id}/book").json()["book"]
+
+    def put_book(self, book):
+        return self.client.put(f"/api/convert/{self.id}/book", book, content_type="application/json")
+
+    def test_the_editor_gets_the_book(self):
+        response = self.client.get(f"/api/convert/{self.id}/book")
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["name"], "My Book")
+        self.assertEqual(data["pages"], 2)
+        self.assertTrue(data["book"]["blocks"])
+
+    def test_an_edit_is_saved(self):
+        book = self.get_book()
+        book["metadata"]["title"] = "A New Title"
+
+        response = self.put_book(book)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["problems"], [])
+        self.assertEqual(self.get_book()["metadata"]["title"], "A New Title")
+
+    def test_a_book_that_cant_be_written_says_why(self):
+        book = self.get_book()
+        for block in book["blocks"]:
+            block["include"] = False
+
+        problems = self.put_book(book).json()["problems"]
+
+        self.assertTrue(any("nothing to write" in problem for problem in problems))
+        self.assertEqual(self.client.get(f"/api/convert/{self.id}/epub").status_code, 400)
+
+    def test_data_that_isnt_a_book_is_refused(self):
+        response = self.put_book({"version": 1, "blocks": "nope"})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "bad_book")
+
+        response = self.put_book([1, 2, 3])
+        self.assertEqual(response.json()["error"], "bad_book")
+
+    def test_the_epub_downloads_named_after_the_title(self):
+        book = self.get_book()
+        book["metadata"]["title"] = "Ünïcode Title"
+        self.put_book(book)
+
+        response = self.client.get(f"/api/convert/{self.id}/epub")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/epub+zip")
+        self.assertIn("%C3%9Cn%C3%AFcode%20Title.epub", response["Content-Disposition"])
+        self.assertEqual(response.content[:2], b"PK")
+
+    def test_a_page_of_the_pdf_comes_as_an_image(self):
+        response = self.client.get(f"/api/convert/{self.id}/pages/1.png?width=300")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "image/png")
+        self.assertEqual(response.content[:4], b"\x89PNG")
+
+    def test_a_page_outside_the_pdf_is_404(self):
+        response = self.client.get(f"/api/convert/{self.id}/pages/9.png")
+        self.assertEqual(response.status_code, 404)
+
+    def test_an_unreasonable_page_width_is_refused(self):
+        response = self.client.get(f"/api/convert/{self.id}/pages/1.png?width=99999")
+        self.assertEqual(response.status_code, 400)
+
+    def test_a_book_still_being_read_cant_be_edited(self):
+        Conversion.objects.filter(pk=self.id).update(status="reading")
+        response = self.client.get(f"/api/convert/{self.id}/book")
+        self.assertEqual(response.status_code, 409)

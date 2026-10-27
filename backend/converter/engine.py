@@ -1,5 +1,6 @@
 """The one place Bookflow talks to PDF2EPUB."""
 
+import io
 import logging
 import threading
 
@@ -7,7 +8,8 @@ import pymupdf
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import connection
-from pdf2epub import STEPS, ConvertError, Options, read_book
+from pdf2epub import STEPS, Book, ConvertError, Options, read_book, render_page, write_book
+from pdf2epub.cover import load_cover
 
 from .models import Conversion
 
@@ -65,3 +67,35 @@ def read(pk) -> None:
         # A thread has its own database connection; close it when done.
         if settings.CONVERTER_BACKGROUND:
             connection.close()
+
+
+def book_of(conversion: Conversion) -> Book:
+    """The conversion's book, as last saved, with its cover image put back."""
+    book = Book.from_dict(conversion.book)
+    if conversion.cover:
+        with conversion.cover.open("rb") as f:
+            book.cover = load_cover(f.read())
+    return book
+
+
+def save_book(conversion: Conversion, data: dict) -> list[str]:
+    """Save the edited book; ConvertError if the data isn't a book. Returns its problems:
+    what would keep it from being written, empty if nothing does. The cover is the
+    server's to change (set_cover, remove_cover), so its source is kept as it was."""
+    data = {**data, "cover": None, "cover_source": conversion.book["cover_source"]}
+    book = Book.from_dict(data)
+    conversion.book = data
+    conversion.save(update_fields=["book", "updated_at"])
+    return book.problems()
+
+
+def epub_of(conversion: Conversion) -> bytes:
+    """The book written as an EPUB; ConvertError if it has problems to fix first."""
+    buffer = io.BytesIO()
+    write_book(book_of(conversion), buffer)
+    return buffer.getvalue()
+
+
+def page_image(conversion: Conversion, number: int, width: int) -> bytes:
+    """Page `number` of the PDF, from 1, as a PNG `width` pixels wide."""
+    return render_page(conversion.pdf.path, number, width)
