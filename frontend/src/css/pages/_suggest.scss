@@ -9,6 +9,10 @@
         padding: 0;
         border: 0;
     }
+
+    textarea {
+        resize: none;
+    }
 }
 
 // The attached PDF, or the button to attach one
