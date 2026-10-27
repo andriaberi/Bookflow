@@ -178,3 +178,41 @@ class EditorTests(TestCase):
         Conversion.objects.filter(pk=self.id).update(status="reading")
         response = self.client.get(f"/api/convert/{self.id}/book")
         self.assertEqual(response.status_code, 409)
+
+    def test_the_cover_can_be_replaced_and_goes_into_the_epub(self):
+        pixmap = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, 60, 90), False)
+        pixmap.clear_with(200)
+        image = SimpleUploadedFile("cover.png", pixmap.tobytes("png"), "image/png")
+
+        response = self.client.post(f"/api/convert/{self.id}/cover", {"cover": image})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("cover.jpg", response.json()["cover_url"])
+        conversion = Conversion.objects.get(pk=self.id)
+        self.assertEqual(conversion.book["cover_source"], "cover from the given image")
+        epub = self.client.get(f"/api/convert/{self.id}/epub").content
+        self.assertIn(b"images/cover.jpg", epub)
+
+    def test_saving_the_book_keeps_the_new_cover(self):
+        old = self.get_book()
+        pixmap = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, 60, 90), False)
+        pixmap.clear_with(200)
+        self.client.post(f"/api/convert/{self.id}/cover", {"cover": SimpleUploadedFile("c.png", pixmap.tobytes("png"))})
+
+        self.put_book(old)  # an autosave from before the cover changed
+
+        self.assertEqual(Conversion.objects.get(pk=self.id).book["cover_source"], "cover from the given image")
+
+    def test_the_cover_can_be_removed(self):
+        response = self.client.delete(f"/api/convert/{self.id}/cover")
+
+        self.assertEqual(response.json(), {"cover_url": None})
+        conversion = Conversion.objects.get(pk=self.id)
+        self.assertFalse(conversion.cover)
+        self.assertEqual(conversion.book["cover_source"], "no cover")
+        self.assertNotIn(b"images/cover.jpg", self.client.get(f"/api/convert/{self.id}/epub").content)
+
+    def test_a_cover_must_be_an_image(self):
+        response = self.client.post(f"/api/convert/{self.id}/cover", {"cover": SimpleUploadedFile("c.png", b"not an image")})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "not_image")

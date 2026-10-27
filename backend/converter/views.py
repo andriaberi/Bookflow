@@ -170,6 +170,32 @@ def epub(request, pk):
     return response
 
 
+# Cover images up to this size, in megabytes
+MAX_COVER_MB = 10
+
+
+@require_http_methods(["POST", "DELETE"])
+def cover(request, pk):
+    """POST: replace the cover with an uploaded image. DELETE: remove the cover."""
+    conversion, error = _ready(pk)
+    if error:
+        return error
+    if request.method == "DELETE":
+        engine.remove_cover(conversion)
+        return JsonResponse({"cover_url": None})
+
+    image = request.FILES.get("cover")
+    if not image:
+        return _error("no_file", "No image uploaded")
+    if image.size > MAX_COVER_MB * 1024 * 1024:
+        return _error("too_big", f"Covers up to {MAX_COVER_MB} MB only")
+    try:
+        engine.set_cover(conversion, image.read())
+    except ConvertError:
+        return _error("not_image", "The file isn't an image")
+    return JsonResponse({"cover_url": _cover_url(conversion)})
+
+
 def _cover_url(conversion: Conversion) -> str | None:
     """The cover's address, new each time it changes, so the browser never shows an old
     one from its cache."""

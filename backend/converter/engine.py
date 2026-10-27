@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import connection
 from pdf2epub import STEPS, Book, ConvertError, Options, read_book, render_page, write_book
+from pdf2epub.book import GIVEN_COVER, NO_COVER
 from pdf2epub.cover import load_cover
 
 from .models import Conversion
@@ -99,3 +100,21 @@ def epub_of(conversion: Conversion) -> bytes:
 def page_image(conversion: Conversion, number: int, width: int) -> bytes:
     """Page `number` of the PDF, from 1, as a PNG `width` pixels wide."""
     return render_page(conversion.pdf.path, number, width)
+
+
+def set_cover(conversion: Conversion, image: bytes) -> None:
+    """Use this image as the cover; CoverError if it isn't one. Saved as JPEG."""
+    cover = load_cover(image)
+    if conversion.cover:
+        conversion.cover.delete(save=False)
+    conversion.cover.save("cover.jpg", ContentFile(cover.data), save=False)
+    conversion.book = {**conversion.book, "cover_source": GIVEN_COVER}
+    conversion.save()
+
+
+def remove_cover(conversion: Conversion) -> None:
+    """Leave the book without a cover."""
+    if conversion.cover:
+        conversion.cover.delete(save=False)
+    conversion.book = {**conversion.book, "cover_source": NO_COVER}
+    conversion.save()
