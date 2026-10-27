@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getConversion } from '../helpers/api';
-import { fill, megabytes } from '../helpers/format';
+import { fileSize, fill } from '../helpers/format';
 import { useConversionOpen } from '../helpers/presence';
 import { useSettings } from '../helpers/settings';
 import { Check, FileIcon } from '../includes/icons';
@@ -73,7 +73,7 @@ function Reading() {
                     { conversion && (
                         <div className="bf-reading-file-line small bf-muted mb-3">
                             <span className="fw-medium bf-reading-name">{ conversion.name }.pdf</span>
-                            <span>{ megabytes(conversion.size) } { t.reading.mb }</span>
+                            <span>{ fileSize(conversion.size, t.units) }</span>
                             <span>{ fill(t.reading.pages, { n: conversion.pages }) }</span>
                         </div>
                     ) }

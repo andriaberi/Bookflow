@@ -1,5 +1,6 @@
 const ka = {
     languages: { ka: 'ქართული', en: 'ინგლისური' },
+    units: { kb: 'კბ', mb: 'მბ' },
     nav: {
         converter: 'გადამყვანი',
         library: 'ბიბლიოთეკა',
@@ -101,7 +102,6 @@ const ka = {
         steps: ['PDF-ის კითხვა', 'აბზაცების ძებნა', 'თავების ძებნა'],
         progress: 'კითხვის პროგრესი',
         pages: '{n} გვერდი',
-        mb: 'მბ',
         coverFound: 'ყდა ნაპოვნია',
         noCover: 'PDF-ში ყდა არ არის',
         untitled: 'უსათაურო',
@@ -227,7 +227,6 @@ const ka = {
         language: 'ენა',
         chapters: 'თავები',
         size: 'EPUB-ის ზომა',
-        mb: '{mb} მბ',
         readers: 'იხსნება Apple Books-ში, Google Play Books-ში, Kobo-ში და ელწიგნების უმეტეს წამკითხველში.',
         more: 'სხვა წიგნები ბიბლიოთეკიდან',
         notFound: 'ეს წიგნი ბიბლიოთეკაში არ არის.',

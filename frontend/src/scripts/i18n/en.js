@@ -1,5 +1,6 @@
 const en = {
     languages: { ka: 'Georgian', en: 'English' },
+    units: { kb: 'KB', mb: 'MB' },
     nav: {
         converter: 'Converter',
         library: 'Library',
@@ -101,7 +102,6 @@ const en = {
         steps: ['Reading the PDF', 'Finding paragraphs', 'Finding chapters'],
         progress: 'Reading progress',
         pages: '{n} pages',
-        mb: 'MB',
         coverFound: 'Cover found',
         noCover: 'No cover in the PDF',
         untitled: 'Untitled',
@@ -227,7 +227,6 @@ const en = {
         language: 'Language',
         chapters: 'Chapters',
         size: 'EPUB size',
-        mb: '{mb} MB',
         readers: 'Opens in Apple Books, Google Play Books, Kobo and most e-readers.',
         more: 'More from the library',
         notFound: 'This book isn’t in the library.',

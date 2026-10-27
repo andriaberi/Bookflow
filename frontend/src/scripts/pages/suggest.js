@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { errorCode, suggestBook } from '../helpers/api';
 import { MAX_PDF_MB, pdfProblem } from '../helpers/files';
-import { fill, megabytes } from '../helpers/format';
+import { fileSize, fill } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
 import { FieldLabel, FormPage, Sent, Trap, useFields } from '../includes/forms';
 import { Close, FileIcon } from '../includes/icons';
@@ -90,7 +90,7 @@ function Suggest() {
                                 <div className="bf-file">
                                     <FileIcon size={ 20 } />
                                     <span className="bf-file-name">{ pdf.name }</span>
-                                    <span className="bf-muted small">{ megabytes(pdf.size) } { t.reading.mb }</span>
+                                    <span className="bf-muted small">{ fileSize(pdf.size, t.units) }</span>
                                     <button type="button" className="bf-icon-btn bf-icon-btn-sm" aria-label={ t.suggest.removePdf } onClick={ () => setPdf(null) }><Close size={ 16 } /></button>
                                 </div>
                             ) : (
