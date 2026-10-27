@@ -4,6 +4,7 @@ import { getConversion } from '../helpers/api';
 import { fill, megabytes } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
 import { Check, FileIcon } from '../includes/icons';
+import Message from '../includes/message';
 
 // How often to ask the server how far the reading has got.
 const POLL_MS = 500;
@@ -41,11 +42,10 @@ function Reading() {
 
     if (missing) {
         return (
-            <section className="container bf-section bf-fill text-center bf-soon">
-                <h1 className="bf-display bf-section-title bf-optical-top mb-3">{ t.reading.notFound }</h1>
+            <Message title={ t.reading.notFound }>
                 <p className="bf-muted fs-5 mb-4">{ t.reading.notFoundLead }</p>
                 <Link to="/convert" className="btn btn-cobalt px-4">{ t.reading.tryAgain }</Link>
-            </section>
+            </Message>
         );
     }
 

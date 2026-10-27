@@ -66,18 +66,20 @@ export function levelAt(blocks, index) {
     return before ? before.level : 1;
 }
 
+// What a block keeps when it changes type.
+function kept({ id, page, role, include }) {
+    return { id, page, role, include };
+}
+
 // A paragraph made into a heading: its text becomes the label.
 export function toHeading(block, level) {
-    return {
-        type: 'heading', id: block.id, page: block.page, role: block.role, include: block.include,
-        level, label: block.text.trim() || '…', title: null,
-    };
+    return { type: 'heading', ...kept(block), level, label: block.text.trim() || '…', title: null };
 }
 
 // A heading made into a paragraph: "label: title" becomes its text.
 export function toText(block) {
     return {
-        type: 'text', id: block.id, page: block.page, role: block.role, include: block.include,
+        type: 'text', ...kept(block),
         text: headingText(block), lines: [], verse: false, epigraph: false, attribution: false, notes: {},
     };
 }

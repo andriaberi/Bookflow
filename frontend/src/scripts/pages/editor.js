@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getBook, getEpub, getPreviewPage, getPreviewUrl, pageUrl, removeCover, saveBook, uploadCover } from '../helpers/api';
+import { errorCode, getBook, getEpub, getPreviewPage, getPreviewUrl, pageUrl, removeCover, saveBook, uploadCover } from '../helpers/api';
 import {
     headingText, joinBlocks, levelAt, newHeading, pageRange, roleCounts, sectionOf, sectionsOf,
     splitBlock, toHeading, toText, withBlock, withBlocks,
@@ -8,6 +8,7 @@ import {
 import { fill } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
 import { ChevronRight, Close } from '../includes/icons';
+import Message from '../includes/message';
 
 // How long to wait after the last change before saving, and before trying a failed save again.
 const SAVE_DELAY_MS = 600;
@@ -45,8 +46,7 @@ function Editor() {
                 setCoverUrl(data.cover_url);
                 // Open on the first section with something in the EPUB, not on a title
                 // page that's left out.
-                const sections = sectionsOf(data.book.blocks);
-                const start = sections.findIndex((range) => data.book.blocks.slice(range.start, range.end).some((block) => block.include));
+                const start = sectionsOf(data.book.blocks).findIndex((range) => data.book.blocks.slice(range.start, range.end).some((block) => block.include));
                 setSection(Math.max(start, 0));
                 const first = data.book.blocks.find((block) => block.include && block.page > 0);
                 setPage(first ? first.page : 1);
@@ -104,12 +104,9 @@ function Editor() {
 
     if (loadError) {
         return (
-            <section className="container bf-section bf-fill text-center bf-soon">
-                <h1 className="bf-display bf-section-title bf-optical-top mb-3">
-                    { loadError === 'notReady' ? t.editor.notReady : t.editor.errors.server }
-                </h1>
+            <Message title={ loadError === 'notReady' ? t.editor.notReady : t.editor.errors.server }>
                 <Link to={ `/convert/${id}` } className="btn btn-cobalt px-4">{ t.editor.back }</Link>
-            </section>
+            </Message>
         );
     }
 
@@ -187,7 +184,7 @@ function Editor() {
             link.click();
             URL.revokeObjectURL(link.href);
         } catch (e) {
-            setDownloadError(e.code in t.editor.errors ? e.code : 'server');
+            setDownloadError(errorCode(e, t.editor.errors));
         } finally {
             setDownloading(false);
         }
@@ -278,7 +275,7 @@ function BookDetails({ t, id, book, coverUrl, setCoverUrl, setBook }) {
         try {
             setCoverUrl((await action()).cover_url);
         } catch (e) {
-            setCoverError(e.code in t.editor.coverErrors ? e.code : 'server');
+            setCoverError(errorCode(e, t.editor.coverErrors));
         } finally {
             setCoverBusy(false);
         }
@@ -369,6 +366,11 @@ function Included({ t, book, setBook }) {
     );
 }
 
+// A section is named after its heading; the blocks before the first heading have none.
+function sectionName(t, first) {
+    return first?.type === 'heading' ? headingText(first) || t.editor.untitled : t.editor.beforeFirst;
+}
+
 // The headings, indented by level; picking one shows its section.
 function Contents({ t, book, sections, current, onPick }) {
     const chapters = sections.filter((section) => book.blocks[section.start].type === 'heading').length;
@@ -391,7 +393,7 @@ function Contents({ t, book, sections, current, onPick }) {
                                 aria-current={ index === current ? 'true' : undefined }
                                 onClick={ () => onPick(index) }
                             >
-                                <span className="bf-toc-text">{ isHeading ? headingText(block) || t.editor.untitled : t.editor.beforeFirst }</span>
+                                <span className="bf-toc-text">{ sectionName(t, block) }</span>
                                 { block.page > 0 && <span className="bf-toc-page">{ block.page }</span> }
                             </button>
                         </li>
@@ -445,7 +447,7 @@ function SectionView({ t, book, sections, index, range, selected, onSelect, onPi
                     { pages && ` · ${fill(t.editor.pageRange, pages)}` }
                 </div>
                 <h1 className="bf-display bf-section-name">
-                    { first && first.type === 'heading' ? headingText(first) || t.editor.untitled : t.editor.beforeFirst }
+                    { sectionName(t, first) }
                 </h1>
                 {/* Tablets and phones: the contents as a picker, instead of the long list. */}
                 <select
@@ -456,8 +458,7 @@ function SectionView({ t, book, sections, index, range, selected, onSelect, onPi
                 >
                     { sections.map((section, at) => {
                         const block = book.blocks[section.start];
-                        const name = block.type === 'heading' ? headingText(block) || t.editor.untitled : t.editor.beforeFirst;
-                        return <option key={ block.id } value={ at }>{ name }</option>;
+                        return <option key={ block.id } value={ at }>{ sectionName(t, block) }</option>;
                     }) }
                 </select>
             </div>
@@ -662,17 +663,7 @@ function Preview({ t, id, page, pages, setPage, blockId, version, blocked }) {
                     <button type="button" className={ view === 'pdf' ? 'on' : '' } aria-pressed={ view === 'pdf' } onClick={ () => setView('pdf') }>{ t.editor.pdfTab }</button>
                     <button type="button" className={ view === 'epub' ? 'on' : '' } aria-pressed={ view === 'epub' } onClick={ () => setView('epub') }>{ t.editor.epubTab }</button>
                 </div>
-                { view === 'pdf' && (
-                    <div className="d-flex align-items-center gap-1">
-                        <button type="button" className="bf-icon-btn bf-icon-btn-sm" aria-label={ t.editor.previousPage } disabled={ page <= 1 } onClick={ () => setPage(page - 1) }>
-                            <ChevronRight size={ 16 } style={ { transform: 'rotate(180deg)' } } />
-                        </button>
-                        <span className="small fw-medium px-1">{ fill(t.editor.pageOf, { n: page, total: pages }) }</span>
-                        <button type="button" className="bf-icon-btn bf-icon-btn-sm" aria-label={ t.editor.nextPage } disabled={ page >= pages } onClick={ () => setPage(page + 1) }>
-                            <ChevronRight size={ 16 } />
-                        </button>
-                    </div>
-                ) }
+                { view === 'pdf' && <PageTurn t={ t } className="d-flex align-items-center gap-1" page={ page } count={ pages } onTurn={ setPage } /> }
             </div>
             { view === 'pdf' ? (
                 <div className="bf-preview-page">
@@ -682,6 +673,21 @@ function Preview({ t, id, page, pages, setPage, blockId, version, blocked }) {
                 <EpubPreview t={ t } id={ id } blockId={ blockId } version={ version } blocked={ blocked } />
             ) }
         </section>
+    );
+}
+
+// Arrows either side of "Page n of count"; pages count from 1.
+function PageTurn({ t, className, page, count, onTurn }) {
+    return (
+        <div className={ className }>
+            <button type="button" className="bf-icon-btn bf-icon-btn-sm" aria-label={ t.editor.previousPage } disabled={ page <= 1 } onClick={ () => onTurn(page - 1) }>
+                <ChevronRight size={ 16 } style={ { transform: 'rotate(180deg)' } } />
+            </button>
+            <span className="small fw-medium px-1">{ fill(t.editor.pageOf, { n: page, total: count }) }</span>
+            <button type="button" className="bf-icon-btn bf-icon-btn-sm" aria-label={ t.editor.nextPage } disabled={ page >= count } onClick={ () => onTurn(page + 1) }>
+                <ChevronRight size={ 16 } />
+            </button>
+        </div>
     );
 }
 
@@ -711,9 +717,11 @@ function EpubPreview({ t, id, blockId, version, blocked }) {
         };
     }, [id, blockId, version, blocked]);
 
+    const frameDoc = () => frame.current?.contentDocument?.documentElement;
+
     // The section is laid out in columns one frame wide; each column is a page.
     function measure() {
-        const doc = frame.current?.contentDocument?.documentElement;
+        const doc = frameDoc();
         if (!doc) return;
         setCount(Math.max(1, Math.round(doc.scrollWidth / doc.clientWidth)));
         setAt(0);
@@ -721,7 +729,7 @@ function EpubPreview({ t, id, blockId, version, blocked }) {
     }
 
     function turn(to) {
-        const doc = frame.current?.contentDocument?.documentElement;
+        const doc = frameDoc();
         if (!doc) return;
         setAt(to);
         doc.scrollLeft = to * doc.clientWidth;
@@ -746,15 +754,7 @@ function EpubPreview({ t, id, blockId, version, blocked }) {
                     />
                 ) }
             </div>
-            <div className="bf-preview-turn">
-                <button type="button" className="bf-icon-btn bf-icon-btn-sm" aria-label={ t.editor.previousPage } disabled={ at <= 0 } onClick={ () => turn(at - 1) }>
-                    <ChevronRight size={ 16 } style={ { transform: 'rotate(180deg)' } } />
-                </button>
-                <span className="small fw-medium px-1">{ fill(t.editor.pageOf, { n: at + 1, total: count }) }</span>
-                <button type="button" className="bf-icon-btn bf-icon-btn-sm" aria-label={ t.editor.nextPage } disabled={ at >= count - 1 } onClick={ () => turn(at + 1) }>
-                    <ChevronRight size={ 16 } />
-                </button>
-            </div>
+            <PageTurn t={ t } className="bf-preview-turn" page={ at + 1 } count={ count } onTurn={ (to) => turn(to - 1) } />
         </>
     );
 }
