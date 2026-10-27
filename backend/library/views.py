@@ -1,3 +1,4 @@
+from converter import engine
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET
@@ -8,12 +9,16 @@ from .models import Book
 def _serialize(b: Book) -> dict:
     return {
         "title":       b.title,
-        "slug":        b.slug,
+        "id":          str(b.uid),
         "author":      b.author,
         "language":    b.language,
         "description": b.description,
         "cover_url":   b.cover.url if b.cover else None,
         "epub_url":    b.epub.url if b.epub else None,
+        "epub_size":   b.epub.size if b.epub else None,
+        # Known only for books kept with their data
+        "chapters":    engine.counts(b.data)["headings"] if b.data else None,
+        "added":       b.created_at.isoformat(),
     }
 
 
@@ -24,6 +29,6 @@ def book_list(request):
 
 
 @require_GET
-def book_detail(request, slug):
-    book = get_object_or_404(Book, slug=slug, is_published=True)
+def book_detail(request, uid):
+    book = get_object_or_404(Book, uid=uid, is_published=True)
     return JsonResponse(_serialize(book))

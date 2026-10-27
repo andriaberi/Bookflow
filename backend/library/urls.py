@@ -4,5 +4,5 @@ from .views import book_detail, book_list
 
 urlpatterns = [
     path("", book_list, name="book-list"),
-    path("<str:slug>", book_detail, name="book-detail"),
+    path("<uuid:uid>", book_detail, name="book-detail"),
 ]

@@ -25,7 +25,6 @@ class BookForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["title"].required = False
-        self.fields["slug"].required = False
         self.data_to_save = self.instance.data
         self.written_epub = None
 

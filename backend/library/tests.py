@@ -41,7 +41,6 @@ class LibraryTests(TestCase):
 
         metadata = self.data["metadata"]
         self.assertEqual((book.title, book.language), (metadata["title"], metadata["language"]))
-        self.assertTrue(book.slug)
         self.assertEqual(book.data["blocks"], self.data["blocks"])
         with book.epub.open("rb") as f:
             self.assertEqual(f.read(2), b"PK")
@@ -90,10 +89,10 @@ class LibraryTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         self.assertIsNone(form.save().data)
 
-    def test_books_with_the_same_title_get_numbered_slugs(self):
+    def test_books_with_the_same_title_get_their_own_ids(self):
         first = Book.objects.create(title="Same", epub="a.epub")
         second = Book.objects.create(title="Same", epub="b.epub")
-        self.assertEqual((first.slug, second.slug), ("same", "same-2"))
+        self.assertNotEqual(first.uid, second.uid)
 
     def test_a_conversion_can_be_added_to_the_library(self):
         Conversion.objects.filter(pk=self.id).update(book={**self.data, "metadata": {**self.data["metadata"], "title": "Edited"}})
@@ -113,12 +112,26 @@ class LibraryTests(TestCase):
         self.assertEqual(book.data["metadata"]["title"], "Edited")
 
     def test_the_api_lists_only_published_books(self):
-        Book.objects.create(title="Shown", epub="a.epub")
-        Book.objects.create(title="Hidden", epub="b.epub", is_published=False)
+        epub = SimpleUploadedFile("book.epub", b"PK epub")
+        Book.objects.create(title="Shown", epub=epub)
+        Book.objects.create(title="Hidden", epub=epub, is_published=False)
 
         titles = [book["title"] for book in self.client.get("/api/library/").json()]
 
         self.assertEqual(titles, ["Shown"])
+
+    def test_the_api_describes_a_book(self):
+        form = self.form(files={"data_file": json_file(self.data)})
+        self.assertTrue(form.is_valid(), form.errors)
+        book = form.save()
+
+        data = self.client.get(f"/api/library/{book.uid}").json()
+
+        self.assertEqual(data["id"], str(book.uid))
+        self.assertEqual(data["chapters"], 2)
+        self.assertEqual(data["epub_size"], book.epub.size)
+        self.assertNotIn("data", data)
+        self.assertEqual(self.client.get("/api/library/00000000-0000-0000-0000-000000000000").status_code, 404)
 
     def test_the_admin_pages_open(self):
         form = self.form(files={"data_file": json_file(self.data)})

@@ -16,13 +16,12 @@ class BookAdmin(admin.ModelAdmin):
     list_filter         = ("language", "is_published")
     list_editable       = ("is_published", "order")
     search_fields       = ("title", "author", "description")
-    prepopulated_fields = {"slug": ("title",)}
-    readonly_fields     = ("contents", "created_at")
+    readonly_fields     = ("uid", "contents", "created_at")
 
     fieldsets = (
         ("Basic Info", {
             "description": "Left blank, the title, author and language come from the book data.",
-            "fields": ("title", "slug", "author", "language", "description")
+            "fields": ("uid", "title", "author", "language", "description")
         }),
         ("Files", {
             "fields": ("data_file", "contents", "cover", "epub")
