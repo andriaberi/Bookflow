@@ -3,7 +3,7 @@ from functools import wraps
 from pathlib import Path
 from urllib.parse import quote
 
-from django.conf import settings
+from bookflow.responses import error
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -13,18 +13,12 @@ from pdf2epub import ConvertError
 
 from . import engine
 from .models import Conversion
+from .uploads import MB, UploadError, check_pdf
 
-PDF_START = b"%PDF-"
-MB = 1024 * 1024
 MAX_COVER_MB = 10
 
 # Widths the page preview may ask for, in pixels
 PAGE_WIDTHS = range(100, 1601)
-
-
-def _error(code: str, detail: str, status: int = 400) -> JsonResponse:
-    """An error the frontend shows in the page's language: it translates `code`."""
-    return JsonResponse({"error": code, "detail": detail}, status=status)
 
 
 def _summary(book: dict) -> dict:
@@ -64,21 +58,12 @@ def csrf(request):
 def conversion_create(request):
     pdf = request.FILES.get("pdf")
     if not pdf:
-        return _error("no_file", "No PDF uploaded")
-    if pdf.size > settings.MAX_PDF_SIZE_MB * MB:
-        return _error("too_big", f"PDFs up to {settings.MAX_PDF_SIZE_MB} MB only")
-
-    data = pdf.read()
-    if not data.startswith(PDF_START):
-        return _error("not_pdf", "The file isn't a PDF")
+        return error("no_file", "No PDF uploaded")
     try:
-        pages = engine.count_pages(data)
-    except ValueError as e:
-        return _error("unreadable", f"The PDF can't be opened: {e}")
-    if pages == 0:
-        return _error("unreadable", "The PDF has no pages")
+        pages = check_pdf(pdf)
+    except UploadError as e:
+        return error(e.code, str(e))
 
-    pdf.seek(0)
     conversion = Conversion.objects.create(
         pdf=pdf,
         name=Path(pdf.name).stem,
@@ -103,7 +88,7 @@ def _ready(view):
     def wrapper(request, pk, **kwargs):
         conversion = get_object_or_404(Conversion, pk=pk)
         if conversion.status != "ready":
-            return _error("not_ready", "The book hasn't been read yet", status=409)
+            return error("not_ready", "The book hasn't been read yet", status=409)
         return view(request, conversion, **kwargs)
     return wrapper
 
@@ -124,13 +109,13 @@ def book(request, conversion):
     try:
         data = json.loads(request.body)
     except ValueError:
-        return _error("bad_book", "The book isn't JSON")
+        return error("bad_book", "The book isn't JSON")
     if not isinstance(data, dict):
-        return _error("bad_book", "The book must be an object")
+        return error("bad_book", "The book must be an object")
     try:
         problems = engine.save_book(conversion, data)
     except ConvertError as e:
-        return _error("bad_book", str(e))
+        return error("bad_book", str(e))
     return JsonResponse({"problems": problems})
 
 
@@ -143,11 +128,11 @@ def page(request, pk, number):
     except ValueError:
         width = 0
     if width not in PAGE_WIDTHS:
-        return _error("bad_width", f"Pages are {PAGE_WIDTHS.start} to {PAGE_WIDTHS.stop - 1} pixels wide")
+        return error("bad_width", f"Pages are {PAGE_WIDTHS.start} to {PAGE_WIDTHS.stop - 1} pixels wide")
     try:
         image = engine.page_image(conversion, number, width)
     except ConvertError as e:
-        return _error("no_page", str(e), status=404)
+        return error("no_page", str(e), status=404)
     response = HttpResponse(image, content_type="image/png")
     # A PDF's pages never change, so the browser can keep them.
     response["Cache-Control"] = "private, max-age=86400"
@@ -161,7 +146,7 @@ def epub(request, conversion):
     try:
         data = engine.epub_of(conversion)
     except ConvertError as e:
-        return _error("problems", str(e))
+        return error("problems", str(e))
     title = (conversion.book["metadata"].get("title") or conversion.name).strip() or "book"
     response = HttpResponse(data, content_type="application/epub+zip")
     response["Content-Disposition"] = f"attachment; filename*=UTF-8''{quote(f'{title}.epub')}"
@@ -178,13 +163,13 @@ def cover(request, conversion):
 
     image = request.FILES.get("cover")
     if not image:
-        return _error("no_file", "No image uploaded")
+        return error("no_file", "No image uploaded")
     if image.size > MAX_COVER_MB * MB:
-        return _error("too_big", f"Covers up to {MAX_COVER_MB} MB only")
+        return error("too_big", f"Covers up to {MAX_COVER_MB} MB only")
     try:
         engine.set_cover(conversion, image.read())
     except ConvertError:
-        return _error("not_image", "The file isn't an image")
+        return error("not_image", "The file isn't an image")
     return JsonResponse({"cover_url": _cover_url(conversion)})
 
 
@@ -204,7 +189,7 @@ def preview(request, conversion):
         name = engine.preview_page(conversion, request.GET.get("block"))
         engine.preview_epub(conversion)
     except ConvertError as e:
-        return _error("problems", str(e), status=409)
+        return error("problems", str(e), status=409)
     return JsonResponse({"url": f"/api/convert/{conversion.pk}/epub-files/{name}"})
 
 
@@ -217,7 +202,7 @@ def epub_file(request, conversion, name):
     try:
         data, content_type = engine.preview_file(conversion, name)
     except KeyError:
-        return _error("not_found", "No such file in the EPUB", status=404)
+        return error("not_found", "No such file in the EPUB", status=404)
     except ConvertError as e:
-        return _error("problems", str(e), status=409)
+        return error("problems", str(e), status=409)
     return HttpResponse(data, content_type=content_type)
