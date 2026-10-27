@@ -385,9 +385,9 @@
     color: var(--bf-muted);
 }
 
-// Support
+// The banner at the bottom: get in touch
 
-.bf-support {
+.bf-banner {
     border-radius: 2rem;
     background: var(--bf-cobalt);
     color: #fff;
@@ -399,7 +399,7 @@
 
 // The text on the left, the two buttons stacked on the right, vertically centered.
 // In the stacked layout the buttons go under the text and everything is centered.
-.bf-support-inner {
+.bf-banner-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -412,13 +412,13 @@
     }
 }
 
-.bf-support-text {
+.bf-banner-text {
     flex: 1 1 auto;
     max-width: 640px;
 }
 
 // A one-column grid sized to the widest label, so both buttons are the same width.
-.bf-support-actions {
+.bf-banner-actions {
     display: grid;
     flex-shrink: 0;
     gap: 12px;
@@ -437,7 +437,7 @@
 @media (max-width: 575.98px) {
     .bf-panel,
     .bf-panel-soft,
-    .bf-support {
+    .bf-banner {
         border-radius: 1.5rem;
     }
 }

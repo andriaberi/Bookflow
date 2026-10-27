@@ -108,14 +108,14 @@ function Home() {
             </section>
 
             <section className="container bf-section pb-5">
-                <div className="bf-support p-4 p-lg-5">
-                    <div className="bf-support-inner">
-                        <div className="bf-support-text">
-                            <h2 className="bf-display bf-card-title mb-2">{ t.home.supportTitle }</h2>
-                            <p className="fs-5 mb-0">{ t.home.supportText }</p>
+                <div className="bf-banner p-4 p-lg-5">
+                    <div className="bf-banner-inner">
+                        <div className="bf-banner-text">
+                            <h2 className="bf-display bf-card-title mb-2">{ t.home.contactTitle }</h2>
+                            <p className="fs-5 mb-0">{ t.home.contactText }</p>
                         </div>
-                        <div className="bf-support-actions">
-                            <Link to="/support" className="btn btn-lg btn-white px-4 py-3">{ t.home.supportButton }</Link>
+                        <div className="bf-banner-actions">
+                            <Link to="/contact" className="btn btn-lg btn-white px-4 py-3">{ t.home.contactButton }</Link>
                             <a href={ ENGINE_URL } className="btn btn-lg btn-white-outline px-4 py-3">{ t.home.star }</a>
                         </div>
                     </div>

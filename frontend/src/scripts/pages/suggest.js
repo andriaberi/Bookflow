@@ -4,7 +4,8 @@ import { errorCode, suggestBook } from '../helpers/api';
 import { MAX_PDF_MB, pdfProblem } from '../helpers/files';
 import { fill, megabytes } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
-import { Check, Close, FileIcon } from '../includes/icons';
+import { FieldLabel, Sent } from '../includes/forms';
+import { Close, FileIcon } from '../includes/icons';
 import SideList from '../includes/side-list';
 
 const EMPTY = { title: '', author: '', note: '', rights: '', holder: '', email: '', website: '' };
@@ -66,15 +67,10 @@ function Suggest() {
             <div className="row g-4">
                 <div className="col-lg-7">
                     { sent ? (
-                        <div className="bf-panel bf-sent h-100 p-4 p-lg-5" role="status">
-                            <span className="bf-icon-tile mb-4"><Check size={ 24 } /></span>
-                            <h2 className="bf-display bf-card-title mb-2">{ t.suggest.sentTitle }</h2>
-                            <p className="bf-muted mb-4">{ t.suggest.sentText }</p>
-                            <div className="bf-cta">
-                                <button type="button" className="btn btn-cobalt px-4" onClick={ again }>{ t.suggest.another }</button>
-                                <Link to="/library" className="btn btn-ghost px-4">{ t.home.browse }</Link>
-                            </div>
-                        </div>
+                        <Sent title={ t.suggest.sentTitle } text={ t.suggest.sentText }>
+                            <button type="button" className="btn btn-cobalt px-4" onClick={ again }>{ t.suggest.another }</button>
+                            <Link to="/library" className="btn btn-ghost px-4">{ t.home.browse }</Link>
+                        </Sent>
                     ) : (
                         <form className="bf-panel bf-suggest-form p-4 p-lg-5" onSubmit={ send } noValidate>
                             <div className="row g-3 align-items-end">
@@ -159,18 +155,6 @@ function Suggest() {
                 </div>
             </div>
         </section>
-    );
-}
-
-// A field's name, and "(optional)" after it when the field may be left empty. Without
-// `htmlFor` it names a group of controls rather than one.
-function FieldLabel({ htmlFor, optional, children }) {
-    const Tag = htmlFor ? 'label' : 'span';
-    return (
-        <Tag className="form-label fw-medium d-block" htmlFor={ htmlFor }>
-            { children }
-            { optional && <span className="bf-muted fw-normal"> { optional }</span> }
-        </Tag>
     );
 }
 

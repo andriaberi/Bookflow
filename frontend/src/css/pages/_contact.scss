@@ -1,0 +1,15 @@
+// Contact: the message form beside the other places to go.
+
+.bf-contact {
+    padding-top: var(--bf-fill-pad);
+    padding-bottom: var(--bf-fill-pad);
+
+    textarea {
+        resize: none;
+    }
+
+    // The form is the taller card: the other places start level with its first row.
+    .bf-looks {
+        justify-content: flex-start;
+    }
+}

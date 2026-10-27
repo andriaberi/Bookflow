@@ -101,6 +101,12 @@ export function suggestBook(fields, onProgress) {
     return upload('/api/library/suggestions', form, onProgress);
 }
 
+export function sendMessage(fields) {
+    const body = new FormData();
+    Object.entries(fields).forEach(([name, value]) => value && body.append(name, value));
+    return send('POST', '/api/contact/', { body });
+}
+
 export function getConversion(id) {
     return getJson(`/api/convert/${id}`);
 }

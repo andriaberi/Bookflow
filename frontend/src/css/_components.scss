@@ -28,7 +28,7 @@
     --bs-btn-active-border-color: var(--bf-line-strong);
 }
 
-// On the blue support banner, in both themes
+// On the blue banner, in both themes
 .btn-white {
     --bs-btn-color: var(--bf-cobalt-active);
     --bs-btn-bg: #fff;
@@ -159,4 +159,11 @@
 .bf .form-check-input:checked {
     border-color: var(--bf-cobalt);
     background-color: var(--bf-cobalt);
+}
+
+// A form once it's sent (includes/forms.js)
+.bf-sent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }

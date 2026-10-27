@@ -4,11 +4,11 @@ import Footer from './includes/footer';
 import Home from './pages/home';
 import Convert from './pages/convert';
 import Reading from './pages/reading';
+import Contact from './pages/contact';
 import Editor from './pages/editor';
 import Library from './pages/library';
 import LibraryBook from './pages/library-book';
 import Suggest from './pages/suggest';
-import Support from './pages/support';
 import NotFound from './pages/not-found';
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
                     <Route path="/library" element={ <Library /> } />
                     <Route path="/library/:id" element={ <LibraryBook /> } />
                     <Route path="/suggest" element={ <Suggest /> } />
-                    <Route path="/support" element={ <Support /> } />
+                    <Route path="/contact" element={ <Contact /> } />
                     <Route path="*" element={ <NotFound /> } />
                 </Routes>
             </main>
