@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getConversion } from '../helpers/api';
 import { fill, megabytes } from '../helpers/format';
+import { useConversionOpen } from '../helpers/presence';
 import { useSettings } from '../helpers/settings';
 import { Check, FileIcon } from '../includes/icons';
 import Message from '../includes/message';
@@ -14,6 +15,7 @@ function Reading() {
     const { id } = useParams();
     const [conversion, setConversion] = useState(null);
     const [missing, setMissing] = useState(false);
+    useConversionOpen(id);
 
     // Ask again until the book is ready or reading has failed.
     useEffect(() => {

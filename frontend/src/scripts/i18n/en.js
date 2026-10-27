@@ -65,6 +65,7 @@ const en = {
     convert: {
         title: 'Drop in a book.',
         lead: 'Bookflow reads it, then you check every chapter before you download.',
+        privacy: 'Your PDF and your edits are deleted from our server as soon as you leave.',
         drop: 'Drop your PDF here',
         or: 'or',
         browse: 'browse your files',
@@ -95,7 +96,7 @@ const en = {
         failed: 'Bookflow couldn’t read this book.',
         failedLead: 'The PDF may have no text to read, such as a scan without OCR.',
         notFound: 'This conversion doesn’t exist.',
-        notFoundLead: 'It may have been removed. Try uploading the PDF again.',
+        notFoundLead: 'Books are deleted once their page is closed. Upload the PDF again to start over.',
         steps: ['Reading the PDF', 'Finding paragraphs', 'Finding chapters'],
         progress: 'Reading progress',
         pages: '{n} pages',
@@ -114,6 +115,8 @@ const en = {
     editor: {
         loading: 'Opening the book…',
         notReady: 'This book isn’t ready to edit yet.',
+        gone: 'This book has been deleted.',
+        leaveNote: 'Leaving deletes this book. Download the EPUB first.',
         back: 'Back to the book',
         pages: '{n} pages',
         saved: 'Saved',

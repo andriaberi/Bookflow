@@ -211,3 +211,24 @@ test('the EPUB tab shows the section as the EPUB writes it', async () => {
     await act(async () => fireEvent.click(screen.getByText('It is a truth universally acknowledged.')));
     expect(frame()).toContain('Page for-b3.xhtml');
 });
+
+test('an open editor keeps its book, and leaving lets it go', async () => {
+    mockApi();
+    navigator.sendBeacon = jest.fn();
+    await renderEditor();
+
+    expect(global.fetch).toHaveBeenCalledWith(`/api/convert/${ID}/seen`, expect.objectContaining({ method: 'POST' }));
+    expect(screen.getByText(/Leaving deletes this book/)).toBeInTheDocument();
+
+    window.dispatchEvent(new Event('pagehide'));
+    expect(navigator.sendBeacon).toHaveBeenCalledWith(`/api/convert/${ID}/left`, expect.any(FormData));
+    expect(navigator.sendBeacon.mock.calls[0][1].get('csrfmiddlewaretoken')).toBe('test');
+});
+
+test('a deleted book says so', async () => {
+    global.fetch = jest.fn(() => Promise.resolve({ ok: false, status: 404, json: () => Promise.reject(new Error('no json')) }));
+    await renderEditor();
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('This book has been deleted.');
+    expect(screen.getByRole('link', { name: 'Try another PDF' })).toHaveAttribute('href', '/convert');
+});

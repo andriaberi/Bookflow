@@ -87,6 +87,7 @@ function Convert() {
                         />
                     </label>
 
+                    <p className="small bf-muted text-center mt-3 mb-0">{ t.convert.privacy }</p>
                     { error && (
                         <div className="bf-alert mt-3" role="alert">
                             { fill(t.convert.errors[error], { mb: MAX_PDF_MB }) }

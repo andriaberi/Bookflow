@@ -6,6 +6,7 @@ import {
     splitBlock, toHeading, toText, withBlock, withBlocks,
 } from '../helpers/book';
 import { fill } from '../helpers/format';
+import { useConversionOpen } from '../helpers/presence';
 import { useSettings } from '../helpers/settings';
 import { ChevronRight, Close } from '../includes/icons';
 import Message from '../includes/message';
@@ -35,6 +36,7 @@ function Editor() {
     const [downloadError, setDownloadError] = useState('');
     // Goes up each time a save finishes, so the EPUB preview shows the latest edits.
     const [savedVersion, setSavedVersion] = useState(0);
+    useConversionOpen(id);
 
     useEffect(() => {
         let stale = false;
@@ -51,7 +53,7 @@ function Editor() {
                 const first = data.book.blocks.find((block) => block.include && block.page > 0);
                 setPage(first ? first.page : 1);
             })
-            .catch((e) => !stale && setLoadError(e.code === 'not_ready' || e.code === 'not_found' ? 'notReady' : 'server'));
+            .catch((e) => !stale && setLoadError({ not_ready: 'notReady', not_found: 'gone' }[e.code] || 'server'));
         // A load that's been replaced (another book, or React mounting twice in
         // development) is ignored, so the book isn't set twice and saved for nothing.
         return () => {
@@ -104,8 +106,15 @@ function Editor() {
 
     if (loadError) {
         return (
-            <Message title={ loadError === 'notReady' ? t.editor.notReady : t.editor.errors.server }>
-                <Link to={ `/convert/${id}` } className="btn btn-cobalt px-4">{ t.editor.back }</Link>
+            <Message title={ loadError === 'server' ? t.editor.errors.server : t.editor[loadError] }>
+                { loadError === 'gone' ? (
+                    <>
+                        <p className="bf-muted fs-5 mb-4">{ t.reading.notFoundLead }</p>
+                        <Link to="/convert" className="btn btn-cobalt px-4">{ t.reading.tryAgain }</Link>
+                    </>
+                ) : (
+                    <Link to={ `/convert/${id}` } className="btn btn-cobalt px-4">{ t.editor.back }</Link>
+                ) }
             </Message>
         );
     }
@@ -200,6 +209,7 @@ function Editor() {
                         <span className="bf-save-dot" aria-hidden="true" />
                         { saveState === 'saved' ? t.editor.saved : saveState === 'saving' ? t.editor.saving : t.editor.unsaved }
                     </span>
+                    <span className="small bf-muted">{ t.editor.leaveNote }</span>
                 </div>
                 <div className="bf-editor-actions">
                     <Link to="/convert" className="btn btn-ghost bf-another">{ t.editor.another }</Link>
