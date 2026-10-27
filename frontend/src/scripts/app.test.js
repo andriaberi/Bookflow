@@ -77,11 +77,6 @@ test('picking a page in the phone menu goes there and closes the menu', async ()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Library');
 });
 
-test('pages not built yet say so', async () => {
-    await renderAt('/suggest');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Suggestions are on their way.');
-});
-
 test('an unknown address shows the not-found page', async () => {
     await renderAt('/nowhere');
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Page not found');

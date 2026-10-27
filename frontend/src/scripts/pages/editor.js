@@ -112,7 +112,7 @@ function Editor() {
 
     if (!book) {
         return (
-            <section className="container bf-section bf-fill text-center bf-soon" aria-busy="true">
+            <section className="container bf-section bf-fill text-center bf-message" aria-busy="true">
                 <span className="spinner-border bf-editor-spinner mb-3" aria-hidden="true" />
                 <p className="bf-muted fs-5">{ t.editor.loading }</p>
             </section>

@@ -94,6 +94,13 @@ export function uploadPdf(file, onProgress) {
     return upload('/api/convert/', form, onProgress);
 }
 
+// Sends a book suggestion: its fields, and the PDF if there is one.
+export function suggestBook(fields, onProgress) {
+    const form = new FormData();
+    Object.entries(fields).forEach(([name, value]) => value && form.append(name, value));
+    return upload('/api/library/suggestions', form, onProgress);
+}
+
 export function getConversion(id) {
     return getJson(`/api/convert/${id}`);
 }

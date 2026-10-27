@@ -1,0 +1,58 @@
+// Suggest a book: the form beside what happens next.
+
+.bf-suggest {
+    padding-top: var(--bf-fill-pad);
+    padding-bottom: var(--bf-fill-pad);
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+}
+
+// The attached PDF, or the button to attach one
+.bf-file {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    min-height: 52px;
+    padding: 8px 8px 8px 14px;
+    border: 1px solid var(--bf-line-strong);
+    border-radius: 10px;
+    background: var(--bf-surface);
+}
+
+.bf-file-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bf-file-pick {
+    border-style: dashed;
+    color: var(--bf-cobalt);
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+
+    &:hover {
+        border-color: var(--bf-cobalt);
+        background: var(--bf-soft);
+    }
+
+    &:focus-within {
+        outline: 3px solid rgba(59, 91, 255, 0.4);
+        outline-offset: 2px;
+    }
+}
+
+.bf-sent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
