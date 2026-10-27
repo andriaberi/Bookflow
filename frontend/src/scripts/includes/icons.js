@@ -84,21 +84,6 @@ export const Download = (props) => (
     <Icon { ...props }><path d="M12 4v11" /><path d="m7 10 5 5 5-5" /><path d="M5 20h14" /></Icon>
 );
 
-export const Star = (props) => (
-    <Icon { ...props }><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z" /></Icon>
-);
-
-export const Share = (props) => (
-    <Icon { ...props }>
-        <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-        <path d="m8.6 13.5 6.8 4" /><path d="m15.4 6.5-6.8 4" />
-    </Icon>
-);
-
-export const Flag = (props) => (
-    <Icon { ...props }><path d="M5 21V4" /><path d="M5 4h11l-2 4 2 4H5" /></Icon>
-);
-
 export const BookIcon = (props) => (
     <Icon { ...props }><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6.5A2.5 2.5 0 0 0 4 21.5z" /><path d="M20 17v4H6.5" /></Icon>
 );
