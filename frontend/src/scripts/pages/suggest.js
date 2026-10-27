@@ -111,15 +111,17 @@ function Suggest() {
                                 </div>
 
                                 { pdf && (
-                                    <fieldset className="col-12">
-                                        <legend className="form-label fw-medium fs-6">{ t.suggest.rights }</legend>
-                                        { RIGHTS.map((value) => (
-                                            <div className="form-check" key={ value }>
-                                                <input className="form-check-input" type="radio" name="rights" id={ `bf-rights-${value}` } value={ value } checked={ fields.rights === value } onChange={ set('rights') } />
-                                                <label className="form-check-label" htmlFor={ `bf-rights-${value}` }>{ t.suggest.rightsChoices[value] }</label>
-                                            </div>
-                                        )) }
-                                    </fieldset>
+                                    <div className="col-12">
+                                        <fieldset>
+                                            <legend className="form-label fw-medium fs-6">{ t.suggest.rights }</legend>
+                                            { RIGHTS.map((value) => (
+                                                <div className="form-check" key={ value }>
+                                                    <input className="form-check-input" type="radio" name="rights" id={ `bf-rights-${value}` } value={ value } checked={ fields.rights === value } onChange={ set('rights') } />
+                                                    <label className="form-check-label" htmlFor={ `bf-rights-${value}` }>{ t.suggest.rightsChoices[value] }</label>
+                                                </div>
+                                            )) }
+                                        </fieldset>
+                                    </div>
                                 ) }
 
                                 { permission && (
