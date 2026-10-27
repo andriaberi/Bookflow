@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { uploadPdf } from '../helpers/api';
+import { errorCode, uploadPdf } from '../helpers/api';
 import { fill } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
 import { FileUp } from '../includes/icons';
@@ -16,7 +16,6 @@ function isPdf(file) {
 function Convert() {
     const { t } = useSettings();
     const navigate = useNavigate();
-    const input = useRef(null);
     const [over, setOver] = useState(false);
     const [progress, setProgress] = useState(null);
     const [error, setError] = useState('');
@@ -35,7 +34,7 @@ function Convert() {
             navigate(`/convert/${conversion.id}`);
         } catch (e) {
             setProgress(null);
-            setError(e.code in t.convert.errors ? e.code : 'server');
+            setError(errorCode(e, t.convert.errors));
         }
     }
 
@@ -82,7 +81,6 @@ function Convert() {
                             </>
                         ) }
                         <input
-                            ref={ input }
                             id="bf-pdf"
                             type="file"
                             accept="application/pdf,.pdf"

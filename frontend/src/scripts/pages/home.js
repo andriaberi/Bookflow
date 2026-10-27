@@ -17,7 +17,7 @@ function Home() {
     }, [location]);
 
     useEffect(() => {
-        getBooks().then(setBooks).catch(() => setBooks([]));
+        getBooks().then(setBooks).catch(() => {});
     }, []);
 
     const shelf = books.filter((book) => book.cover_url).slice(0, SHELF_SIZE);

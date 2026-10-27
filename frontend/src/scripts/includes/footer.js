@@ -10,7 +10,7 @@ function Footer() {
     // The version of the engine the server actually runs.
     useEffect(() => {
         // A development build's version ends in +g<commit>; the part before is enough.
-        getInfo().then((info) => setEngine((info.engine || '').split('+')[0])).catch(() => setEngine(''));
+        getInfo().then((info) => setEngine((info.engine || '').split('+')[0])).catch(() => {});
     }, []);
 
     return (

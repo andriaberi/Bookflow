@@ -29,16 +29,34 @@ async function readError(response) {
     }
 }
 
-export async function getInfo() {
-    const response = await fetch('/api/info');
+// The response, or the API's error if there is one.
+async function request(url, options) {
+    const response = await fetch(url, options);
     if (!response.ok) throw await readError(response);
+    return response;
+}
+
+async function getJson(url) {
+    return (await request(url)).json();
+}
+
+// A request that changes something, so it carries the CSRF token.
+async function send(method, url, { body, headers } = {}) {
+    const response = await request(url, { method, headers: { ...headers, 'X-CSRFToken': await csrfToken() }, body });
     return response.json();
 }
 
-export async function getBooks() {
-    const response = await fetch('/api/library/');
-    if (!response.ok) throw await readError(response);
-    return response.json();
+// The error code to show: `e`'s if the page has a message for it, else "server".
+export function errorCode(e, messages) {
+    return e.code in messages ? e.code : 'server';
+}
+
+export function getInfo() {
+    return getJson('/api/info');
+}
+
+export function getBooks() {
+    return getJson('/api/library/');
 }
 
 // Uploads the PDF, telling onProgress the share sent so far (0 to 1). Uses XHR, as
@@ -68,29 +86,17 @@ export async function uploadPdf(file, onProgress = () => {}) {
     });
 }
 
-export async function getConversion(id) {
-    const response = await fetch(`/api/convert/${id}`);
-    if (!response.ok) throw await readError(response);
-    return response.json();
+export function getConversion(id) {
+    return getJson(`/api/convert/${id}`);
 }
 
-// The editor
-
-export async function getBook(id) {
-    const response = await fetch(`/api/convert/${id}/book`);
-    if (!response.ok) throw await readError(response);
-    return response.json();
+export function getBook(id) {
+    return getJson(`/api/convert/${id}/book`);
 }
 
 // Saves the edited book; answers with its problems (what keeps it from being written).
-export async function saveBook(id, book) {
-    const response = await fetch(`/api/convert/${id}/book`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': await csrfToken() },
-        body: JSON.stringify(book),
-    });
-    if (!response.ok) throw await readError(response);
-    return response.json();
+export function saveBook(id, book) {
+    return send('PUT', `/api/convert/${id}/book`, { body: JSON.stringify(book), headers: { 'Content-Type': 'application/json' } });
 }
 
 export function pageUrl(id, number, width = 700) {
@@ -99,48 +105,32 @@ export function pageUrl(id, number, width = 700) {
 
 // The book as an EPUB file, and the name to save it under.
 export async function getEpub(id) {
-    const response = await fetch(`/api/convert/${id}/epub`);
-    if (!response.ok) throw await readError(response);
+    const response = await request(`/api/convert/${id}/epub`);
     const disposition = response.headers.get('Content-Disposition') || '';
     const match = disposition.match(/filename\*=UTF-8''([^;]+)/);
     return { blob: await response.blob(), filename: match ? decodeURIComponent(match[1]) : 'book.epub' };
 }
 
 // Replaces the cover with an image file; answers with the new cover's address.
-export async function uploadCover(id, file) {
-    const form = new FormData();
-    form.append('cover', file);
-    const response = await fetch(`/api/convert/${id}/cover`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': await csrfToken() },
-        body: form,
-    });
-    if (!response.ok) throw await readError(response);
-    return response.json();
+export function uploadCover(id, file) {
+    const body = new FormData();
+    body.append('cover', file);
+    return send('POST', `/api/convert/${id}/cover`, { body });
 }
 
-export async function removeCover(id) {
-    const response = await fetch(`/api/convert/${id}/cover`, {
-        method: 'DELETE',
-        headers: { 'X-CSRFToken': await csrfToken() },
-    });
-    if (!response.ok) throw await readError(response);
-    return response.json();
+export function removeCover(id) {
+    return send('DELETE', `/api/convert/${id}/cover`);
 }
 
 // The address of the EPUB page block `blockId` is written on, for the preview.
 export async function getPreviewUrl(id, blockId) {
-    const response = await fetch(`/api/convert/${id}/preview?block=${encodeURIComponent(blockId)}`);
-    if (!response.ok) throw await readError(response);
-    return (await response.json()).url;
+    return (await getJson(`/api/convert/${id}/preview?block=${encodeURIComponent(blockId)}`)).url;
 }
 
 // The EPUB page at `url`, ready to show in a frame: a <base> makes its stylesheet,
 // fonts and images load from the same place in the EPUB.
 export async function getPreviewPage(url) {
-    const response = await fetch(url);
-    if (!response.ok) throw await readError(response);
-    const page = await response.text();
+    const page = await (await request(url)).text();
     const base = `<base href="${url.slice(0, url.lastIndexOf('/') + 1)}">`;
     return page.replace(/<head(\s[^>]*)?>/i, (head) => `${head}${base}`);
 }
