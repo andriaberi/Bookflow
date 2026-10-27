@@ -13,6 +13,11 @@
     textarea {
         resize: none;
     }
+
+    // The form is the taller card: what happens next starts level with its first row.
+    .bf-looks {
+        justify-content: flex-start;
+    }
 }
 
 // The attached PDF, or the button to attach one

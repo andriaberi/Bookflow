@@ -114,11 +114,13 @@
     margin-bottom: clamp(24px, 4.5vh, 48px);
 }
 
+// The same line height as the item's name, so the two line up.
 .bf-looks-mark {
     flex-shrink: 0;
     width: 28px;
     color: var(--bf-mark);
     font-size: 22px;
+    line-height: 1.5rem;
     text-align: center;
 }
 
