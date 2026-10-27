@@ -1,5 +1,5 @@
-// The library: a storefront (search, the newest book, then every book as a cover) and
-// a page for each book.
+// The library: a storefront (search, then every book as a cover) and a page for each
+// book.
 
 .bf-library-header {
     display: flex;
@@ -73,47 +73,6 @@
     object-fit: cover;
 }
 
-// The newest book
-
-.bf-featured {
-    display: grid;
-    grid-template-columns: 200px minmax(0, 1fr);
-    align-items: center;
-    gap: clamp(24px, 4vw, 48px);
-    margin-bottom: clamp(32px, 5vh, 56px);
-    padding: clamp(24px, 4vw, 40px);
-    border: 1px solid var(--bf-line);
-    border-radius: 2rem;
-    background: var(--bf-soft);
-
-    @media (max-width: 575.98px) {
-        grid-template-columns: minmax(0, 1fr);
-        justify-items: center;
-        text-align: center;
-
-        .bf-featured-cover {
-            width: 160px;
-        }
-
-        .bf-cta {
-            justify-content: center;
-        }
-    }
-}
-
-.bf-featured-cover {
-    display: block;
-    width: 100%;
-}
-
-.bf-featured-description {
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    max-width: 640px;
-    overflow: hidden;
-}
-
 // The toolbar and the grid
 
 .bf-library-toolbar {
@@ -158,12 +117,11 @@
 
     .bf-cover {
         margin-bottom: 8px;
-        transition: transform 0.15s, box-shadow 0.15s;
+        transition: box-shadow 0.3s ease;
     }
 
     &:hover .bf-cover {
-        transform: translateY(-3px);
-        box-shadow: 0 14px 28px rgba(13, 14, 20, 0.22);
+        box-shadow: 0 12px 28px rgba(13, 14, 20, 0.24);
     }
 
     &:hover .bf-book-card-title {
@@ -174,10 +132,12 @@
 .bf-book-card-title {
     font-weight: 600;
     line-height: 1.3;
+    transition: color 0.3s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .bf-book-card .bf-cover {
+    .bf-book-card .bf-cover,
+    .bf-book-card-title {
         transition: none;
     }
 }

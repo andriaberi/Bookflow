@@ -18,7 +18,6 @@ def _serialize(b: Book) -> dict:
         "epub_size":   b.epub.size if b.epub else None,
         # Known only for books kept with their data
         "chapters":    engine.counts(b.data)["headings"] if b.data else None,
-        "added":       b.created_at.isoformat(),
     }
 
 

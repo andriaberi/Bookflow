@@ -3,15 +3,15 @@ import { MemoryRouter } from 'react-router-dom';
 import App from '../app';
 import { SettingsProvider } from '../helpers/settings';
 
-const book = (title, author, language, added, fields = {}) => ({
-    title, id: `id-${added}`, author, language, description: '', added,
+const book = (id, title, author, language, fields = {}) => ({
+    id, title, author, language, description: '',
     cover_url: null, epub_url: `/media/${title}.epub`, epub_size: 1572864, chapters: null, ...fields,
 });
 
 const BOOKS = [
-    book('Anna Karenina', 'Leo Tolstoy', 'en', '2026-10-01T00:00:00', { chapters: 246 }),
-    book('ბუდენბროკები', 'თომას მანი', 'ka', '2026-10-20T00:00:00', { description: 'A family saga.' }),
-    book('War and Peace', 'Leo Tolstoy', 'en', '2026-10-10T00:00:00'),
+    book('b1', 'War and Peace', 'Leo Tolstoy', 'en', { chapters: 246 }),
+    book('b2', 'ბუდენბროკები', 'თომას მანი', 'ka', { description: 'A family saga.' }),
+    book('b3', 'Anna Karenina', 'Leo Tolstoy', 'en'),
 ];
 
 async function renderAt(path, reply) {
@@ -39,24 +39,20 @@ const gridTitles = () => within(screen.getAllByRole('list').at(-1)).getAllByRole
 
 beforeEach(() => localStorage.clear());
 
-test('the library shows the newest book first, then every book', async () => {
+test('the library shows every book by title', async () => {
     await renderAt('/library', api);
 
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('ბუდენბროკები');
-    expect(screen.getByText('A family saga.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Download EPUB' })).toHaveAttribute('href', '/media/ბუდენბროკები.epub');
-    expect(gridTitles()).toEqual(['ბუდენბროკები', 'War and Peace', 'Anna Karenina']);
+    expect(gridTitles()).toEqual(['Anna Karenina', 'War and Peace', 'ბუდენბროკები']);
     expect(screen.getByText('3 books')).toBeInTheDocument();
 });
 
 test('books can be searched, filtered by language and sorted', async () => {
     await renderAt('/library', api);
 
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'tolstoy' } });
-    expect(gridTitles()).toEqual(['War and Peace', 'Anna Karenina']);
-    expect(screen.queryByText('New in the library')).toBeNull();
+    fireEvent.change(screen.getByRole('combobox', { name: 'Sort by' }), { target: { value: 'author' } });
+    expect(gridTitles()).toEqual(['Anna Karenina', 'War and Peace', 'ბუდენბროკები']);
 
-    fireEvent.change(screen.getByRole('combobox', { name: 'Sort by' }), { target: { value: 'title' } });
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'tolstoy' } });
     expect(gridTitles()).toEqual(['Anna Karenina', 'War and Peace']);
 
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: '' } });
@@ -74,11 +70,11 @@ test('books can be searched, filtered by language and sorted', async () => {
 test('a book has its own page with its details and other books', async () => {
     await renderAt(`/library/${BOOKS[0].id}`, api);
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Anna Karenina');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('War and Peace');
     expect(screen.getByText('246')).toBeInTheDocument();
     expect(screen.getByText('1.5 MB')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Download EPUB' })).toHaveAttribute('href', '/media/Anna Karenina.epub');
-    expect(gridTitles()).toEqual(['ბუდენბროკები', 'War and Peace']);
+    expect(screen.getByRole('link', { name: 'Download EPUB' })).toHaveAttribute('href', '/media/War and Peace.epub');
+    expect(gridTitles()).toEqual(['ბუდენბროკები', 'Anna Karenina']);
 });
 
 test('an unknown book says so', async () => {

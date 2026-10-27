@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom';
 import { getBooks } from '../helpers/api';
 import { fill } from '../helpers/format';
 import { useSettings } from '../helpers/settings';
-import { BookCover, BookGrid, DownloadButton } from '../includes/books';
+import { BookGrid } from '../includes/books';
 import { Search } from '../includes/icons';
 
 const SORTS = {
-    newest: (a, b) => b.added.localeCompare(a.added),
     title: (a, b) => a.title.localeCompare(b.title),
     author: (a, b) => a.author.localeCompare(b.author) || a.title.localeCompare(b.title),
 };
@@ -18,14 +17,13 @@ function Library() {
     const [failed, setFailed] = useState(false);
     const [query, setQuery] = useState('');
     const [language, setLanguage] = useState('');
-    const [sort, setSort] = useState('newest');
+    const [sort, setSort] = useState('title');
 
     useEffect(() => {
         getBooks().then(setBooks).catch(() => setFailed(true));
     }, []);
 
     const languages = useMemo(() => [...new Set((books || []).map((book) => book.language).filter(Boolean))], [books]);
-    const newest = useMemo(() => (books || []).slice().sort(SORTS.newest)[0], [books]);
 
     const words = query.trim().toLowerCase();
     const shown = (books || [])
@@ -57,8 +55,6 @@ function Library() {
 
             { books?.length > 0 && (
                 <>
-                    { !words && <Featured t={ t } book={ newest } /> }
-
                     <div className="bf-library-toolbar">
                         { languages.length > 1 && (
                             <div className="bf-seg" role="group" aria-label={ t.library.language }>
@@ -86,27 +82,6 @@ function Library() {
                 </>
             ) }
         </section>
-    );
-}
-
-// The newest book, large, with its description and download.
-function Featured({ t, book }) {
-    return (
-        <article className="bf-featured" lang={ book.language || undefined }>
-            <Link to={ `/library/${book.id}` } className="bf-featured-cover" tabIndex={ -1 } aria-hidden="true">
-                <BookCover book={ book } />
-            </Link>
-            <div className="bf-featured-text">
-                <div className="bf-eyebrow mb-2">{ t.library.featured }</div>
-                <h2 className="bf-display bf-card-title mb-1">{ book.title }</h2>
-                { book.author && <div className="fs-5 bf-muted mb-3">{ book.author }</div> }
-                { book.description && <p className="bf-featured-description mb-4">{ book.description }</p> }
-                <div className="bf-cta">
-                    { book.epub_url && <DownloadButton t={ t } book={ book } className="px-4" /> }
-                    <Link to={ `/library/${book.id}` } className="btn btn-ghost px-4">{ t.library.details }</Link>
-                </div>
-            </div>
-        </article>
     );
 }
 
