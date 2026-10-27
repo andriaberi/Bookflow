@@ -205,6 +205,13 @@
     background: var(--bf-well);
 }
 
+.bf-cover-actions {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
 .bf-editor .form-control,
 .bf-editor .form-select {
     border-color: var(--bf-line-strong);
@@ -351,8 +358,21 @@
         border: 2px solid var(--bf-cobalt);
     }
 
+    &.picked {
+        border-color: var(--bf-cobalt);
+        background: var(--bf-soft);
+    }
+
     .form-check-input {
         margin-top: 0.3em;
+    }
+
+    .bf-pick {
+        flex-shrink: 0;
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.25em;
+        pointer-events: none;
     }
 }
 
@@ -451,18 +471,6 @@
         background: #fff;
     }
 }
-
-
-
-// The cover's buttons
-
-.bf-cover-actions {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 12px;
-}
-
 .bf-alert-sm {
     padding: 8px 10px;
     font-size: 0.85rem;
@@ -508,21 +516,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 6px 10px;
-}
-
-.bf-block-card {
-    .bf-pick {
-        flex-shrink: 0;
-        width: 1.2em;
-        height: 1.2em;
-        margin-top: 0.25em;
-        pointer-events: none;
-    }
-
-    &.picked {
-        border-color: var(--bf-cobalt);
-        background: var(--bf-soft);
-    }
 }
 
 // Editing the selected block

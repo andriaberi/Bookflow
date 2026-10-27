@@ -188,7 +188,6 @@ const en = {
         empty: 'This section is empty.',
         previous: 'Previous',
         next: 'Next',
-        pdfPage: 'PDF page',
         previewTabs: 'Preview',
         pdfTab: 'PDF',
         epubTab: 'EPUB',
@@ -200,9 +199,7 @@ const en = {
         nextPage: 'Next page',
         pageAlt: 'Page {n} of the PDF',
         errors: {
-            bad_book: 'That change couldn’t be saved.',
             problems: 'The book can’t be written yet. Fix the problems above.',
-            network: 'Couldn’t reach the server. Your changes are kept here and will be saved when it’s back.',
             server: 'Something went wrong on our side. Please try again.',
         },
     },
