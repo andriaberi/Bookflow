@@ -31,6 +31,12 @@ def make_pdf(chapters=2) -> bytes:
     return data
 
 
+def cover_image(name="cover.png"):
+    pixmap = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, 60, 90), False)
+    pixmap.clear_with(200)
+    return SimpleUploadedFile(name, pixmap.tobytes("png"), "image/png")
+
+
 def upload(name="book.pdf", data=None):
     return SimpleUploadedFile(name, make_pdf() if data is None else data, "application/pdf")
 
@@ -180,11 +186,7 @@ class EditorTests(TestCase):
         self.assertEqual(response.status_code, 409)
 
     def test_the_cover_can_be_replaced_and_goes_into_the_epub(self):
-        pixmap = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, 60, 90), False)
-        pixmap.clear_with(200)
-        image = SimpleUploadedFile("cover.png", pixmap.tobytes("png"), "image/png")
-
-        response = self.client.post(f"/api/convert/{self.id}/cover", {"cover": image})
+        response = self.client.post(f"/api/convert/{self.id}/cover", {"cover": cover_image()})
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("cover.jpg", response.json()["cover_url"])
@@ -195,9 +197,7 @@ class EditorTests(TestCase):
 
     def test_saving_the_book_keeps_the_new_cover(self):
         old = self.get_book()
-        pixmap = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, 60, 90), False)
-        pixmap.clear_with(200)
-        self.client.post(f"/api/convert/{self.id}/cover", {"cover": SimpleUploadedFile("c.png", pixmap.tobytes("png"))})
+        self.client.post(f"/api/convert/{self.id}/cover", {"cover": cover_image()})
 
         self.put_book(old)  # an autosave from before the cover changed
 

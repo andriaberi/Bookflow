@@ -1,4 +1,5 @@
 import json
+from functools import wraps
 from pathlib import Path
 from urllib.parse import quote
 
@@ -14,6 +15,8 @@ from . import engine
 from .models import Conversion
 
 PDF_START = b"%PDF-"
+MB = 1024 * 1024
+MAX_COVER_MB = 10
 
 # Widths the page preview may ask for, in pixels
 PAGE_WIDTHS = range(100, 1601)
@@ -65,7 +68,7 @@ def conversion_create(request):
     pdf = request.FILES.get("pdf")
     if not pdf:
         return _error("no_file", "No PDF uploaded")
-    if pdf.size > settings.MAX_PDF_SIZE_MB * 1024 * 1024:
+    if pdf.size > settings.MAX_PDF_SIZE_MB * MB:
         return _error("too_big", f"PDFs up to {settings.MAX_PDF_SIZE_MB} MB only")
 
     data = pdf.read()
@@ -97,22 +100,22 @@ def conversion_detail(request, pk):
     return JsonResponse(_serialize(conversion))
 
 
-def _ready(pk) -> tuple[Conversion | None, JsonResponse | None]:
-    """The conversion, if its book has been read; else the error to answer with."""
-    conversion = get_object_or_404(Conversion, pk=pk)
-    if conversion.status != "ready":
-        return None, _error("not_ready", "The book hasn't been read yet", status=409)
-    return conversion, None
+def _ready(view):
+    """Passes the view the conversion once its book has been read; until then, 409."""
+    @wraps(view)
+    def wrapper(request, pk, **kwargs):
+        conversion = get_object_or_404(Conversion, pk=pk)
+        if conversion.status != "ready":
+            return _error("not_ready", "The book hasn't been read yet", status=409)
+        return view(request, conversion, **kwargs)
+    return wrapper
 
 
 @require_http_methods(["GET", "PUT"])
-def book(request, pk):
+@_ready
+def book(request, conversion):
     """GET: the book to edit. PUT: save the edited book, and say what would keep it
     from being written."""
-    conversion, error = _ready(pk)
-    if error:
-        return error
-
     if request.method == "GET":
         return JsonResponse({
             "book":      conversion.book,
@@ -155,32 +158,23 @@ def page(request, pk, number):
 
 
 @require_GET
-def epub(request, pk):
+@_ready
+def epub(request, conversion):
     """The edited book as an EPUB file."""
-    conversion, error = _ready(pk)
-    if error:
-        return error
     try:
         data = engine.epub_of(conversion)
     except ConvertError as e:
         return _error("problems", str(e))
     title = (conversion.book["metadata"].get("title") or conversion.name).strip() or "book"
-    filename = f"{title}.epub"
     response = HttpResponse(data, content_type="application/epub+zip")
-    response["Content-Disposition"] = f"attachment; filename*=UTF-8''{quote(filename)}"
+    response["Content-Disposition"] = f"attachment; filename*=UTF-8''{quote(f'{title}.epub')}"
     return response
 
 
-# Cover images up to this size, in megabytes
-MAX_COVER_MB = 10
-
-
 @require_http_methods(["POST", "DELETE"])
-def cover(request, pk):
+@_ready
+def cover(request, conversion):
     """POST: replace the cover with an uploaded image. DELETE: remove the cover."""
-    conversion, error = _ready(pk)
-    if error:
-        return error
     if request.method == "DELETE":
         engine.remove_cover(conversion)
         return JsonResponse({"cover_url": None})
@@ -188,7 +182,7 @@ def cover(request, pk):
     image = request.FILES.get("cover")
     if not image:
         return _error("no_file", "No image uploaded")
-    if image.size > MAX_COVER_MB * 1024 * 1024:
+    if image.size > MAX_COVER_MB * MB:
         return _error("too_big", f"Covers up to {MAX_COVER_MB} MB only")
     try:
         engine.set_cover(conversion, image.read())
@@ -206,27 +200,23 @@ def _cover_url(conversion: Conversion) -> str | None:
 
 
 @require_GET
-def preview(request, pk):
+@_ready
+def preview(request, conversion):
     """Where the EPUB preview of a block is: the address of the EPUB page it's on."""
-    conversion, error = _ready(pk)
-    if error:
-        return error
     try:
         name = engine.preview_page(conversion, request.GET.get("block"))
         engine.preview_epub(conversion)
     except ConvertError as e:
         return _error("problems", str(e), status=409)
-    return JsonResponse({"url": f"/api/convert/{pk}/epub-files/{name}"})
+    return JsonResponse({"url": f"/api/convert/{conversion.pk}/epub-files/{name}"})
 
 
 # Shown in the editor's preview frame, which is on the same site.
 @xframe_options_sameorigin
 @require_GET
-def epub_file(request, pk, name):
+@_ready
+def epub_file(request, conversion, name):
     """A file from inside the preview EPUB: a page, its stylesheet, fonts or cover."""
-    conversion, error = _ready(pk)
-    if error:
-        return error
     try:
         data, content_type = engine.preview_file(conversion, name)
     except KeyError:

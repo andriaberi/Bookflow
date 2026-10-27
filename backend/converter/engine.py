@@ -108,23 +108,21 @@ def page_image(conversion: Conversion, number: int, width: int) -> bytes:
 
 def set_cover(conversion: Conversion, image: bytes) -> None:
     """Use this image as the cover; CoverError if it isn't one. Saved as JPEG."""
-    cover = load_cover(image)
-    if conversion.cover:
-        conversion.cover.delete(save=False)
-    conversion.cover.save("cover.jpg", ContentFile(cover.data), save=False)
-    conversion.book = {**conversion.book, "cover_source": GIVEN_COVER}
-    conversion.save()
+    _change_cover(conversion, load_cover(image).data, GIVEN_COVER)
 
 
 def remove_cover(conversion: Conversion) -> None:
-    """Leave the book without a cover."""
+    _change_cover(conversion, None, NO_COVER)
+
+
+def _change_cover(conversion: Conversion, jpeg: bytes | None, source: str) -> None:
     if conversion.cover:
         conversion.cover.delete(save=False)
-    conversion.book = {**conversion.book, "cover_source": NO_COVER}
+    if jpeg:
+        conversion.cover.save("cover.jpg", ContentFile(jpeg), save=False)
+    conversion.book = {**conversion.book, "cover_source": source}
     conversion.save()
 
-
-# EPUB preview
 
 def preview_epub(conversion: Conversion) -> Path:
     """The book written as an EPUB for the editor's preview, kept next to the PDF and
@@ -146,11 +144,10 @@ def preview_page(conversion: Conversion, block_id: str | None) -> str:
     goes over several pages, so its paragraphs are counted the way the engine splits them.
     """
     book = Book.from_dict(conversion.book)
-    sections = book.sections()
     first_file = []  # each section's first page number, from 1
     parts_of = []  # each section's pages, as how many paragraphs each holds
     number = 1
-    for section in sections:
+    for section in book.sections():
         parts = [len(part.paragraphs) for part in split_long(section)]
         first_file.append(number)
         parts_of.append(parts)
