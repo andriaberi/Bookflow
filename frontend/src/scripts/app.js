@@ -4,6 +4,7 @@ import Footer from './includes/footer';
 import Home from './pages/home';
 import Convert from './pages/convert';
 import Reading from './pages/reading';
+import Editor from './pages/editor';
 import ComingSoon from './pages/coming-soon';
 import NotFound from './pages/not-found';
 
@@ -16,7 +17,7 @@ function App() {
                     <Route path="/" element={ <Home /> } />
                     <Route path="/convert" element={ <Convert /> } />
                     <Route path="/convert/:id" element={ <Reading /> } />
-                    <Route path="/convert/:id/edit" element={ <ComingSoon page="editor" /> } />
+                    <Route path="/convert/:id/edit" element={ <Editor /> } />
                     <Route path="/library" element={ <ComingSoon page="library" /> } />
                     <Route path="/suggest" element={ <ComingSoon page="suggest" /> } />
                     <Route path="*" element={ <NotFound /> } />

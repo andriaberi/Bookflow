@@ -1,0 +1,708 @@
+// The editor: the book's details and contents on the left, the selected section's
+// blocks in the middle, the PDF page on the right. Narrower screens put the PDF page
+// under the blocks, then stack everything.
+
+.bf-editor {
+    padding-top: 24px;
+    padding-bottom: 48px;
+}
+
+.bf-editor-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--bf-cobalt);
+}
+
+// The bar: file, save state and the buttons
+
+.bf-editor-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-bottom: 16px;
+}
+
+.bf-editor-file {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    min-width: 0;
+}
+
+.bf-editor-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.bf-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--bf-pill);
+    color: var(--bf-muted);
+    font-size: 0.875rem;
+}
+
+.bf-save-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+
+    .bf-save-saving & {
+        background: var(--bf-cobalt);
+        animation: bf-pulse 1s ease-in-out infinite;
+    }
+
+    .bf-save-error & {
+        background: var(--bf-error-text);
+    }
+}
+
+@keyframes bf-pulse {
+    50% {
+        opacity: 0.3;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bf-save-saving .bf-save-dot {
+        animation: none;
+    }
+}
+
+.bf-alert-close {
+    display: inline-flex;
+    margin-left: 8px;
+    padding: 2px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    vertical-align: middle;
+}
+
+// Layout
+
+.bf-editor-grid {
+    display: grid;
+    grid-template-areas: 'side main preview';
+    grid-template-columns: 280px minmax(0, 1fr) 380px;
+    gap: 24px;
+    align-items: start;
+
+    @media (max-width: 1199.98px) {
+        grid-template-areas:
+            'side main'
+            'side preview';
+        grid-template-columns: 260px minmax(0, 1fr);
+    }
+
+    // Tablets and phones: the section first, then the book's details, then the PDF page.
+    @media (max-width: 991.98px) {
+        grid-template-areas:
+            'main'
+            'side'
+            'preview';
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+}
+
+.bf-editor-side {
+    grid-area: side;
+}
+
+.bf-editor-main {
+    grid-area: main;
+    min-width: 0;
+}
+
+.bf-editor-preview {
+    grid-area: preview;
+}
+
+// The side and the PDF page stay in view while the blocks scroll.
+@media (min-width: 992px) {
+    .bf-editor-side {
+        position: sticky;
+        top: calc(var(--bf-nav-height) + 16px);
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100dvh - var(--bf-nav-height) - 32px);
+    }
+
+    .bf-editor-contents {
+        flex-direction: column;
+        min-height: 0;
+        margin-bottom: 0;
+
+        .bf-toc {
+            min-height: 120px;
+            overflow-y: auto;
+        }
+    }
+}
+
+@media (min-width: 1200px) {
+    .bf-editor-preview {
+        position: sticky;
+        top: calc(var(--bf-nav-height) + 16px);
+    }
+}
+
+// Cards on the side
+
+.bf-editor-card {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid var(--bf-line);
+    border-radius: 1rem;
+    background: var(--bf-surface);
+}
+
+.bf-editor-card-title {
+    margin-bottom: 12px;
+    color: var(--bf-muted);
+    font-family: var(--bf-font);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    &:lang(ka) {
+        letter-spacing: 0.02em;
+        text-transform: none;
+    }
+}
+
+.bf-editor-cover {
+    width: 60%;
+    max-width: 180px;
+    margin: 0 auto 12px;
+
+    img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+        box-shadow: 0 6px 16px rgba(13, 14, 20, 0.2);
+    }
+}
+
+// Without a cover, a book-shaped placeholder of the same width.
+.bf-editor-cover-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 2 / 3;
+    border-radius: 6px;
+    background: var(--bf-well);
+}
+
+.bf-editor .form-control,
+.bf-editor .form-select {
+    border-color: var(--bf-line-strong);
+    border-radius: 10px;
+    background-color: var(--bf-surface);
+    color: var(--bf-text);
+
+    &:focus {
+        border-color: var(--bf-cobalt);
+        box-shadow: 0 0 0 0.2rem rgba(59, 91, 255, 0.25);
+    }
+}
+
+.bf-editor .form-check-input:checked {
+    border-color: var(--bf-cobalt);
+    background-color: var(--bf-cobalt);
+}
+
+.bf-switch-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding-left: 0;
+    font-size: 0.9rem;
+
+    .form-check-input {
+        flex-shrink: 0;
+        margin: 0;
+        float: none;
+    }
+
+    label {
+        flex: 1;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+// Contents
+
+.bf-toc {
+    max-height: 50vh;
+    margin: 0 -6px;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.bf-toc-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--bf-text);
+    font-size: 0.875rem;
+    text-align: left;
+
+    &:hover {
+        background: var(--bf-pill);
+    }
+
+    &.on {
+        background: var(--bf-cobalt);
+        color: #fff;
+        font-weight: 600;
+
+        .bf-toc-page {
+            color: #e3e8ff;
+        }
+    }
+
+    &.out:not(.on) {
+        color: var(--bf-muted);
+        text-decoration: line-through;
+    }
+}
+
+.bf-toc-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bf-toc-page {
+    flex-shrink: 0;
+    color: var(--bf-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+// The section and its blocks
+
+.bf-section-head {
+    margin-bottom: 16px;
+}
+
+.bf-section-picker {
+    margin-top: 12px;
+}
+
+.bf-section-name {
+    margin: 4px 0 0;
+    font-size: clamp(24px, 2.4vw, 32px);
+    line-height: 1.15;
+}
+
+.bf-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bf-block-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--bf-line);
+    border-radius: 14px;
+    background: var(--bf-surface);
+    cursor: pointer;
+
+    &.heading {
+        background: var(--bf-soft);
+        border-color: transparent;
+    }
+
+    &.out {
+        border-style: dashed;
+        border-color: var(--bf-line-strong);
+        background: var(--bf-surface-2);
+        color: var(--bf-muted);
+    }
+
+    &.selected {
+        padding: 13px 15px;
+        border: 2px solid var(--bf-cobalt);
+    }
+
+    .form-check-input {
+        margin-top: 0.3em;
+    }
+}
+
+.bf-block-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.bf-block-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 28px;
+}
+
+.bf-block-text {
+    margin: 0;
+    line-height: 1.7;
+
+    &.clamp {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    &.verse {
+        white-space: pre-line;
+    }
+}
+
+.bf-block-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.bf-tag {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--bf-pill);
+    color: var(--bf-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.bf-tag-out {
+    background: var(--bf-error-bg);
+    color: var(--bf-error-text);
+}
+
+.bf-block-page {
+    flex-shrink: 0;
+    padding-top: 0.15em;
+    color: var(--bf-muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.bf-section-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+// The PDF page
+
+.bf-preview-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.bf-icon-btn-sm {
+    width: 36px;
+    height: 36px;
+
+    &:disabled {
+        opacity: 0.4;
+    }
+}
+
+.bf-preview-page {
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--bf-well);
+
+    img {
+        display: block;
+        width: 100%;
+        border-radius: 6px;
+        background: #fff;
+    }
+}
+
+
+
+// The cover's buttons
+
+.bf-cover-actions {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.bf-alert-sm {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+}
+
+// Including or leaving out many blocks at once
+
+.bf-bulk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-bottom: 12px;
+
+    &.picking {
+        position: sticky;
+        top: calc(var(--bf-nav-height) + 8px);
+        z-index: 5;
+        padding: 10px 12px;
+        border: 1px solid var(--bf-cobalt);
+        border-radius: 12px;
+        background: var(--bf-surface);
+        box-shadow: 0 8px 24px rgba(13, 14, 20, 0.08);
+    }
+}
+
+.bf-bulk-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.bf-bulk-hint {
+    flex-basis: 100%;
+    color: var(--bf-muted);
+    font-size: 0.8rem;
+}
+
+.bf-bulk-top,
+.bf-bulk-links,
+.bf-bulk-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+}
+
+.bf-block-card {
+    .bf-pick {
+        flex-shrink: 0;
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.25em;
+        pointer-events: none;
+    }
+
+    &.picked {
+        border-color: var(--bf-cobalt);
+        background: var(--bf-soft);
+    }
+}
+
+// Editing the selected block
+
+.bf-block-edit {
+    cursor: default;
+}
+
+.bf-block-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+
+    .bf-type {
+        flex: 0 1 220px;
+    }
+
+    .bf-label {
+        flex: 0 1 180px;
+        font-weight: 600;
+    }
+
+    .bf-title-input {
+        flex: 1 1 200px;
+    }
+}
+
+.bf-block-note {
+    margin: 0;
+    color: var(--bf-muted);
+    font-size: 0.8rem;
+}
+
+.bf-block-textarea {
+    line-height: 1.7;
+    resize: vertical;
+}
+
+.bf-block-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+// The EPUB preview: the page as a reader shows it, on paper whatever the site's theme.
+
+.bf-preview-tabs button {
+    min-width: 56px;
+}
+
+.bf-preview-epub {
+    overflow: hidden;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--bf-line);
+
+    // A page the shape of a book page, like the PDF page beside it.
+    iframe {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1 / 1.414;
+        border: 0;
+        background: #fff;
+    }
+}
+
+.bf-preview-turn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 10px;
+}
+
+// Phones: one action per line, and no wrapping clusters of small buttons.
+@media (max-width: 575.98px) {
+    // Download first, as the main action, then Convert another; each full width.
+    .bf-editor-actions {
+        flex-direction: column;
+        width: 100%;
+
+        .btn {
+            width: 100%;
+        }
+
+        .bf-download {
+            order: -1;
+        }
+    }
+
+    // Include all / Leave out all / Select: one full-width control in three equal parts.
+    .bf-bulk-segmented {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--bf-line-strong);
+        border-radius: 12px;
+        background: var(--bf-surface);
+
+        // Long labels (Georgian especially) wrap onto two centred lines instead of
+        // spilling out; every part keeps the same height.
+        .btn {
+            --bs-btn-border-radius: 0;
+            --bs-btn-border-width: 0;
+            --bs-btn-padding-x: 0.35rem;
+            --bs-btn-padding-y: 0.45rem;
+            --bs-btn-font-size: 0.85rem;
+            --bs-btn-line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .btn + .btn {
+            border-left: 1px solid var(--bf-line-strong);
+        }
+    }
+
+    // Select mode: a bar fixed to the bottom of the screen, like a phone app's.
+    .bf-bulk.picking {
+        position: fixed;
+        top: auto;
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        z-index: 1020;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin: 0;
+        padding: 12px;
+        box-shadow: 0 12px 32px rgba(13, 14, 20, 0.22);
+    }
+
+    // The count, then Select all and Done; they move under the count if they don't fit.
+    .bf-bulk-top {
+        justify-content: space-between;
+        row-gap: 2px;
+    }
+
+    .bf-bulk-links {
+        flex-wrap: nowrap;
+        gap: 2px;
+        margin-left: auto;
+
+        .btn {
+            --bs-btn-border-width: 0;
+            --bs-btn-padding-x: 0.45rem;
+            --bs-btn-font-size: 0.85rem;
+            white-space: nowrap;
+        }
+    }
+
+    .bf-bulk-main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+
+        .btn {
+            --bs-btn-padding-x: 0.4rem;
+            --bs-btn-padding-y: 0.6rem;
+            --bs-btn-font-size: 0.95rem;
+            white-space: normal;
+        }
+    }
+
+    // Touch screens have no Shift key.
+    .bf-bulk-hint {
+        display: none;
+    }
+
+    // Room at the end, so the bar never hides the last paragraphs.
+    .bf-blocks.picking {
+        padding-bottom: 140px;
+    }
+}

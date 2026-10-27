@@ -73,3 +73,74 @@ export async function getConversion(id) {
     if (!response.ok) throw await readError(response);
     return response.json();
 }
+
+// The editor
+
+export async function getBook(id) {
+    const response = await fetch(`/api/convert/${id}/book`);
+    if (!response.ok) throw await readError(response);
+    return response.json();
+}
+
+// Saves the edited book; answers with its problems (what keeps it from being written).
+export async function saveBook(id, book) {
+    const response = await fetch(`/api/convert/${id}/book`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': await csrfToken() },
+        body: JSON.stringify(book),
+    });
+    if (!response.ok) throw await readError(response);
+    return response.json();
+}
+
+export function pageUrl(id, number, width = 700) {
+    return `/api/convert/${id}/pages/${number}.png?width=${width}`;
+}
+
+// The book as an EPUB file, and the name to save it under.
+export async function getEpub(id) {
+    const response = await fetch(`/api/convert/${id}/epub`);
+    if (!response.ok) throw await readError(response);
+    const disposition = response.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename\*=UTF-8''([^;]+)/);
+    return { blob: await response.blob(), filename: match ? decodeURIComponent(match[1]) : 'book.epub' };
+}
+
+// Replaces the cover with an image file; answers with the new cover's address.
+export async function uploadCover(id, file) {
+    const form = new FormData();
+    form.append('cover', file);
+    const response = await fetch(`/api/convert/${id}/cover`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': await csrfToken() },
+        body: form,
+    });
+    if (!response.ok) throw await readError(response);
+    return response.json();
+}
+
+export async function removeCover(id) {
+    const response = await fetch(`/api/convert/${id}/cover`, {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': await csrfToken() },
+    });
+    if (!response.ok) throw await readError(response);
+    return response.json();
+}
+
+// The address of the EPUB page block `blockId` is written on, for the preview.
+export async function getPreviewUrl(id, blockId) {
+    const response = await fetch(`/api/convert/${id}/preview?block=${encodeURIComponent(blockId)}`);
+    if (!response.ok) throw await readError(response);
+    return (await response.json()).url;
+}
+
+// The EPUB page at `url`, ready to show in a frame: a <base> makes its stylesheet,
+// fonts and images load from the same place in the EPUB.
+export async function getPreviewPage(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw await readError(response);
+    const page = await response.text();
+    const base = `<base href="${url.slice(0, url.lastIndexOf('/') + 1)}">`;
+    return page.replace(/<head(\s[^>]*)?>/i, (head) => `${head}${base}`);
+}
