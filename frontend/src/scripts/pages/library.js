@@ -34,7 +34,7 @@ function Library() {
         .sort(SORTS[sort]);
 
     return (
-        <section className="container bf-section bf-fill bf-library">
+        <section className="container bf-section bf-library">
             <header className="bf-library-header">
                 <div className="bf-center-stacked">
                     <h1 className="bf-display bf-page-title bf-optical-top mb-2">{ t.library.title }</h1>
