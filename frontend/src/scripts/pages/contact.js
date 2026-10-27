@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { errorCode, sendMessage } from '../helpers/api';
-import { REPORT_URL } from '../helpers/links';
+import { CODE_URL, ENGINE_URL, REPORT_URL } from '../helpers/links';
 import { useSettings } from '../helpers/settings';
 import { FieldLabel, Sent } from '../includes/forms';
 import SideList from '../includes/side-list';
@@ -38,6 +38,12 @@ function Contact() {
     const elsewhere = [
         { mark: '!', name: t.contact.report, text: <>{ t.contact.reportText } <a href={ REPORT_URL }>{ t.contact.reportLink }</a></> },
         { mark: '+', name: t.nav.suggest, text: <>{ t.contact.suggestText } <Link to="/suggest">{ t.contact.suggestLink }</Link></> },
+        { mark: '¶', name: t.nav.library, text: <>{ t.contact.libraryText } <Link to="/library">{ t.contact.libraryLink }</Link></> },
+        {
+            mark: '#',
+            name: t.contact.code,
+            text: <>{ t.contact.codeText } <a href={ CODE_URL }>Bookflow</a> · <a href={ ENGINE_URL }>PDF2EPUB</a></>,
+        },
     ];
 
     return (
@@ -54,7 +60,7 @@ function Contact() {
                             <button type="button" className="btn btn-cobalt px-4" onClick={ () => { setFields(EMPTY); setSent(false); } }>{ t.contact.another }</button>
                         </Sent>
                     ) : (
-                        <form className="bf-panel p-4 p-lg-5" onSubmit={ send } noValidate>
+                        <form className="bf-panel h-100 p-4 p-lg-5" onSubmit={ send } noValidate>
                             <div className="row g-3 align-items-end">
                                 <div className="col-md-6">
                                     <FieldLabel htmlFor="bf-c-name" optional={ t.suggest.optional }>{ t.contact.name }</FieldLabel>

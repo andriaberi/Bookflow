@@ -294,6 +294,10 @@ const en = {
         reportLink: 'Open an issue on GitHub',
         suggestText: 'Know a book that belongs in the library?',
         suggestLink: 'Suggest it',
+        libraryText: 'Books already converted and checked by hand.',
+        libraryLink: 'Browse the library',
+        code: 'Read the code',
+        codeText: 'Bookflow and its engine are open source on GitHub:',
         errors: {
             no_text: 'Write a message first.',
             too_long: 'That’s too long. Messages can be up to 5000 characters.',

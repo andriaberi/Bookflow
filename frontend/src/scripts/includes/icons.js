@@ -27,10 +27,6 @@ export const ArrowRight = (props) => (
     <Icon strokeWidth={ 2.2 } { ...props }><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></Icon>
 );
 
-export const Mail = (props) => (
-    <Icon { ...props }><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></Icon>
-);
-
 export const Sun = (props) => (
     <Icon { ...props }>
         <circle cx="12" cy="12" r="4" />

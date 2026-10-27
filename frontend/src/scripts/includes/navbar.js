@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSettings } from '../helpers/settings';
-import { ChevronRight, Close, LogoMark, Mail, Menu, Moon, Sun } from './icons';
+import { ChevronRight, Close, LogoMark, Menu, Moon, Sun } from './icons';
 
 const PAGES = [
     { to: '/convert', key: 'converter' },
     { to: '/library', key: 'library' },
     { to: '/suggest', key: 'suggest' },
+    { to: '/contact', key: 'contact' },
 ];
 
 // Wide enough for the desktop navbar; matches Bootstrap's lg breakpoint.
@@ -82,10 +83,6 @@ function Navbar() {
                     { PAGES.map((page) => (
                         <NavLink key={ page.to } to={ page.to } className="bf-nav-link">{ t.nav[page.key] }</NavLink>
                     )) }
-                    <Link to="/contact" className="btn btn-ghost px-3 d-inline-flex align-items-center gap-2">
-                        <Mail size={ 16 } className="bf-mail" />
-                        { t.nav.contact }
-                    </Link>
                     { languageSwitch }
                     { themeToggle }
                 </div>
@@ -119,11 +116,6 @@ function Navbar() {
                                     </li>
                                 )) }
                             </ul>
-
-                            <Link to="/contact" className="btn btn-cobalt btn-lg w-100 d-flex align-items-center justify-content-center gap-2">
-                                <Mail size={ 18 } />
-                                { t.nav.contact }
-                            </Link>
 
                             <div className="bf-menu-settings">
                                 { languageSwitch }
