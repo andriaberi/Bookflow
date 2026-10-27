@@ -1,3 +1,4 @@
+from bookflow import mail
 from bookflow.responses import error
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -27,5 +28,11 @@ def message_create(request):
         except ValidationError:
             return error("bad_email", "That isn't an email address")
 
-    Message.objects.create(**fields)
+    message = Message.objects.create(**fields)
+    sender = message.name or message.email or "Someone"
+    mail.notify(
+        f"Message from {sender}",
+        f"{message.text}\n\n— {sender} {message.email}\n{mail.admin_url(message)}",
+        reply_to=message.email,
+    )
     return JsonResponse({}, status=201)

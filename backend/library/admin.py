@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from django.utils.html import format_html
 
 from . import models
+from . import emails
 from .forms import BookForm
 
 admin.site.site_header = "Bookflow Admin"
@@ -47,12 +48,21 @@ class SuggestionAdmin(admin.ModelAdmin):
     list_filter     = ("status", "rights")
     list_editable   = ("status",)
     search_fields   = ("title", "author", "note", "email")
-    readonly_fields = ("title", "author", "note", "pdf", "rights", "holder", "email", "created_at")
-    actions         = ("convert",)
+    readonly_fields = ("title", "author", "note", "pdf", "rights", "holder", "email", "lang", "created_at")
+    actions         = ("convert", "tell_added")
 
     @admin.display(boolean=True, description="PDF")
     def has_pdf(self, suggestion):
         return bool(suggestion.pdf)
+
+    @admin.action(description="Tell them it's in the library")
+    def tell_added(self, request, queryset):
+        told = 0
+        for suggestion in queryset.exclude(email=""):
+            emails.tell_added(suggestion)
+            told += 1
+        queryset.update(status="accepted")
+        self.message_user(request, f"Emailed {told}; the rest left no address.", messages.SUCCESS)
 
     @admin.action(description="Read the PDF in the converter")
     def convert(self, request, queryset):

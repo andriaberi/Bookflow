@@ -1,3 +1,4 @@
+from bookflow import mail
 from bookflow.responses import error
 from converter import engine
 from converter.uploads import UploadError, check_pdf
@@ -40,6 +41,7 @@ def book_detail(request, uid):
 # The longest note a suggestion may have, in characters
 MAX_NOTE = 2000
 RIGHTS = {choice for choice, _ in Suggestion.RIGHTS_CHOICES}
+LANGS = {"en", "ka"}
 
 
 @require_POST
@@ -74,5 +76,13 @@ def suggestion_create(request):
     elif not fields["holder"]:
         return error("no_holder", "Say who holds the rights")
 
-    Suggestion.objects.create(pdf=pdf or "", **fields)
+    lang = request.POST.get("lang")
+    suggestion = Suggestion.objects.create(pdf=pdf or "", lang=lang if lang in LANGS else "en", **fields)
+    lines = [
+        f"{suggestion.title}" + (f" — {suggestion.author}" if suggestion.author else ""),
+        suggestion.note,
+        f"PDF: {suggestion.get_rights_display()}" + (f" ({suggestion.holder})" if suggestion.holder else "") if suggestion.pdf else "No PDF",
+        mail.admin_url(suggestion),
+    ]
+    mail.notify(f"Book suggested: {suggestion.title}", "\n\n".join(line for line in lines if line), reply_to=suggestion.email)
     return JsonResponse({}, status=201)

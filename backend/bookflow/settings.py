@@ -100,9 +100,31 @@ MAX_PDF_SIZE_MB = int(os.getenv("MAX_PDF_SIZE_MB", "100"))
 # Read uploaded books in a background thread; tests turn this off to read right away.
 CONVERTER_BACKGROUND = True
 
+# Email, sent through Gmail (or any SMTP server) with the account's app password.
+# Without a password, emails are printed to the console instead of sent.
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_TIMEOUT = 15
+if not EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = f"Bookflow <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else "Bookflow <bookflow@localhost>"
+# Who hears about new suggestions and messages
+NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL", EMAIL_HOST_USER)
+# The site's address, for links in emails
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000").rstrip("/")
+# Send emails in a background thread, so a form never waits on the mail server; tests
+# turn this off.
+MAIL_BACKGROUND = True
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "loggers": {"converter": {"handlers": ["console"], "level": "INFO"}},
+    "loggers": {
+        "converter": {"handlers": ["console"], "level": "INFO"},
+        "bookflow": {"handlers": ["console"], "level": "INFO"},
+    },
 }

@@ -62,6 +62,8 @@ class Suggestion(models.Model):
     # Asked only of those with permission
     holder     = models.CharField(max_length=200, blank=True, help_text="Who holds the rights")
     email      = models.EmailField(blank=True, help_text="To tell them when the book is added")
+    # The site's language when they suggested it, for that email
+    lang       = models.CharField(max_length=5, default="en")
 
     status     = models.CharField(max_length=10, choices=STATUS_CHOICES, default="new")
     created_at = models.DateTimeField(auto_now_add=True)

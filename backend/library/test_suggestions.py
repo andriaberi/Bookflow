@@ -4,6 +4,7 @@ import tempfile
 from converter.models import Conversion
 from converter.tests import make_pdf
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 
@@ -16,7 +17,7 @@ def pdf_upload(data=None):
     return SimpleUploadedFile("book.pdf", make_pdf() if data is None else data, "application/pdf")
 
 
-@override_settings(MEDIA_ROOT=MEDIA, CONVERTER_BACKGROUND=False)
+@override_settings(MEDIA_ROOT=MEDIA, CONVERTER_BACKGROUND=False, MAIL_BACKGROUND=False, NOTIFY_EMAIL="owner@example.com", SITE_URL="https://bookflow.test")
 class SuggestionTests(TestCase):
     @classmethod
     def tearDownClass(cls):
@@ -58,6 +59,34 @@ class SuggestionTests(TestCase):
     def test_only_permission_keeps_a_holder(self):
         self.suggest(title="Old Book", pdf=pdf_upload(), rights="public_domain", holder="Someone")
         self.assertEqual(Suggestion.objects.get().holder, "")
+
+    def test_the_owner_hears_of_each_suggestion(self):
+        self.suggest(title="My Book", author="Me", pdf=pdf_upload(), rights="permission", holder="The translator", email="r@example.com")
+
+        [email] = mail.outbox
+        self.assertEqual((email.to, email.reply_to), (["owner@example.com"], ["r@example.com"]))
+        self.assertIn("My Book", email.subject)
+        self.assertIn("Has the rights or permission (The translator)", email.body)
+        self.assertIn(f"/admin/library/suggestion/{Suggestion.objects.get().pk}/change/", email.body)
+
+    def test_the_suggester_is_told_in_their_language(self):
+        self.suggest(title="ომი და მშვიდობა", email="r@example.com", lang="ka")
+        self.suggest(title="No Address")
+        self.client.force_login(User.objects.create_superuser("admin", "admin@example.com", "pw"))
+        mail.outbox.clear()
+
+        ids = list(Suggestion.objects.values_list("pk", flat=True))
+        self.client.post("/admin/library/suggestion/", {"action": "tell_added", "_selected_action": ids})
+
+        [email] = mail.outbox
+        self.assertEqual(email.to, ["r@example.com"])
+        self.assertIn("ბიბლიოთეკაშია", email.subject)
+        self.assertIn("https://bookflow.test/library", email.body)
+        self.assertEqual(set(Suggestion.objects.values_list("status", flat=True)), {"accepted"})
+
+    def test_an_unknown_language_is_english(self):
+        self.suggest(title="A", lang="fr")
+        self.assertEqual(Suggestion.objects.get().lang, "en")
 
     def test_bad_suggestions_are_refused(self):
         self.assertEqual(self.suggest(title="  ").json()["error"], "no_title")
