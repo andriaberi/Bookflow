@@ -1,0 +1,13 @@
+# Django under gunicorn: /etc/systemd/system/gunicorn.service
+[Unit]
+Description=Bookflow (gunicorn)
+After=network.target
+
+[Service]
+User=bookflow
+WorkingDirectory=/srv/bookflow/backend
+ExecStart=/srv/bookflow/.venv/bin/gunicorn bookflow.wsgi:application --bind 127.0.0.1:8000 --workers 3 --timeout 120
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

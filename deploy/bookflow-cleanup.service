@@ -1,0 +1,9 @@
+# Deletes conversions whose page was closed: /etc/systemd/system/bookflow-cleanup.service
+[Unit]
+Description=Bookflow: delete left conversions
+
+[Service]
+Type=oneshot
+User=bookflow
+WorkingDirectory=/srv/bookflow
+ExecStart=/usr/bin/make cleanup PYTHON=/srv/bookflow/.venv/bin/python

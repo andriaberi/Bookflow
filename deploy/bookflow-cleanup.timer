@@ -1,0 +1,10 @@
+# Runs the cleanup every 10 minutes: /etc/systemd/system/bookflow-cleanup.timer
+[Unit]
+Description=Bookflow: delete left conversions every 10 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target
