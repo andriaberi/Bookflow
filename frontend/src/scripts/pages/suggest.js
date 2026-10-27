@@ -14,7 +14,7 @@ const RIGHTS = ['public_domain', 'permission', 'unsure'];
 const MAX_NOTE = 2000;
 
 function Suggest() {
-    const { t } = useSettings();
+    const { t, lang } = useSettings();
     const [fields, setFields] = useState(EMPTY);
     const [pdf, setPdf] = useState(null);
     const [progress, setProgress] = useState(null);
@@ -42,7 +42,7 @@ function Suggest() {
         setError('');
         setProgress(0);
         try {
-            await suggestBook({ ...fields, rights: pdf ? fields.rights : '', holder: permission ? fields.holder : '', pdf }, setProgress);
+            await suggestBook({ ...fields, rights: pdf ? fields.rights : '', holder: permission ? fields.holder : '', pdf, lang }, setProgress);
             setSent(true);
         } catch (e) {
             setError(errorCode(e, t.suggest.errors));

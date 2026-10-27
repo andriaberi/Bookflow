@@ -61,7 +61,7 @@ test('a book can be suggested by name', async () => {
     type('Email', 'reader@example.com');
     await act(async () => fireEvent.click(send));
 
-    expect(sent).toEqual({ url: '/api/library/suggestions', fields: { title: 'Animal Farm', author: 'George Orwell', email: 'reader@example.com' } });
+    expect(sent).toEqual({ url: '/api/library/suggestions', fields: { title: 'Animal Farm', author: 'George Orwell', email: 'reader@example.com', lang: 'en' } });
     expect(screen.getByRole('status')).toHaveTextContent('Thank you. We have it.');
 
     fireEvent.click(screen.getByRole('button', { name: 'Suggest another' }));
