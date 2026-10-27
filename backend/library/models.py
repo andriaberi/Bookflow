@@ -35,3 +35,37 @@ class Book(models.Model):
         if self.epub:
             self.epub.delete(save=False)
         self.epub = ContentFile(epub, name=f"{slugify(self.title, allow_unicode=True) or 'book'}.epub")
+
+
+def suggestion_path(suggestion, filename):
+    return f"suggestions/{uuid.uuid4()}.pdf"
+
+
+class Suggestion(models.Model):
+    RIGHTS_CHOICES = [
+        ("public_domain", "Public domain"),
+        ("permission",    "Has the rights or permission"),
+        ("unsure",        "Not sure"),
+    ]
+    STATUS_CHOICES = [
+        ("new",      "New"),
+        ("accepted", "Accepted"),
+        ("declined", "Declined"),
+    ]
+
+    title      = models.CharField(max_length=300)
+    author     = models.CharField(max_length=200, blank=True)
+    note       = models.TextField(blank=True)
+    pdf        = models.FileField(upload_to=suggestion_path, blank=True)
+    # Asked only when a PDF is sent
+    rights     = models.CharField(max_length=20, choices=RIGHTS_CHOICES, blank=True)
+    email      = models.EmailField(blank=True, help_text="To tell them when the book is added")
+
+    status     = models.CharField(max_length=10, choices=STATUS_CHOICES, default="new")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.title} — {self.author}" if self.author else self.title
