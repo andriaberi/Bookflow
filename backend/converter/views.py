@@ -29,14 +29,11 @@ def _error(code: str, detail: str, status: int = 400) -> JsonResponse:
 
 def _summary(book: dict) -> dict:
     """What the reading page shows once the book is found."""
-    blocks = [block for block in book["blocks"] if block["include"]]
     return {
-        "title":      book["metadata"]["title"],
-        "author":     book["metadata"]["author"],
-        "language":   book["metadata"]["language"],
-        "headings":   sum(1 for block in blocks if block["type"] == "heading"),
-        "paragraphs": sum(1 for block in blocks if block["type"] == "text"),
-        "notes":      len(book["notes"]) if book["include_notes"] else 0,
+        "title":    book["metadata"]["title"],
+        "author":   book["metadata"]["author"],
+        "language": book["metadata"]["language"],
+        **engine.counts(book),
     }
 
 

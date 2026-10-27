@@ -74,13 +74,36 @@ def read(pk) -> None:
             connection.close()
 
 
-def book_of(conversion: Conversion) -> Book:
-    """The conversion's book, as last saved, with its cover image put back."""
-    book = Book.from_dict(conversion.book)
-    if conversion.cover:
-        with conversion.cover.open("rb") as f:
+def load_book(data: dict, cover=None) -> Book:
+    """The book in `data`, with the image in the file field `cover` as its cover;
+    ConvertError if the data isn't a book."""
+    book = Book.from_dict(data)
+    if cover:
+        with cover.open("rb") as f:
             book.cover = load_cover(f.read())
     return book
+
+
+def take_cover(data: dict) -> tuple[dict, bytes | None]:
+    """The book data without its cover image, kept as a file instead, and that image as
+    JPEG if it has one; ConvertError if the data isn't a book."""
+    book = Book.from_dict(data)
+    return {**data, "cover": None}, book.cover.data if book.cover else None
+
+
+def counts(data: dict) -> dict:
+    """How many headings, paragraphs and notes of the book data go into the EPUB."""
+    blocks = [block for block in data["blocks"] if block["include"]]
+    return {
+        "headings":   sum(1 for block in blocks if block["type"] == "heading"),
+        "paragraphs": sum(1 for block in blocks if block["type"] == "text"),
+        "notes":      len(data["notes"]) if data["include_notes"] else 0,
+    }
+
+
+def book_of(conversion: Conversion) -> Book:
+    """The conversion's book, as last saved, with its cover image put back."""
+    return load_book(conversion.book, conversion.cover)
 
 
 def save_book(conversion: Conversion, data: dict) -> list[str]:
@@ -94,11 +117,15 @@ def save_book(conversion: Conversion, data: dict) -> list[str]:
     return book.problems()
 
 
-def epub_of(conversion: Conversion) -> bytes:
+def epub_bytes(book: Book) -> bytes:
     """The book written as an EPUB; ConvertError if it has problems to fix first."""
     buffer = io.BytesIO()
-    write_book(book_of(conversion), buffer)
+    write_book(book, buffer)
     return buffer.getvalue()
+
+
+def epub_of(conversion: Conversion) -> bytes:
+    return epub_bytes(book_of(conversion))
 
 
 def page_image(conversion: Conversion, number: int, width: int) -> bytes:
