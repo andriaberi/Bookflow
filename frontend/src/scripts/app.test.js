@@ -27,6 +27,21 @@ test('home page shows the hero and links to the converter', async () => {
     expect(screen.getByRole('link', { name: /Convert a PDF/ })).toHaveAttribute('href', '/convert');
 });
 
+// The server, counting `converted` books.
+const converting = (converted) => jest.fn((url) => Promise.resolve({ ok: true, json: () => Promise.resolve(url === '/api/info' ? { converted } : []) }));
+
+test('the home page says how many books have been converted, once there are any', async () => {
+    global.fetch = converting(1234);
+    await renderAt('/');
+    expect(screen.getByText('1,234').closest('p')).toHaveTextContent('1,234 books converted so far');
+});
+
+test('nothing is said about converted books before the first', async () => {
+    global.fetch = converting(0);
+    await renderAt('/');
+    expect(screen.queryByText(/converted so far/)).toBeNull();
+});
+
 test('the language switch translates the page and is remembered', async () => {
     await renderAt('/');
     fireEvent.click(screen.getByRole('button', { name: 'ქა' }));

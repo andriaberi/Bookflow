@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getBooks } from '../helpers/api';
+import { getBooks, getInfo } from '../helpers/api';
 import { ENGINE_URL } from '../helpers/links';
 import { useSettings } from '../helpers/settings';
 import { ArrowRight, BookIcon, Plus } from '../includes/icons';
@@ -9,12 +9,14 @@ import { usePageTitle } from '../includes/page';
 const SHELF_SIZE = 4;
 
 function Home() {
-    const { t } = useSettings();
+    const { t, lang } = useSettings();
     usePageTitle();
     const [books, setBooks] = useState([]);
+    const [converted, setConverted] = useState(0);
 
     useEffect(() => {
         getBooks().then(setBooks).catch(() => {});
+        getInfo().then((info) => setConverted(info.converted || 0)).catch(() => {});
     }, []);
 
     const shelf = books.filter((book) => book.cover_url).slice(0, SHELF_SIZE);
@@ -37,6 +39,13 @@ function Home() {
                                 </Link>
                                 <Link to="/library" className="btn btn-ghost btn-lg px-4 py-3">{ t.home.browse }</Link>
                             </div>
+                            {/* Shown once there's something to count. */}
+                            { converted > 0 && (
+                                <p className="bf-hero-count bf-muted mt-4 mb-0">
+                                    <strong>{ converted.toLocaleString(lang === 'ka' ? 'ka-GE' : 'en-US') }</strong>
+                                    { converted === 1 ? t.home.convertedOne : t.home.converted }
+                                </p>
+                            ) }
                         </div>
                         <div className="col-lg-6">
                             <HeroArt t={ t } />

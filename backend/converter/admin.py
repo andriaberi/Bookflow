@@ -54,3 +54,8 @@ class ConversionAdmin(admin.ModelAdmin):
             book.set_epub(epub)
             book.save()
             self.message_user(request, f"{book.title} is in the library, unpublished.", messages.SUCCESS)
+
+
+@admin.register(models.Total)
+class TotalAdmin(admin.ModelAdmin):
+    list_display = ("name", "count")

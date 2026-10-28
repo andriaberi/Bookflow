@@ -8,9 +8,10 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from pdf2epub import ConvertError
 
 from . import cleanup
-from .models import Conversion
+from .models import Conversion, Total
 
 MEDIA = tempfile.mkdtemp(prefix="bookflow-test-media-")
 
@@ -67,6 +68,20 @@ class ConversionTests(TestCase):
         conversion = Conversion.objects.get(pk=data["id"])
         self.assertEqual(conversion.book["version"], 1)
         self.assertIsNone(conversion.book["cover"])
+
+    def test_each_book_read_is_counted_and_the_count_outlives_it(self):
+        self.client.post("/api/convert/", {"pdf": upload()})
+        self.client.post("/api/convert/", {"pdf": upload()})
+        Conversion.objects.all().delete()
+
+        self.assertEqual(self.client.get("/api/info").json()["converted"], 2)
+
+    def test_a_book_that_cant_be_read_isnt_counted(self):
+        with mock.patch("converter.engine.read_book", side_effect=ConvertError("no text in this PDF")):
+            data = self.client.post("/api/convert/", {"pdf": upload()}).json()
+
+        self.assertEqual(data["status"], "failed")
+        self.assertEqual(Total.of(Total.CONVERTED), 0)
 
     def test_detail_returns_the_conversion(self):
         created = self.client.post("/api/convert/", {"pdf": upload()}).json()

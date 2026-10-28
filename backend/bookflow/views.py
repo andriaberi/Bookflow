@@ -1,4 +1,5 @@
 import pdf2epub
+from converter.models import Total
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -29,7 +30,12 @@ def csrf(request):
 
 
 # What the footer shows: the version of the engine actually installed, and the commit of
-# the site's own code, so its source can be found as it runs.
+# the site's own code, so its source can be found as it runs; and for the home page, how
+# many books have been converted.
 @require_GET
 def info(request):
-    return JsonResponse({"engine": pdf2epub.__version__, "commit": settings.SOURCE_COMMIT})
+    return JsonResponse({
+        "engine": pdf2epub.__version__,
+        "commit": settings.SOURCE_COMMIT,
+        "converted": Total.of(Total.CONVERTED),
+    })

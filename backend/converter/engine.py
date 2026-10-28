@@ -16,7 +16,7 @@ from pdf2epub.book import GIVEN_COVER, NO_COVER
 from pdf2epub.cover import load_cover
 from pdf2epub.epub.writer import split_long
 
-from .models import Conversion
+from .models import Conversion, Total
 
 log = logging.getLogger(__name__)
 
@@ -65,6 +65,8 @@ def read(pk) -> None:
             conversion.status = "ready"
             conversion.step = len(READING_STEPS) - 1
         conversion.save()
+        if conversion.status == "ready":
+            Total.add(Total.CONVERTED)
     except Exception:
         log.exception("reading conversion %s failed", pk)
         Conversion.objects.filter(pk=pk).update(status="failed", error="Something went wrong while reading the book.")

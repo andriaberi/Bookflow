@@ -29,6 +29,9 @@ const en = {
         heroText: 'Bookflow turns a PDF into a reflowable EPUB, with real chapters, clean paragraphs and linked notes. If it misreads something, you fix it before you download.',
         convert: 'Convert a PDF',
         browse: 'Browse the library',
+        // After the number, in bold
+        converted: ' books converted so far',
+        convertedOne: ' book converted so far',
         fixedLayout: 'fixed layout',
         howEyebrow: 'How it works',
         howTitle: 'Three steps, and nothing to install.',

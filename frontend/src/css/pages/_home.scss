@@ -441,3 +441,11 @@
         border-radius: 1.5rem;
     }
 }
+
+// How many books have been converted, under the hero's buttons
+.bf-hero-count {
+    strong {
+        color: var(--bf-text);
+        font-variant-numeric: tabular-nums;
+    }
+}

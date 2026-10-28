@@ -8,7 +8,7 @@ class InfoTests(TestCase):
             response = self.client.get("/api/info")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"engine": pdf2epub.__version__, "commit": "0123abc"})
+        self.assertEqual(response.json(), {"engine": pdf2epub.__version__, "commit": "0123abc", "converted": 0})
 
 
 class PageTests(TestCase):
