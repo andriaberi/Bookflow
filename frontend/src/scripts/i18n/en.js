@@ -15,6 +15,7 @@ const en = {
     footer: {
         poweredBy: 'Powered by',
         copyright: '© {year} Andria Beridze',
+        source: 'Source code',
     },
     home: {
         badge: 'Georgian and English books',

@@ -1,4 +1,5 @@
 import pdf2epub
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
@@ -27,7 +28,8 @@ def csrf(request):
     return JsonResponse({})
 
 
-# What the footer shows: the version of the engine actually installed.
+# What the footer shows: the version of the engine actually installed, and the commit of
+# the site's own code, so its source can be found as it runs.
 @require_GET
 def info(request):
-    return JsonResponse({"engine": pdf2epub.__version__})
+    return JsonResponse({"engine": pdf2epub.__version__, "commit": settings.SOURCE_COMMIT})

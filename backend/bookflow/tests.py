@@ -3,11 +3,12 @@ from django.test import TestCase
 
 
 class InfoTests(TestCase):
-    def test_info_gives_the_installed_engine_version(self):
-        response = self.client.get("/api/info")
+    def test_info_gives_the_installed_engine_version_and_the_running_commit(self):
+        with self.settings(SOURCE_COMMIT="0123abc"):
+            response = self.client.get("/api/info")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"engine": pdf2epub.__version__})
+        self.assertEqual(response.json(), {"engine": pdf2epub.__version__, "commit": "0123abc"})
 
 
 class PageTests(TestCase):

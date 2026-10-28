@@ -40,6 +40,7 @@ make dev           # Django on :8000 and React on :3000; open http://localhost:3
 | `PDF2EPUB_SOURCE` | Where `make install-engine` installs the engine from: a release tag, or a local folder while developing it |
 | `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | The Gmail account that sends email, and an [app password](https://myaccount.google.com/apppasswords) for it. Without a password, emails are printed to the console |
 | `NOTIFY_EMAIL` | Who hears about new suggestions and messages (the account above if left out) |
+| `SOURCE_COMMIT` | The commit the footer's "Source code" link points to. Read from the checkout when the server starts if left out; set it where there is no `.git` |
 
 ## Deploying
 
@@ -78,6 +79,21 @@ Everything is in the admin, at `/admin/`:
 - **Contact → Messages**: what people wrote. The email you get for each one replies to
   the sender.
 
+## Contributing
+
+Contributions are welcome under the [Developer Certificate of Origin](https://developercertificate.org/):
+sign off each commit (`git commit -s`) to certify you wrote it, or otherwise have the right
+to submit it under this project's license. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
-MIT, © 2026 Andria Beridze.
+[GNU AGPL-3.0](LICENSE) or later, © 2026 Andria Beridze, with one added term (see
+[NOTICE](NOTICE)): anything built on Bookflow, including a website, must show its users
+this credit:
+
+> Based on Bookflow by Andria Beridze (https://github.com/andriaberi/Bookflow)
+
+Under the AGPL, anyone who runs Bookflow, or a changed copy of it, as a site for others
+must offer those visitors its source under the same license. The footer does this here:
+its "Source code" link goes to the exact commit the server runs. PDF2EPUB, the engine, is
+AGPL too, with its own credit, which the footer also shows.

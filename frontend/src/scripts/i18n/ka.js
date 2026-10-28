@@ -15,6 +15,7 @@ const ka = {
     footer: {
         poweredBy: 'ძრავა:',
         copyright: '© {year} ანდრია ბერიძე',
+        source: 'წყაროს კოდი',
     },
     home: {
         badge: 'ქართული და ინგლისური წიგნები',

@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -105,6 +106,21 @@ WHITENOISE_ROOT = BUILD_DIR if BUILD_DIR.exists() else None
 # Uploaded PDFs, converted EPUBs and library covers
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# The commit the server runs, for the footer's link to its source: read from the checkout
+# when the server starts, which every deploy does again. SOURCE_COMMIT overrides it where
+# there is no checkout.
+def running_commit():
+    if commit := os.getenv("SOURCE_COMMIT"):
+        return commit
+    try:
+        git = ["git", "-C", BASE_DIR.parent, "rev-parse", "HEAD"]
+        return subprocess.run(git, capture_output=True, text=True, check=True, timeout=5).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+SOURCE_COMMIT = running_commit()
 
 # Largest PDF the converter accepts, in megabytes
 MAX_PDF_SIZE_MB = int(os.getenv("MAX_PDF_SIZE_MB", "100"))
