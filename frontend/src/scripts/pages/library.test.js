@@ -35,7 +35,7 @@ function api(url) {
     return found ? json(found) : json({}, 404);
 }
 
-const gridTitles = () => within(screen.getAllByRole('list').at(-1)).getAllByRole('link').map((link) => link.querySelector('.bf-book-card-title').textContent);
+const gridTitles = () => within(within(screen.getByRole('main')).getAllByRole('list').at(-1)).getAllByRole('link').map((link) => link.querySelector('.bf-book-card-title').textContent);
 
 beforeEach(() => localStorage.clear());
 

@@ -9,6 +9,7 @@ import Contact from './pages/contact';
 import Editor from './pages/editor';
 import Library from './pages/library';
 import LibraryBook from './pages/library-book';
+import Legal from './pages/legal';
 import NotFound from './pages/not-found';
 
 function App() {
@@ -34,6 +35,9 @@ function App() {
                         {/* The old page for suggesting a book is part of the contact page now. */}
                         <Route path="/suggest" element={ <Navigate to="/contact?kind=book" replace /> } />
                         <Route path="/contact" element={ <Contact /> } />
+                        <Route path="/terms" element={ <Legal page="terms" /> } />
+                        <Route path="/privacy" element={ <Legal page="privacy" /> } />
+                        <Route path="/copyright" element={ <Legal page="copyright" /> } />
                         <Route path="*" element={ <NotFound /> } />
                     </Routes>
                 </div>

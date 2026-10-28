@@ -1,7 +1,9 @@
 # Contributing to Bookflow
 
-Thank you for helping. Bookflow is under the GNU AGPL, version 3 or later (see LICENSE and
-NOTICE), and so is every contribution to it.
+Thank you for helping. Bookflow is under the GNU AGPL, version 3 or later (see
+[LICENSE](../LICENSE) and [NOTICE](../NOTICE)), and so is every contribution to it.
+Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md); security
+problems go privately, as [SECURITY.md](SECURITY.md) says, not in an issue.
 
 ## Sign off your commits
 

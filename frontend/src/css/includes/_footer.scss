@@ -3,15 +3,112 @@
     border-top: 1px solid var(--bf-line);
     color: var(--bf-muted);
 
-    .bf-display {
-        color: var(--bf-text);
+    a {
+        color: var(--bf-muted);
+        text-decoration: none;
+        transition: color var(--bf-fast) var(--bf-ease);
+
+        &:hover {
+            color: var(--bf-text);
+        }
     }
 
-    a {
+    .bf-brand,
+    .bf-brand:hover {
         color: var(--bf-text);
     }
 }
 
-.bf-version {
+.bf-footer-inner {
+    padding-top: 56px;
+    padding-bottom: 28px;
+
+    @media (max-width: 767.98px) {
+        padding-top: 40px;
+        padding-bottom: 24px;
+    }
+}
+
+// Below md everything is centered: the brand, then Site and Legal side by side, then
+// Open source in a row of its own (includes/footer.js).
+.bf-footer-top {
+    @media (max-width: 767.98px) {
+        text-align: center;
+    }
+}
+
+.bf-footer-about {
+    max-width: 340px;
+    line-height: 1.6;
+
+    @media (max-width: 991.98px) {
+        max-width: 460px;
+    }
+
+    @media (max-width: 767.98px) {
+        margin-right: auto;
+        margin-left: auto;
+    }
+}
+
+.bf-footer-heading {
+    color: var(--bf-text);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    // As .bf-eyebrow: Georgian isn't written in Mtavruli capitals.
+    &:lang(ka) {
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
+        text-transform: none;
+    }
+}
+
+.bf-footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    // A link and its pill never part.
+    li {
+        white-space: nowrap;
+    }
+}
+
+// The commit, the engine's version, the license
+.bf-footer-pill {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--bf-chip);
+    color: var(--bf-chip-text);
+    font-size: 0.75rem;
     font-variant-numeric: tabular-nums;
+    vertical-align: 1px;
+}
+
+// The copyright and the engine's credit: a line each side from md up, stacked and
+// centered below.
+.bf-footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 24px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--bf-line);
+
+    a {
+        color: var(--bf-text);
+    }
+
+    @media (max-width: 767.98px) {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 32px;
+        text-align: center;
+    }
 }

@@ -87,7 +87,7 @@ test('the editor shows the book: details, contents and the first section', async
 
     expect(screen.getByLabelText('Title')).toHaveValue('Pride and Prejudice');
     expect(screen.getByLabelText('Author')).toHaveValue('Jane Austen');
-    const contents = screen.getByRole('list', { name: '' }).closest('section');
+    const contents = within(screen.getByRole('main')).getByRole('list', { name: '' }).closest('section');
     expect(within(contents).getByText('Before the first chapter')).toBeInTheDocument();
     expect(within(contents).getByText('Chapter II')).toBeInTheDocument();
     expect(screen.getByText('PRIDE AND PREJUDICE')).toBeInTheDocument();
