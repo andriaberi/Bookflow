@@ -49,7 +49,7 @@ function Library() {
             { books?.length === 0 && (
                 <div className="bf-panel p-4 p-lg-5 text-center">
                     <p className="fs-5 mb-4">{ t.library.empty }</p>
-                    <Link to="/suggest" className="btn btn-cobalt px-4">{ t.nav.suggest }</Link>
+                    <Link to="/contact?kind=book" className="btn btn-cobalt px-4">{ t.contact.kinds.book }</Link>
                 </div>
             ) }
 

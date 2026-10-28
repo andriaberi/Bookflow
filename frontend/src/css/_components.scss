@@ -201,6 +201,12 @@
     gap: 12px 20px;
 }
 
+// Wrapped onto two lines (SendRow in includes/forms.js)
+.bf-send-row-wrapped {
+    justify-content: center;
+    text-align: center;
+}
+
 // A form once it's sent (includes/forms.js)
 .bf-sent {
     display: flex;

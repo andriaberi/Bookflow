@@ -103,7 +103,7 @@ function Home() {
                             <span className="bf-icon-tile mb-4"><Plus size={ 24 } /></span>
                             <h2 className="bf-display bf-card-title mb-3">{ t.home.suggestTitle }</h2>
                             <p className="mb-4">{ t.home.suggestText }</p>
-                            <div className="mt-auto"><Link to="/suggest" className="btn btn-cobalt px-4 py-2">{ t.nav.suggest }</Link></div>
+                            <div className="mt-auto"><Link to="/contact?kind=book" className="btn btn-cobalt px-4 py-2">{ t.contact.kinds.book }</Link></div>
                         </div>
                     </div>
                 </div>

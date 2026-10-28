@@ -1,0 +1,9 @@
+# Emails what is waiting in the admin: /etc/systemd/system/bookflow-review.service
+[Unit]
+Description=Bookflow: email what is waiting for review
+
+[Service]
+Type=oneshot
+User=bookflow
+WorkingDirectory=/srv/bookflow
+ExecStart=/usr/bin/make review PYTHON=/srv/bookflow/.venv/bin/python

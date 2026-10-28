@@ -9,20 +9,21 @@ from django.core.mail import EmailMessage
 log = logging.getLogger(__name__)
 
 
-def send(subject: str, body: str, to: str, reply_to: str = "") -> None:
-    """Email `to`, in the background unless settings say otherwise (tests)."""
+def send(subject: str, body: str, to: str, reply_to: str = "", wait: bool = False) -> None:
+    """Email `to`, in the background unless settings say otherwise (tests), or `wait`:
+    a command exits right after, and would take a background send with it."""
     if not to:
         return
     message = EmailMessage(subject, body, to=[to], reply_to=[reply_to] if reply_to else None)
-    if settings.MAIL_BACKGROUND:
+    if settings.MAIL_BACKGROUND and not wait:
         threading.Thread(target=_deliver, args=(message,), daemon=True).start()
     else:
         _deliver(message)
 
 
-def notify(subject: str, body: str, reply_to: str = "") -> None:
+def notify(subject: str, body: str, reply_to: str = "", wait: bool = False) -> None:
     """Email the site's owner (NOTIFY_EMAIL)."""
-    send(f"[Bookflow] {subject}", body, settings.NOTIFY_EMAIL, reply_to)
+    send(f"[Bookflow] {subject}", body, settings.NOTIFY_EMAIL, reply_to, wait)
 
 
 def admin_url(obj) -> str:

@@ -10,7 +10,9 @@ light and dark.
   side by side with the PDF page and the EPUB page, and download the EPUB. Uploads and
   edits are deleted as soon as the person leaves.
 - **Library**: ready-made EPUBs to search, sort and download, each with its own page.
-- **Suggest a book** and **Contact**: forms that land in the admin and email the owner.
+- **Contact**: one form, with a dropdown for what it's about: a message, a problem, a book
+  to suggest (with its PDF if there is one) or a copyright concern. Each shows its own
+  fields, lands in the admin and emails the owner.
 
 ## Running it locally
 
@@ -39,7 +41,7 @@ make dev           # Django on :8000 and React on :3000; open http://localhost:3
 | `MAX_PDF_SIZE_MB` | The largest PDF accepted (100) |
 | `PDF2EPUB_SOURCE` | Where `make install-engine` installs the engine from: a release tag, or a local folder while developing it |
 | `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | The Gmail account that sends email, and an [app password](https://myaccount.google.com/apppasswords) for it. Without a password, emails are printed to the console |
-| `NOTIFY_EMAIL` | Who hears about new suggestions and messages (the account above if left out) |
+| `NOTIFY_EMAIL` | Who hears about new suggestions and messages, and gets the daily email of what's waiting for review (the account above if left out) |
 | `SOURCE_COMMIT` | The commit the footer's "Source code" link points to. Read from the checkout when the server starts if left out; set it where there is no `.git` |
 
 ## Deploying
@@ -58,6 +60,9 @@ On a Linux server with nginx, from a checkout at `/srv/bookflow` run by a `bookf
 5. `deploy/bookflow-cleanup.service` and `.timer` to `/etc/systemd/system/`, then
    `systemctl enable --now bookflow-cleanup.timer`, so conversions left open are deleted
    even when nobody visits.
+6. `deploy/bookflow-review.service` and `.timer` the same way, then
+   `systemctl enable --now bookflow-review.timer`: every morning at 9, if anything is
+   waiting in the admin, `NOTIFY_EMAIL` gets one email listing it, with links.
 
 nginx serves `/media/` (uploads, covers, EPUBs) itself and passes the rest to gunicorn,
 with the visitor's address in `X-Real-IP`: Django uses it to limit how often one visitor
@@ -76,8 +81,12 @@ Everything is in the admin, at `/admin/`:
 - **Library → Suggestions**: suggested books, with their PDFs. "Read the PDF in the
   converter" starts on one; "Tell them it's in the library" emails whoever suggested it,
   in their language.
-- **Contact → Messages**: what people wrote. The email you get for each one replies to
-  the sender.
+- **Contact → Messages**: messages, problems and copyright concerns, filtered by kind.
+  The email you get for each one replies to the sender. Tick "Is read" once handled.
+
+Besides the email for each new message or suggestion, `make review` (run daily by the
+timer) emails a list of what is still waiting: unread messages, new suggestions and
+unpublished books.
 
 ## Contributing
 

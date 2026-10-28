@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check } from './icons';
 import { PageHeader } from './page';
 
@@ -41,6 +41,27 @@ export function Trap({ value, onChange }) {
             <input name="website" tabIndex={ -1 } autoComplete="off" value={ value } onChange={ onChange } />
         </div>
     );
+}
+
+// The send button and what's beside it. Once they no longer fit on one line, both are
+// centered; CSS can't tell when a row has wrapped, so this watches for it.
+export function SendRow({ children }) {
+    const ref = useRef(null);
+    const [wrapped, setWrapped] = useState(false);
+
+    useEffect(() => {
+        const row = ref.current;
+        if (typeof ResizeObserver === 'undefined') return;
+        const check = () => {
+            const first = row.firstElementChild;
+            setWrapped(row.lastElementChild.offsetTop >= first.offsetTop + first.offsetHeight);
+        };
+        const observer = new ResizeObserver(check);
+        observer.observe(row);
+        return () => observer.disconnect();
+    }, []);
+
+    return <div ref={ ref } className={ `bf-send-row mt-4${wrapped ? ' bf-send-row-wrapped' : ''}` }>{ children }</div>;
 }
 
 // What a form becomes once it's sent: a thank-you, then what to do next.

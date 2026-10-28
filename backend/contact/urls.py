@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import message_create
+from .views import contact_create
 
 urlpatterns = [
-    path("", message_create, name="message-create"),
+    path("", contact_create, name="contact-create"),
 ]

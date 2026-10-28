@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Navigate, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './includes/navbar';
 import Footer from './includes/footer';
 import Home from './pages/home';
@@ -9,7 +9,6 @@ import Contact from './pages/contact';
 import Editor from './pages/editor';
 import Library from './pages/library';
 import LibraryBook from './pages/library-book';
-import Suggest from './pages/suggest';
 import NotFound from './pages/not-found';
 
 function App() {
@@ -32,7 +31,8 @@ function App() {
                         <Route path="/convert/:id/edit" element={ <Editor /> } />
                         <Route path="/library" element={ <Library /> } />
                         <Route path="/library/:id" element={ <LibraryBook /> } />
-                        <Route path="/suggest" element={ <Suggest /> } />
+                        {/* The old page for suggesting a book is part of the contact page now. */}
+                        <Route path="/suggest" element={ <Navigate to="/contact?kind=book" replace /> } />
                         <Route path="/contact" element={ <Contact /> } />
                         <Route path="*" element={ <NotFound /> } />
                     </Routes>

@@ -101,13 +101,10 @@ function formOf(fields) {
     return form;
 }
 
-// Sends a book suggestion: its fields, and the PDF if there is one.
-export function suggestBook(fields, onProgress) {
-    return upload('/api/library/suggestions', formOf(fields), onProgress);
-}
-
-export function sendMessage(fields) {
-    return send('POST', '/api/contact/', { body: formOf(fields) });
+// Sends what the contact page holds, by its kind: a message, or a suggested book with
+// its PDF if there is one.
+export function sendContact(fields, onProgress) {
+    return upload('/api/contact/', formOf(fields), onProgress);
 }
 
 export function getConversion(id) {

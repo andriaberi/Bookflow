@@ -42,6 +42,7 @@ RIGHTS = {choice for choice, _ in Suggestion.RIGHTS_CHOICES}
 LANGS = {"en", "ka"}
 
 
+# Sent from the contact page (contact.views), as kind "book".
 @require_POST
 @public.limited("suggestion")
 def suggestion_create(request):

@@ -25,7 +25,7 @@ class SuggestionTests(TestCase):
         shutil.rmtree(MEDIA, ignore_errors=True)
 
     def suggest(self, **fields):
-        return self.client.post("/api/library/suggestions", fields)
+        return self.client.post("/api/contact/", {"kind": "book", **fields})
 
     def test_a_book_can_be_suggested_by_name(self):
         response = self.suggest(title=" Animal Farm ", author="George Orwell", note="A classic.", email="reader@example.com")

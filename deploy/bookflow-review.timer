@@ -1,0 +1,10 @@
+# Sends the review email every morning: /etc/systemd/system/bookflow-review.timer
+[Unit]
+Description=Bookflow: email what is waiting for review every morning
+
+[Timer]
+OnCalendar=*-*-* 09:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
