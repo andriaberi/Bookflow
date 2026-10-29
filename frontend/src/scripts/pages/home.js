@@ -126,8 +126,8 @@ function Home() {
                             <p className="fs-5 mb-0">{ t.home.contactText }</p>
                         </div>
                         <div className="bf-banner-actions">
-                            <Link to="/contact" className="btn btn-lg btn-white px-4 py-3">{ t.home.contactButton }</Link>
-                            <a href={ ENGINE_URL } className="btn btn-lg btn-white-outline px-4 py-3">{ t.home.star }</a>
+                            <Link to="/contact" className="btn btn-white px-4">{ t.home.contactButton }</Link>
+                            <a href={ ENGINE_URL } className="btn btn-white-outline px-4">{ t.home.star }</a>
                         </div>
                     </div>
                 </div>

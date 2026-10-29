@@ -417,19 +417,19 @@
     max-width: 640px;
 }
 
-// A one-column grid sized to the widest label, so both buttons are the same width.
+// Side by side; under the text, centered, each line of them when they wrap.
 .bf-banner-actions {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     flex-shrink: 0;
-    gap: 12px;
+    gap: 10px;
 
     .btn {
         white-space: nowrap;
     }
 
     @media (max-width: 991.98px) {
-        width: 100%;
-        max-width: 360px;
+        justify-content: center;
     }
 }
 

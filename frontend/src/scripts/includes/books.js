@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookIcon, Download } from './icons';
+import { BookIcon } from './icons';
 
 // A library book's cover, or a plain stand-in when it has none.
 export function BookCover({ book, className = '' }) {
@@ -9,8 +9,7 @@ export function BookCover({ book, className = '' }) {
 
 export function DownloadButton({ t, book, className = '' }) {
     return (
-        <a href={ book.epub_url } download className={ `btn btn-cobalt px-4 d-inline-flex align-items-center gap-2 ${className}` }>
-            <Download size={ 18 } />
+        <a href={ book.epub_url } download className={ `btn btn-cobalt px-4 ${className}` }>
             { t.library.download }
         </a>
     );
