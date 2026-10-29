@@ -18,7 +18,7 @@ async function renderAt(path) {
 beforeEach(() => {
     localStorage.clear();
     global.fetch = jest.fn((url) => {
-        const reply = url === '/api/info' ? { engine: '1.2026.1028.1', commit: '00d1f87abcdef' } : [];
+        const reply = url === '/api/info' ? { engine: '1.2026.1028.3', commit: '00d1f87abcdef' } : [];
         return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(reply) });
     });
 });
@@ -32,7 +32,7 @@ test('the footer links to the legal pages and to the code as it runs', async () 
     expect(footer.getByRole('link', { name: 'Copyright' })).toHaveAttribute('href', '/copyright');
     expect(footer.getByRole('link', { name: 'Source code' })).toHaveAttribute('href', 'https://github.com/andriaberi/Bookflow/tree/00d1f87abcdef');
     expect(footer.getByText('00d1f87')).toBeInTheDocument();
-    expect(footer.getByText('1.2026.1028.1')).toBeInTheDocument();
+    expect(footer.getByText('1.2026.1028.3')).toBeInTheDocument();
     expect(footer.getByText(/Uses/)).toHaveTextContent('Uses PDF2EPUB by Andria Beridze');
 });
 

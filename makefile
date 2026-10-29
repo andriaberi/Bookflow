@@ -15,7 +15,7 @@ NPX_BIN := $(FRONTEND_DIR)/node_modules/.bin
 # editable, so changes there show up right away) or anything pip installs, such as a
 # git tag. Without it, the pinned release is used.
 -include $(BACKEND_DIR)/.env
-PDF2EPUB_SOURCE ?= git+https://github.com/andriaberi/PDF2EPUB.git@v1.2026.1028.1
+PDF2EPUB_SOURCE ?= git+https://github.com/andriaberi/PDF2EPUB.git@v1.2026.1028.3
 
 # PHONY targets
 .PHONY: help install install-backend install-engine install-frontend \
