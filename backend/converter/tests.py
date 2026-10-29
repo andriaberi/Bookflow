@@ -313,7 +313,7 @@ class EditorTests(TestCase):
         heading["label"] = "Renamed Chapter"
         self.put_book(book)
 
-        self.assertIn("Renamed Chapter".encode(), self.client.get(url).content)
+        self.assertIn(b"Renamed Chapter", self.client.get(url).content)
 
     def test_only_files_inside_the_epub_are_served(self):
         response = self.client.get(f"/api/convert/{self.id}/epub-files/../../settings.py")

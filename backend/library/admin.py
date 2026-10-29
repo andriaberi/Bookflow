@@ -4,8 +4,7 @@ from django.contrib import admin, messages
 from django.core.files.base import ContentFile
 from django.utils.html import format_html
 
-from . import models
-from . import emails
+from . import emails, models
 from .forms import BookForm
 
 

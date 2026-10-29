@@ -1,7 +1,7 @@
 // Calls to the Django API. In development the CRA proxy forwards /api to :8000.
 
 // An error from the API, with the code the page translates ("too_big", "not_pdf", …).
-export class ApiError extends Error {
+class ApiError extends Error {
     constructor(code, detail) {
         super(detail || code);
         this.code = code;

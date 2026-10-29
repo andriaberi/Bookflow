@@ -1,6 +1,7 @@
 """Conversions are deleted once their page is closed: nobody's PDF stays on the server.
 
-While a conversion's page is open it says so every HEARTBEAT; leaving says so too
+While a conversion's page is open it says so every 30 seconds (frontend presence.js);
+leaving says so too
 (left()), and the conversion goes a GRACE later, unless the page comes straight back,
 as a reload does. A page that closes without a word (a crash, a killed tab) is
 gone EXPIRY after it was last seen.
@@ -16,7 +17,6 @@ from django.utils import timezone
 
 from .models import Conversion
 
-HEARTBEAT = timedelta(seconds=30)
 GRACE = timedelta(minutes=1)
 EXPIRY = timedelta(minutes=15)
 # A book still being read is left alone, unless reading never finished.

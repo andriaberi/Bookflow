@@ -55,7 +55,7 @@ export function sectionOf(sections, index) {
 
 // New blocks get ids no block of the book has: "new-<time>-<count>".
 let made = 0;
-export function newId() {
+function newId() {
     made += 1;
     return `new-${Date.now().toString(36)}-${made}`;
 }

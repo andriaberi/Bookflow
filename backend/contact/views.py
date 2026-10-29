@@ -31,7 +31,7 @@ def message_create(request, kind):
     fields = public.fields(request, "name", "email", "link", "text")
     if not fields["text"]:
         return error("no_text", "The message is empty")
-    if len(fields["name"]) > 200 or len(fields["link"]) > 500 or len(fields["text"]) > MAX_TEXT:
+    if public.too_long(fields, Message, text=MAX_TEXT):
         return error("too_long", f"Messages up to {MAX_TEXT} characters")
     if fields["email"] and not public.is_email(fields["email"]):
         return error("bad_email", "That isn't an email address")

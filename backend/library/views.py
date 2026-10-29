@@ -4,7 +4,7 @@ from converter import engine
 from converter.uploads import UploadError, check_pdf
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET
 
 from .models import Book, Suggestion
 
@@ -43,13 +43,12 @@ LANGS = {"en", "ka"}
 
 
 # Sent from the contact page (contact.views), as kind "book".
-@require_POST
 @public.limited("suggestion")
 def suggestion_create(request):
     fields = public.fields(request, "title", "author", "note", "rights", "holder", "email")
     if not fields["title"]:
         return error("no_title", "The book's title is needed")
-    if len(fields["title"]) > 300 or max(len(fields["author"]), len(fields["holder"])) > 200 or len(fields["note"]) > MAX_NOTE:
+    if public.too_long(fields, Suggestion, note=MAX_NOTE):
         return error("too_long", f"Notes up to {MAX_NOTE} characters")
     if fields["email"] and not public.is_email(fields["email"]):
         return error("bad_email", "That isn't an email address")

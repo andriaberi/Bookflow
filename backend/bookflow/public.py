@@ -20,6 +20,16 @@ def fields(request, *names: str) -> dict:
     return {name: request.POST.get(name, "").strip() for name in names}
 
 
+def too_long(fields: dict, model, **limits: int) -> bool:
+    """Whether a field is longer than its model field may be, or than `limits` says for
+    a field with no length of its own."""
+    for name, value in fields.items():
+        most = limits.get(name) or getattr(model._meta.get_field(name), "max_length", None)
+        if most and len(value) > most:
+            return True
+    return False
+
+
 def is_email(text: str) -> bool:
     try:
         validate_email(text)
