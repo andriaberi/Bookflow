@@ -65,7 +65,7 @@ function LibraryBook() {
                     { book.epub_url && (
                         <div className="mb-4">
                             <DownloadButton t={ t } book={ book } />
-                            <p className="small bf-muted mt-2 mb-0">{ t.library.readers }</p>
+                            <p className="small bf-muted mt-3 mb-0">{ t.library.readers }</p>
                         </div>
                     ) }
                     { facts.length > 0 && (
