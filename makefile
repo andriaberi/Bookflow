@@ -68,7 +68,9 @@ install-backend:
 	$(MAKE) install-engine
 
 install-engine:
+	@# A folder's version comes from its git tags, which CI makes on GitHub, so fetch them first.
 	@if [ -d "$(PDF2EPUB_SOURCE)" ]; then \
+		git -C "$(PDF2EPUB_SOURCE)" fetch -q --tags || echo "Couldn't fetch PDF2EPUB's tags; its version may be out of date"; \
 		$(PYTHON) -m pip install -q -e "$(PDF2EPUB_SOURCE)"; \
 	else \
 		$(PYTHON) -m pip install -q "$(PDF2EPUB_SOURCE)"; \
