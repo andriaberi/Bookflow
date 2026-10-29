@@ -3,6 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from django.utils.csp import CSP
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,6 +31,23 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
     SECURE_REFERRER_POLICY = "same-origin"
+    # nginx sends plain HTTP on to HTTPS too (certbot sets that up); this is in case not.
+    SECURE_SSL_REDIRECT = True
+
+# What a page may load: only the site's own scripts (and the page's one inline script,
+# which carries the nonce), styles and fonts from Google Fonts besides the site's own.
+# Styles may be inline, for the EPUB preview's page and the style attributes React sets.
+SECURE_CSP = {
+    "default-src": [CSP.SELF],
+    "script-src": [CSP.SELF, CSP.NONCE],
+    "style-src": [CSP.SELF, CSP.UNSAFE_INLINE, "https://fonts.googleapis.com"],
+    "font-src": [CSP.SELF, "https://fonts.gstatic.com"],
+    "img-src": [CSP.SELF, "data:", "blob:"],
+    "object-src": [CSP.NONE],
+    "base-uri": [CSP.SELF],
+    "form-action": [CSP.SELF],
+    "frame-ancestors": [CSP.SELF],
+}
 
 # Application definition
 INSTALLED_APPS = [
@@ -46,6 +64,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -65,6 +84,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                "django.template.context_processors.csp",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -89,6 +109,18 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Files the server keeps for itself: the cache, and the converter's locks
+CACHE_DIR = BASE_DIR / "cache"
+
+# Kept in files, so every gunicorn worker counts the same posts (bookflow/public.py);
+# tests keep it in memory.
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"} if TESTING else {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": CACHE_DIR / "django",
+    },
+}
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -122,8 +154,26 @@ def running_commit():
 
 SOURCE_COMMIT = running_commit()
 
-# Largest PDF the converter accepts, in megabytes
+# Largest PDF the converter accepts, in megabytes and in pages
 MAX_PDF_SIZE_MB = int(os.getenv("MAX_PDF_SIZE_MB", "100"))
+MAX_PDF_PAGES = int(os.getenv("MAX_PDF_PAGES", "2000"))
+
+# Visitors' PDFs and images are opened in a process of their own (converter/isolated.py),
+# which may take this much memory, in megabytes, and this many seconds; more, and it's
+# stopped and the visitor told the file is too much.
+CONVERTER_LIMITS = {
+    "read":  {"memory_mb": 1536, "seconds": 300},  # reading a book
+    "check": {"memory_mb": 512, "seconds": 30},    # counting an upload's pages
+    "page":  {"memory_mb": 512, "seconds": 30},    # a page for the editor's preview
+    "cover": {"memory_mb": 512, "seconds": 15},    # an uploaded cover image
+}
+# How many books are read at once, by all the workers together; others wait their turn,
+# for up to CONVERTER_WAIT seconds.
+CONVERTER_READERS = int(os.getenv("CONVERTER_READERS", "2"))
+CONVERTER_WAIT = 15 * 60
+CONVERTER_LOCKS = CACHE_DIR / "readers"
+# The largest page image the editor's preview gets, in pixels: 1600 wide for a usual page
+MAX_PAGE_PIXELS = 8_000_000
 
 # Read uploaded books in a background thread; tests turn this off to read right away.
 CONVERTER_BACKGROUND = True

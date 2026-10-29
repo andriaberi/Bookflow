@@ -223,6 +223,7 @@ __marimo__/
 node_modules/
 staticfiles/
 media/
+backend/cache/
 
 # The frontend build's page, copied in by make copy
 backend/bookflow/templates/index.html

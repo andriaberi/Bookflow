@@ -15,8 +15,8 @@ class UploadError(Exception):
 
 
 def check_pdf(pdf) -> int:
-    """The uploaded PDF's page count; UploadError if it's too big, isn't a PDF or can't
-    be opened."""
+    """The uploaded PDF's page count; UploadError if it's too big, isn't a PDF, can't be
+    opened or has too many pages."""
     if pdf.size > settings.MAX_PDF_SIZE_MB * MB:
         raise UploadError("too_big", f"PDFs up to {settings.MAX_PDF_SIZE_MB} MB only")
     data = pdf.read()
@@ -29,4 +29,6 @@ def check_pdf(pdf) -> int:
         raise UploadError("unreadable", f"The PDF can't be opened: {e}") from None
     if pages == 0:
         raise UploadError("unreadable", "The PDF has no pages")
+    if pages > settings.MAX_PDF_PAGES:
+        raise UploadError("too_many_pages", f"PDFs up to {settings.MAX_PDF_PAGES} pages only")
     return pages

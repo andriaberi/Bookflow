@@ -1,21 +1,24 @@
 """The one place Bookflow talks to PDF2EPUB."""
 
+import fcntl
 import io
 import logging
 import os
 import threading
+import time
 import zipfile
+from contextlib import contextmanager
 from pathlib import Path
 
-import pymupdf
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import connection
-from pdf2epub import STEPS, Book, ConvertError, HeadingBlock, Options, read_book, render_page, write_book
+from pdf2epub import STEPS, Book, ConvertError, HeadingBlock, write_book
 from pdf2epub.book import GIVEN_COVER, NO_COVER
 from pdf2epub.cover import load_cover
 from pdf2epub.epub.writer import split_long
 
+from . import isolated
 from .models import Conversion, Total
 
 log = logging.getLogger(__name__)
@@ -24,13 +27,42 @@ log = logging.getLogger(__name__)
 READING_STEPS = STEPS[:3]
 
 
+BUSY = "The converter is busy; try again in a few minutes"
+
+
+def limits(task: str) -> isolated.Limits:
+    """How much memory and time opening a visitor's file may take (settings.CONVERTER_LIMITS)."""
+    return isolated.Limits(**settings.CONVERTER_LIMITS[task])
+
+
 def count_pages(data: bytes) -> int:
     """The PDF's page count; ValueError if it can't be opened as a PDF."""
     try:
-        with pymupdf.open(stream=data, filetype="pdf") as doc:
-            return doc.page_count
-    except (pymupdf.FileDataError, RuntimeError) as e:
+        return isolated.count_pages(data, limits("check"))
+    except ConvertError as e:
         raise ValueError(str(e)) from None
+
+
+@contextmanager
+def reading_turn():
+    """Wait for one of settings.CONVERTER_READERS turns to read a book, shared by every
+    worker through lock files, so a crowd of uploads can't take all the server's memory
+    at once; ConvertError if none comes free within CONVERTER_WAIT seconds."""
+    folder = Path(settings.CONVERTER_LOCKS)
+    folder.mkdir(parents=True, exist_ok=True)
+    deadline = time.monotonic() + settings.CONVERTER_WAIT
+    while True:
+        for turn in range(settings.CONVERTER_READERS):
+            with open(folder / f"reader-{turn}.lock", "w") as lock:
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    continue
+                yield  # the lock goes with the file when it closes
+                return
+        if time.monotonic() > deadline:
+            raise ConvertError(BUSY)
+        time.sleep(1)
 
 
 def start(conversion: Conversion) -> None:
@@ -51,16 +83,15 @@ def read(pk) -> None:
                 Conversion.objects.filter(pk=pk).update(step=READING_STEPS.index(step))
 
         try:
-            book = read_book(Options(pdf=conversion.pdf.path), progress)
+            with reading_turn():
+                # The cover is kept as an image file, not as base64 in the JSON.
+                data, cover = isolated.read_book(conversion.pdf.path, limits("read"), progress)
         except ConvertError as e:
             conversion.status = "failed"
             conversion.error = str(e)
         else:
-            data = book.to_dict()
-            # The cover is kept as an image file, not as base64 in the JSON.
-            data["cover"] = None
-            if book.cover:
-                conversion.cover.save("cover.jpg", ContentFile(book.cover.data), save=False)
+            if cover:
+                conversion.cover.save("cover.jpg", ContentFile(cover), save=False)
             conversion.book = data
             conversion.status = "ready"
             conversion.step = len(READING_STEPS) - 1
@@ -131,13 +162,14 @@ def epub_of(conversion: Conversion) -> bytes:
 
 
 def page_image(conversion: Conversion, number: int, width: int) -> bytes:
-    """Page `number` of the PDF, from 1, as a PNG `width` pixels wide."""
-    return render_page(conversion.pdf.path, number, width)
+    """Page `number` of the PDF, from 1, as a PNG `width` pixels wide (narrower if a
+    page that tall would be over settings.MAX_PAGE_PIXELS)."""
+    return isolated.render_page(conversion.pdf.path, number, width, settings.MAX_PAGE_PIXELS, limits("page"))
 
 
 def set_cover(conversion: Conversion, image: bytes) -> None:
     """Use this image as the cover; CoverError if it isn't one. Saved as JPEG."""
-    _change_cover(conversion, load_cover(image).data, GIVEN_COVER)
+    _change_cover(conversion, isolated.cover(image, limits("cover")), GIVEN_COVER)
 
 
 def remove_cover(conversion: Conversion) -> None:

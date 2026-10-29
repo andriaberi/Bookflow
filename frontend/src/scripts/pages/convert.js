@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { errorCode, uploadPdf } from '../helpers/api';
 import { fill } from '../helpers/format';
-import { MAX_PDF_MB, pdfProblem } from '../helpers/files';
+import { MAX_PDF_MB, MAX_PDF_PAGES, pdfProblem } from '../helpers/files';
 import { useSettings } from '../helpers/settings';
 import { FileUp } from '../includes/icons';
 import { PageHeader, usePageTitle } from '../includes/page';
@@ -89,7 +89,7 @@ function Convert() {
                     <p className="small bf-muted text-center mt-3 mb-0">{ t.convert.privacy }</p>
                     { error && (
                         <div className="bf-alert mt-3" role="alert">
-                            { fill(t.convert.errors[error], { mb: MAX_PDF_MB }) }
+                            { fill(t.convert.errors[error], { mb: MAX_PDF_MB, pages: MAX_PDF_PAGES }) }
                         </div>
                     ) }
                 </div>

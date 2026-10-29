@@ -39,6 +39,8 @@ make dev           # Django on :8000 and React on :3000; open http://localhost:3
 | `ALLOWED_HOSTS` | The site's domain(s), comma-separated |
 | `SITE_URL` | The site's address, such as `https://bookflow.example`: links in emails, and where forms are posted from |
 | `MAX_PDF_SIZE_MB` | The largest PDF accepted (100) |
+| `MAX_PDF_PAGES` | The most pages a PDF accepted may have (2000) |
+| `CONVERTER_READERS` | How many books are read at once; more wait their turn (2) |
 | `PDF2EPUB_SOURCE` | Where `make install-engine` installs the engine from: a release tag, or a local folder while developing it |
 | `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | The Gmail account that sends email, and an [app password](https://myaccount.google.com/apppasswords) for it. Without a password, emails are printed to the console |
 | `NOTIFY_EMAIL` | Who hears about new suggestions and messages, and gets the daily email of what's waiting for review (the account above if left out) |
@@ -64,9 +66,28 @@ On a Linux server with nginx, from a checkout at `/srv/bookflow` run by a `bookf
    `systemctl enable --now bookflow-review.timer`: every morning at 9, if anything is
    waiting in the admin, `NOTIFY_EMAIL` gets one email listing it, with links.
 
-nginx serves `/media/` (uploads, covers, EPUBs) itself and passes the rest to gunicorn,
+nginx serves `/media/` (covers and library EPUBs) itself and passes the rest to gunicorn,
 with the visitor's address in `X-Real-IP`: Django uses it to limit how often one visitor
-may upload or post a form.
+may upload or post a form. Run `sudo nginx -t` after changing `deploy/nginx.conf`.
+
+### Security
+
+- **Visitors' files** (PDFs and cover images) are only opened in a process of their own
+  (`backend/converter/isolated.py`), with limits on its memory and time
+  (`CONVERTER_LIMITS` in `settings.py`). A PDF built to unpack into gigabytes, never
+  finish, or crash MuPDF fails with a message instead of taking the site down. Only
+  `CONVERTER_READERS` books are read at once, across all the workers.
+- **How often**: nginx limits requests per address (uploads and admin logins most), the
+  connections each may hold, and slow requests; Django limits how many forms one visitor
+  posts an hour, counted in `backend/cache/` so every worker sees the same count.
+- **Pages** carry a Content-Security-Policy: only the site's own scripts run. The
+  converter's PDFs and preview EPUBs are never served from `/media/`, and what is
+  served there can't run anything.
+- **The service** (`deploy/gunicorn.service`) can write only to `backend/`, can't gain
+  privileges, and is held to `MemoryMax`. Keep that under the server's memory, and
+  `CONVERTER_LIMITS` × `CONVERTER_READERS` under that.
+- `make check` runs `manage.py check`; on the server, `manage.py check --deploy` checks
+  the production settings too.
 
 ## Running the site
 

@@ -9,5 +9,31 @@ WorkingDirectory=/srv/bookflow/backend
 ExecStart=/srv/bookflow/.venv/bin/gunicorn bookflow.wsgi:application --bind 127.0.0.1:8000 --workers 3 --timeout 120
 Restart=always
 
+# Visitors' files are opened here (in processes of their own, converter/isolated.py), so
+# the service may do as little as it can: write only to backend/ (the database, uploads
+# and the cache), see no home folders, other users' temporary files or devices, and
+# never gain privileges.
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/bookflow/backend
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+# All of it together, however many books are being read: keep it under the server's
+# memory, with CONVERTER_LIMITS and CONVERTER_READERS to match.
+MemoryMax=4G
+TasksMax=512
+
 [Install]
 WantedBy=multi-user.target

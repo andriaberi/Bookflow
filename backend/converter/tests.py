@@ -10,7 +10,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from pdf2epub import ConvertError
 
-from . import cleanup
+from . import cleanup, engine, isolated
 from .models import Conversion, Total
 
 MEDIA = tempfile.mkdtemp(prefix="bookflow-test-media-")
@@ -77,7 +77,7 @@ class ConversionTests(TestCase):
         self.assertEqual(self.client.get("/api/info").json()["converted"], 2)
 
     def test_a_book_that_cant_be_read_isnt_counted(self):
-        with mock.patch("converter.engine.read_book", side_effect=ConvertError("no text in this PDF")):
+        with mock.patch("converter.isolated.read_book", side_effect=ConvertError("no text in this PDF")):
             data = self.client.post("/api/convert/", {"pdf": upload()}).json()
 
         self.assertEqual(data["status"], "failed")
@@ -115,6 +115,32 @@ class ConversionTests(TestCase):
         response = self.client.post("/api/convert/", {"pdf": upload()})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], "too_big")
+
+    @override_settings(MAX_PDF_PAGES=1)
+    def test_a_pdf_with_too_many_pages_is_refused(self):
+        response = self.client.post("/api/convert/", {"pdf": upload()})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "too_many_pages")
+
+    def test_a_pdf_that_takes_too_long_fails_on_its_own(self):
+        limits = {**engine.settings.CONVERTER_LIMITS, "read": {"memory_mb": 1536, "seconds": 0.001}}
+        with override_settings(CONVERTER_LIMITS=limits):
+            data = self.client.post("/api/convert/", {"pdf": upload()}).json()
+
+        self.assertEqual(data["status"], "failed")
+        self.assertEqual(Conversion.objects.get(pk=data["id"]).error, isolated.TOO_MUCH)
+
+    @override_settings(CONVERTER_READERS=0, CONVERTER_WAIT=0)
+    def test_a_book_waits_its_turn_and_fails_if_none_comes(self):
+        data = self.client.post("/api/convert/", {"pdf": upload()}).json()
+
+        self.assertEqual(data["status"], "failed")
+        self.assertEqual(Conversion.objects.get(pk=data["id"]).error, engine.BUSY)
+
+    def test_pages_say_what_they_may_load(self):
+        policy = self.client.get("/api/info")["Content-Security-Policy"]
+        self.assertIn("default-src 'self'", policy)
+        self.assertIn("object-src 'none'", policy)
 
     def test_upload_only_accepts_post(self):
         response = self.client.get("/api/convert/")
@@ -191,6 +217,14 @@ class EditorTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "image/png")
         self.assertEqual(response.content[:4], b"\x89PNG")
+
+    @override_settings(MAX_PAGE_PIXELS=300 * 300)
+    def test_a_page_too_big_to_draw_comes_narrower(self):
+        response = self.client.get(f"/api/convert/{self.id}/pages/1.png?width=1000")
+
+        image = pymupdf.Pixmap(response.content)
+        self.assertLess(image.width * image.height, 300 * 300)
+        self.assertGreater(image.width, 200)
 
     def test_a_page_outside_the_pdf_is_404(self):
         response = self.client.get(f"/api/convert/{self.id}/pages/9.png")
@@ -343,3 +377,26 @@ class CleanupTests(TestCase):
         self.later(cleanup.EXPIRY * 2)
         self.assertEqual(self.client.post(f"/api/convert/{self.id}/seen").status_code, 404)
         self.assertEqual(self.client.get(f"/api/convert/{self.id}").status_code, 404)
+
+
+class IsolatedTests(TestCase):
+    """Visitors' files are opened in a process of their own, which is stopped when it
+    takes too much."""
+
+    def test_the_answer_comes_back(self):
+        self.assertEqual(isolated.count_pages(make_pdf(3), isolated.Limits(512, 30)), 3)
+
+    def test_a_file_that_isnt_one_says_why(self):
+        with self.assertRaises(ConvertError):
+            isolated.cover(b"not an image", isolated.Limits(512, 30))
+
+    def test_too_much_memory_is_stopped(self):
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as pdf:
+            pdf.write(make_pdf())
+            pdf.flush()
+            with self.assertRaises(isolated.LimitError):
+                isolated.render_page(pdf.name, 1, 3000, 10**8, isolated.Limits(1, 30))
+
+    def test_too_much_time_is_stopped(self):
+        with self.assertRaises(isolated.LimitError):
+            isolated.count_pages(make_pdf(), isolated.Limits(512, 0.001))

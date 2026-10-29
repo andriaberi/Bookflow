@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { errorCode, sendContact } from '../helpers/api';
-import { MAX_PDF_MB, pdfProblem } from '../helpers/files';
+import { MAX_PDF_MB, MAX_PDF_PAGES, pdfProblem } from '../helpers/files';
 import { fileSize, fill } from '../helpers/format';
 import { CODE_URL, CONTACT_EMAIL, ENGINE_URL, REPORT_URL } from '../helpers/links';
 import { useSettings } from '../helpers/settings';
@@ -189,7 +189,7 @@ function Contact() {
                     <Trap value={ fields.website } onChange={ set('website') } />
                 </div>
 
-                { error && <div className="bf-alert mt-4" role="alert">{ fill(errors[error], { mb: MAX_PDF_MB, n: MAX_NOTE }) }</div> }
+                { error && <div className="bf-alert mt-4" role="alert">{ fill(errors[error], { mb: MAX_PDF_MB, pages: MAX_PDF_PAGES, n: MAX_NOTE }) }</div> }
 
                 <SendRow>
                     <button type="submit" className="btn btn-cobalt btn-lg px-4" disabled={ sending }>
