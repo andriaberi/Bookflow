@@ -28,7 +28,7 @@ const BOOK = {
 };
 
 // The API: the book to edit, and saves answered with `problems`.
-function mockApi(problems = []) {
+function mockApi(problems = [], book = BOOK) {
     const saves = [];
     global.fetch = jest.fn((url, options = {}) => {
         const path = String(url);
@@ -49,7 +49,7 @@ function mockApi(problems = []) {
             return reply({ cover_url: '/media/conversions/x/cover.jpg?v=2' });
         }
         if (path === `/api/convert/${ID}/book`) {
-            return reply({ book: BOOK, name: 'pride', pages: 9, cover_url: null });
+            return reply({ book, name: 'pride', pages: 9, cover_url: null });
         }
         return reply({});
     });
@@ -115,6 +115,20 @@ test('a change is saved after a moment', async () => {
     await waitFor(() => expect(saves).toHaveLength(1));
     expect(saves[0].metadata.title).toBe('Pride & Prejudice');
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Saved'));
+});
+
+test('a picture shows, and is saved without its image', async () => {
+    const picture = { type: 'picture', id: 'p1', page: 2, role: 'body', include: true, data: '/9ggcGljdHVyZQ==', width: 30, height: 20 };
+    const blocks = [...BOOK.blocks.slice(0, 3), picture, ...BOOK.blocks.slice(3)];
+    const saves = mockApi([], { ...BOOK, blocks });
+    await renderEditor();
+
+    const card = screen.getByAltText('Picture').closest('article');
+    expect(screen.getByAltText('Picture')).toHaveAttribute('src', 'data:image/jpeg;base64,/9ggcGljdHVyZQ==');
+    fireEvent.click(within(card).getByRole('switch'));
+
+    await waitFor(() => expect(saves).toHaveLength(1));
+    expect(saves[0].blocks[3]).toEqual({ ...picture, include: false, data: '' });
 });
 
 test('turning on the title page includes it in the EPUB', async () => {

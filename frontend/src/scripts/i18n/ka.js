@@ -198,6 +198,7 @@ const ka = {
         leftOut: 'ამოღებული',
         verse: 'ლექსი',
         epigraph: 'ეპიგრაფი',
+        picture: 'სურათი',
         notesCount: '{n} შენიშვნა',
         empty: 'ეს ნაწილი ცარიელია.',
         previous: 'წინა',

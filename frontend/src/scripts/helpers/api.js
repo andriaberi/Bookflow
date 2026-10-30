@@ -130,7 +130,9 @@ export function getBook(id) {
 
 // Saves the edited book; answers with its problems (what keeps it from being written).
 export function saveBook(id, book) {
-    return send('PUT', `/api/convert/${id}/book`, { body: JSON.stringify(book), headers: { 'Content-Type': 'application/json' } });
+    // Pictures go back without their images: the server keeps those.
+    const blocks = book.blocks.map((block) => (block.type === 'picture' ? { ...block, data: '' } : block));
+    return send('PUT', `/api/convert/${id}/book`, { body: JSON.stringify({ ...book, blocks }), headers: { 'Content-Type': 'application/json' } });
 }
 
 export function pageUrl(id, number, width = 700) {

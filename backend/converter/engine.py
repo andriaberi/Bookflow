@@ -142,7 +142,12 @@ def book_of(conversion: Conversion) -> Book:
 def save_book(conversion: Conversion, data: dict) -> list[str]:
     """Save the edited book; ConvertError if the data isn't a book. Returns its problems:
     what would keep it from being written, empty if nothing does. The cover is the
-    server's to change (set_cover, remove_cover), so its source is kept as it was."""
+    server's to change (set_cover, remove_cover), so its source is kept as it was.
+    Pictures come back without their images, which the server keeps, matched by id."""
+    pictures = {b["id"]: b["data"] for b in conversion.book["blocks"] if b["type"] == "picture"}
+    for block in data.get("blocks") or []:
+        if isinstance(block, dict) and block.get("type") == "picture":
+            block["data"] = pictures.get(block.get("id"), "")
     data = {**data, "cover": None, "cover_source": conversion.book["cover_source"]}
     book = Book.from_dict(data)
     conversion.book = data

@@ -526,6 +526,12 @@
     font-size: 0.8rem;
 }
 
+.bf-block-picture {
+    display: block;
+    max-width: 100%;
+    max-height: 240px;
+}
+
 .bf-block-textarea {
     line-height: 1.7;
     resize: vertical;

@@ -198,6 +198,7 @@ const en = {
         leftOut: 'Left out',
         verse: 'Verse',
         epigraph: 'Epigraph',
+        picture: 'Picture',
         notesCount: '{n} notes',
         empty: 'This section is empty.',
         previous: 'Previous',

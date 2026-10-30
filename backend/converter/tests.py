@@ -181,6 +181,34 @@ class EditorTests(TestCase):
         self.assertEqual(response.json()["problems"], [])
         self.assertEqual(self.get_book()["metadata"]["title"], "A New Title")
 
+    def add_picture(self, data="/9ggcGljdHVyZQ=="):
+        """A picture block after the first block, as the server saved it."""
+        conversion = Conversion.objects.get(pk=self.id)
+        picture = {"type": "picture", "id": "p1", "page": 1, "role": "body", "include": True, "data": data, "width": 30, "height": 20}
+        conversion.book["blocks"].insert(1, picture)
+        conversion.save()
+
+    def test_a_picture_saved_without_its_image_keeps_it(self):
+        self.add_picture()
+        book = self.get_book()
+        book["blocks"][1]["data"] = ""
+        book["blocks"][1]["include"] = False
+
+        self.assertEqual(self.put_book(book).json()["problems"], [])
+        picture = self.get_book()["blocks"][1]
+        self.assertEqual((picture["data"], picture["include"]), ("/9ggcGljdHVyZQ==", False))
+
+    def test_a_picture_from_the_browser_is_never_its_image(self):
+        self.add_picture()
+        book = self.get_book()
+        book["blocks"][1]["data"] = "/9ggb3RoZXI="
+        book["blocks"].insert(2, {**book["blocks"][1], "id": "p2"})
+
+        problems = self.put_book(book).json()["problems"]
+
+        self.assertEqual(self.get_book()["blocks"][1]["data"], "/9ggcGljdHVyZQ==")
+        self.assertEqual(problems, ["block 'p2': a picture must be a JPEG image with its width and height"])
+
     def test_a_book_that_cant_be_written_says_why(self):
         book = self.get_book()
         for block in book["blocks"]:

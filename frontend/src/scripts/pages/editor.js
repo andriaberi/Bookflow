@@ -545,15 +545,17 @@ function SectionView({ t, book, sections, index, range, selected, onSelect, onPi
 
 function Block({ t, block, picking, picked, selected, canJoin, onClick, onInclude, edit }) {
     const heading = block.type === 'heading';
+    const picture = block.type === 'picture';
     const textarea = useRef(null);
     const tags = [];
     if (block.role !== 'body') tags.push(t.editor.roles[block.role] || block.role);
+    if (picture) tags.push(t.editor.picture);
     if (block.verse) tags.push(t.editor.verse);
     if (block.epigraph) tags.push(t.editor.epigraph);
     const notes = block.notes ? Object.keys(block.notes).length : 0;
     if (notes) tags.push(fill(t.editor.notesCount, { n: notes }));
 
-    const classes = ['bf-block-card', heading ? 'heading' : 'text'];
+    const classes = ['bf-block-card', block.type];
     if (!block.include) classes.push('out');
     if (selected) classes.push('selected');
     if (picked) classes.push('picked');
@@ -586,7 +588,9 @@ function Block({ t, block, picking, picked, selected, canJoin, onClick, onInclud
                     </div>
                 ) }
 
-                { selected ? (
+                { picture ? (
+                    <img className="bf-block-picture" src={ `data:image/jpeg;base64,${block.data}` } alt={ t.editor.picture } />
+                ) : selected ? (
                     <div className="bf-block-edit" onClick={ stop }>
                         <div className="bf-block-fields">
                             <select
