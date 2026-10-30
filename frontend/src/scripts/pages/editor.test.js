@@ -131,6 +131,16 @@ test('a picture shows, and is saved without its image', async () => {
     expect(saves[0].blocks[3]).toEqual({ ...picture, include: false, data: '' });
 });
 
+test('a paragraph shows its italics and bold', async () => {
+    const blocks = BOOK.blocks.map((block) => (block.id === 'b3' ? { ...block, text: 'It is a <i>truth</i> <b>universally</b> acknowledged.' } : block));
+    mockApi([], { ...BOOK, blocks });
+    await renderEditor();
+
+    expect(screen.getByText('truth').tagName).toBe('EM');
+    expect(screen.getByText('universally').tagName).toBe('STRONG');
+    expect(screen.queryByText(/<i>/)).toBeNull();
+});
+
 test('turning on the title page includes it in the EPUB', async () => {
     const saves = mockApi();
     await renderEditor();

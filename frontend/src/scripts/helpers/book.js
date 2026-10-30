@@ -132,3 +132,15 @@ export function joinBlocks(block, next) {
 export function withBlocks(book, start, end, blocks) {
     return { ...book, blocks: [...book.blocks.slice(0, start), ...blocks, ...book.blocks.slice(end)] };
 }
+
+// The text's runs between pdf2epub's <i> and <b> tags, each with its style. A tag an
+// edit leaves open runs to the end, and one closing nothing is ignored.
+export function styledRuns(text) {
+    const runs = [];
+    const on = { i: false, b: false };
+    text.split(/(<\/?[ib]>)/).forEach((part, index) => {
+        if (index % 2) on[part.replace(/[</>]/g, '')] = !part.startsWith('</');
+        else if (part) runs.push({ text: part, italic: on.i, bold: on.b });
+    });
+    return runs;
+}

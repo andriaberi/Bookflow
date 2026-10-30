@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { errorCode, getBook, getEpub, getPreviewPage, getPreviewUrl, pageUrl, removeCover, saveBook, uploadCover } from '../helpers/api';
 import {
     headingText, joinBlocks, levelAt, newHeading, pageRange, roleCounts, sectionOf, sectionsOf,
-    splitBlock, toHeading, toText, withBlock, withBlocks,
+    splitBlock, styledRuns, toHeading, toText, withBlock, withBlocks,
 } from '../helpers/book';
 import { fill } from '../helpers/format';
 import { useConversionOpen } from '../helpers/presence';
@@ -660,12 +660,23 @@ function Block({ t, block, picking, picked, selected, canJoin, onClick, onInclud
                         <span className="fw-semibold">{ headingText(block) || t.editor.untitled }</span>
                     </div>
                 ) : (
-                    <p className={ `bf-block-text clamp ${block.verse ? 'verse' : ''}` }>{ text }</p>
+                    <p className={ `bf-block-text clamp ${block.verse ? 'verse' : ''}` }><Styled text={ text } /></p>
                 ) }
             </div>
             { block.page > 0 && <span className="bf-block-page">{ t.editor.page } { block.page }</span> }
         </article>
     );
+}
+
+// Text with its <i> and <b> tags shown as italics and bold.
+function Styled({ text }) {
+    return styledRuns(text).map((run, index) => {
+        let node = run.text;
+        if (run.italic) node = <em>{ node }</em>;
+        if (run.bold) node = <strong>{ node }</strong>;
+        // The runs never move, so their place is their key.
+        return <span key={ index }>{ node }</span>;
+    });
 }
 
 // The PDF page the selected paragraph is printed on, or the same place in the EPUB.

@@ -1,4 +1,4 @@
-import { headingText, joinBlocks, levelAt, pageRange, roleCounts, sectionOf, sectionsOf, splitBlock, toHeading, toText, withBlock, withBlocks } from './book';
+import { headingText, joinBlocks, levelAt, pageRange, roleCounts, sectionOf, sectionsOf, splitBlock, styledRuns, toHeading, toText, withBlock, withBlocks } from './book';
 
 const heading = (label, title = null) => ({ type: 'heading', label, title, role: 'body', include: true, page: 1 });
 const text = (fields = {}) => ({ type: 'text', text: 'x', role: 'body', include: true, page: 1, ...fields });
@@ -82,4 +82,25 @@ test('blocks can be replaced in one go, and found by section', () => {
     const changed = withBlocks(book, 1, 3, [text({ id: 'ab' })]);
     expect(changed.blocks.map((block) => block.id)).toEqual([undefined, 'ab']);
     expect(sectionOf([{ start: 0, end: 2 }, { start: 2, end: 5 }], 3)).toBe(1);
+});
+
+test('italics and bold are runs of their own', () => {
+    expect(styledRuns('a <i>very <b>good</b></i> day')).toEqual([
+        { text: 'a ', italic: false, bold: false },
+        { text: 'very ', italic: true, bold: false },
+        { text: 'good', italic: true, bold: true },
+        { text: ' day', italic: false, bold: false },
+    ]);
+});
+
+test('a tag left open runs to the end, and a stray closing one is ignored', () => {
+    expect(styledRuns('plain</b> <i>open')).toEqual([
+        { text: 'plain', italic: false, bold: false },
+        { text: ' ', italic: false, bold: false },
+        { text: 'open', italic: true, bold: false },
+    ]);
+});
+
+test('other markup stays text', () => {
+    expect(styledRuns('<script>x</script>')).toEqual([{ text: '<script>x</script>', italic: false, bold: false }]);
 });
