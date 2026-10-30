@@ -95,6 +95,16 @@ class ConversionTests(TestCase):
         response = self.client.get("/api/convert/00000000-0000-0000-0000-000000000000")
         self.assertEqual(response.status_code, 404)
 
+    def test_a_books_pictures_are_left_out(self):
+        doc = pymupdf.open(stream=make_pdf(), filetype="pdf")
+        image = pymupdf.Pixmap(pymupdf.csRGB, pymupdf.IRect(0, 0, 200, 100), False)
+        doc[1].insert_image(pymupdf.Rect(150, 500, 450, 650), pixmap=image, keep_proportion=False)
+        pk = self.client.post("/api/convert/", {"pdf": upload(data=doc.tobytes())}).json()["id"]
+
+        blocks = Conversion.objects.get(pk=pk).book["blocks"]
+        self.assertTrue(blocks)
+        self.assertNotIn("picture", {block["type"] for block in blocks})
+
     def test_upload_needs_a_file(self):
         response = self.client.post("/api/convert/", {})
         self.assertEqual(response.status_code, 400)
