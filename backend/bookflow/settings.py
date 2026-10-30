@@ -158,6 +158,10 @@ SOURCE_COMMIT = running_commit()
 MAX_PDF_SIZE_MB = int(os.getenv("MAX_PDF_SIZE_MB", "100"))
 MAX_PDF_PAGES = int(os.getenv("MAX_PDF_PAGES", "2000"))
 
+# A long book's text, as the editor saves it, is over Django's 2.5 MB default; nginx
+# lets the editor's requests through up to 20 MB, so Django does too.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
+
 # Visitors' PDFs and images are opened in a process of their own (converter/isolated.py),
 # which may take this much memory, in megabytes, and this many seconds; more, and it's
 # stopped and the visitor told the file is too much.

@@ -209,6 +209,13 @@ class EditorTests(TestCase):
         self.assertEqual(self.get_book()["blocks"][1]["data"], "/9ggcGljdHVyZQ==")
         self.assertEqual(problems, ["block 'p2': a picture must be a JPEG image with its width and height"])
 
+    def test_a_long_book_is_saved(self):
+        book = self.get_book()
+        # Over Django's 2.5 MB default, as a Georgian book of a few hundred pages is.
+        book["blocks"][1]["text"] = "ტექსტი " * 200_000
+
+        self.assertEqual(self.put_book(book).status_code, 200)
+
     def test_a_book_that_cant_be_written_says_why(self):
         book = self.get_book()
         for block in book["blocks"]:
